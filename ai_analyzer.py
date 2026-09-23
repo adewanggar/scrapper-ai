@@ -9,8 +9,11 @@ API_DIRECT_URL = "http://api-direct.apicloud.my.id:8088/v1/chat/completions"
 API_FALLBACK_URL = "https://clario.apicloud.my.id/v1/chat/completions"
 API_KEY = "sk-clario-55d0256b6122b118913907be97c57f834a6f9ae814133bca"
 
+GOOGLE_GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyC-5euhOw4bOzix7FaMB91jP_y12iPX9XA")
+
 # Model cascade: try user-requested model first, then nearby active variants
 MODELS_TO_TRY = [
+    "gemini-3.8-flash",
     "clario/deepseek-v4-flash",
     "clario/deepseek-v4.1-flash",
     "clario/gemini-3.7-flash"
@@ -40,6 +43,54 @@ def save_cached_analysis(filename: str, analysis_data: dict):
         logger.info(f"Saved AI analysis cache to {cache_path}")
     except Exception as e:
         logger.error(f"Failed to save cache {cache_path}: {e}")
+
+def call_google_gemini(prompt: str, model: str = "gemini-3.8-flash") -> tuple[str, str]:
+    """Call Google AI Studio directly using official Generative Language API."""
+    import time
+    clean_model = model.replace("models/", "")
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/{clean_model}:generateContent?key={GOOGLE_GEMINI_KEY}"
+
+    payload = {
+        "systemInstruction": {
+            "parts": [{
+                "text": (
+                    "Anda adalah asisten peneliti ahli komunikasi digital, video marketing, dan analisis media sosial. "
+                    "Tugas Anda menganalisis dataset komentar penonton pada video marketing berbasis emosi atau kontroversi "
+                    "(emotion-driven / controversy-driven marketing) untuk penulisan skripsi akademik. "
+                    "WAJIB memberikan output dalam format JSON murni yang valid tanpa teks pembuka/penutup."
+                )
+            }]
+        },
+        "contents": [
+            {
+                "role": "user",
+                "parts": [{"text": prompt}]
+            }
+        ],
+        "generationConfig": {
+            "temperature": 0.2
+        }
+    }
+
+    data_bytes = json.dumps(payload).encode('utf-8')
+    headers = {"Content-Type": "application/json"}
+
+    last_error = None
+    for attempt in range(3):
+        try:
+            logger.info(f"Mencoba Google AI Studio API: {clean_model} (attempt {attempt + 1})...")
+            req = urllib.request.Request(url, data=data_bytes, headers=headers)
+            with urllib.request.urlopen(req, timeout=90) as resp:
+                resp_json = json.loads(resp.read().decode('utf-8'))
+                content = resp_json['candidates'][0]['content']['parts'][0]['text'].strip()
+                logger.info(f"Berhasil mendapatkan respon dari Google AI Studio {clean_model}")
+                return content, f"Google {clean_model}"
+        except Exception as e:
+            logger.warning(f"Google AI Studio attempt {attempt + 1} gagal ({clean_model}): {e}")
+            last_error = e
+            time.sleep(2)
+
+    raise RuntimeError(f"Gagal menghubungi Google AI Studio ({clean_model}): {last_error}")
 
 def call_clario_llm(prompt: str, preferred_model: str = "clario/deepseek-v4-flash") -> tuple[str, str]:
     headers = {
@@ -98,7 +149,18 @@ def call_clario_llm(prompt: str, preferred_model: str = "clario/deepseek-v4-flas
 
     raise RuntimeError(f"Gagal menghubungi API Clario setelah mencoba semua model: {last_error}")
 
-def analyze_video_comments(filename: str, sample_size: int = 50, preferred_model: str = "clario/deepseek-v4-flash") -> dict:
+def call_llm(prompt: str, preferred_model: str = "gemini-3.8-flash") -> tuple[str, str]:
+    """Unified LLM router: routes to Google AI Studio for gemini-3.8-flash, or Clario for others with fallback."""
+    if "3.8" in preferred_model or preferred_model == "gemini-3.8-flash" or "google" in preferred_model.lower():
+        try:
+            return call_google_gemini(prompt, model="gemini-3.8-flash")
+        except Exception as e:
+            logger.warning(f"Google Gemini 3.8 error: {e}. Fallback ke Clario Gemini 3.7...")
+            return call_clario_llm(prompt, preferred_model="clario/gemini-3.7-flash")
+    else:
+        return call_clario_llm(prompt, preferred_model=preferred_model)
+
+def analyze_video_comments(filename: str, sample_size: int = 50, preferred_model: str = "gemini-3.8-flash") -> dict:
     safe_filename = os.path.basename(filename)
     file_path = os.path.join(DATA_DIR, safe_filename)
 
@@ -226,7 +288,7 @@ Analisis data di atas secara mendalam dan kembalikan HANYA format JSON valid ber
 """
 
     logger.info(f"Mengirim analisis AI untuk {safe_filename} ({len(comments_text_list)} komentar, model preferensi: {preferred_model})...")
-    llm_output, model_used = call_clario_llm(prompt, preferred_model=preferred_model)
+    llm_output, model_used = call_llm(prompt, preferred_model=preferred_model)
 
     # Clean code fences if present
     cleaned_json_str = re.sub(r"^```(?:json)?\s*", "", llm_output, flags=re.MULTILINE)

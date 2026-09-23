@@ -90,7 +90,7 @@ export default function App() {
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSampleSize, setAiSampleSize] = useState(50);
-  const [aiModel, setAiModel] = useState('clario/deepseek-v4-flash'); // 'clario/deepseek-v4-flash' | 'clario/gemini-3.7-flash'
+  const [aiModel, setAiModel] = useState('gemini-3.8-flash'); // 'gemini-3.8-flash' | 'clario/deepseek-v4-flash' | 'clario/gemini-3.7-flash'
   const [aiError, setAiError] = useState('');
   const [copiedThesisText, setCopiedThesisText] = useState(false);
 
@@ -1575,6 +1575,13 @@ export default function App() {
                       Model AI:
                     </span>
                     <button
+                      className={`sample-size-btn ${aiModel === 'gemini-3.8-flash' ? 'active' : ''}`}
+                      onClick={() => setAiModel('gemini-3.8-flash')}
+                      title="Gunakan Google Gemini 3.8 Flash (Official Google AI Studio API)"
+                    >
+                      ✨ Gemini 3.8 Flash
+                    </button>
+                    <button
                       className={`sample-size-btn ${aiModel === 'clario/deepseek-v4-flash' ? 'active' : ''}`}
                       onClick={() => setAiModel('clario/deepseek-v4-flash')}
                       title="Gunakan Clario DeepSeek V4 Flash"
@@ -2181,11 +2188,11 @@ export default function App() {
                 </div>
 
                 <div className="settings-group">
-                  <div className="settings-group-title">Konfigurasi AI Provider (Clario)</div>
+                  <div className="settings-group-title">Konfigurasi AI Provider (Google AI Studio & Clario)</div>
                   <div className="settings-group-desc">
-                    • <strong>Primary Base URL:</strong> <code>http://api-direct.apicloud.my.id:8088/v1</code><br />
+                    • <strong>Primary AI:</strong> Google AI Studio (<code>gemini-3.8-flash</code>)<br />
+                    • <strong>Fallback / Alternative:</strong> Clario LLM (<code>clario/deepseek-v4-flash</code>, <code>clario/gemini-3.7-flash</code>)<br />
                     • <strong>Fallback Base URL:</strong> <code>https://clario.apicloud.my.id/v1</code><br />
-                    • <strong>Model Aktif:</strong> <code>clario/deepseek-v4-flash</code><br />
                     • <strong>Status Kuota / Koneksi:</strong> Terhubung (HTTP 200 OK)
                   </div>
                 </div>

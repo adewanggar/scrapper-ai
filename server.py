@@ -109,7 +109,7 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
 
         filename = body.get('filename')
         sample_size = int(body.get('sample_size', 50))
-        preferred_model = body.get('model', 'clario/deepseek-v4-flash')
+        preferred_model = body.get('model', 'gemini-3.8-flash')
 
         if not filename:
             self._send_json(400, {"error": "Nama file wajib dicantumkan."})
