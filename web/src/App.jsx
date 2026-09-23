@@ -302,7 +302,7 @@ export default function App() {
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSampleSize, setAiSampleSize] = useState(50);
-  const [aiModel, setAiModel] = useState('gemini-3.8-flash'); // 'gemini-3.8-flash' | 'clario/deepseek-v4-flash' | 'clario/gemini-3.7-flash'
+  const [aiModel, setAiModel] = useState('clario/gemini-3.7-flash');
   const [aiError, setAiError] = useState('');
   const [copiedThesisText, setCopiedThesisText] = useState(false);
 
@@ -463,7 +463,7 @@ export default function App() {
     let md = `# Laporan Analisis AI Skripsi: ${fwMeta.title}\n\n`;
     md += `**Fokus Bidang:** ${fwMeta.badge}\n`;
     md += `**File:** \`${aiAnalysis.filename}\`\n`;
-    md += `**Model AI:** \`${aiAnalysis.model_used}\` | **Sampel:** ${aiAnalysis.sample_analyzed} dari ${aiAnalysis.total_comments} komentar\n`;
+    md += `**Sampel Dianalisis:** ${aiAnalysis.sample_analyzed} dari ${aiAnalysis.total_comments} komentar\n`;
     md += `**Landasan Teori:** ${fwMeta.theory}\n\n`;
     md += `---\n\n`;
 
@@ -1951,7 +1951,7 @@ export default function App() {
                       </h2>
                     </div>
                     <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-                      Model: <strong>{aiAnalysis?.model_used || aiModel}</strong> • Fokus: <strong>{currentFw.badge}</strong>
+                      Fokus Kajian: <strong>{currentFw.badge}</strong>
                       {aiAnalysis && (
                         <span> • <strong>{aiAnalysis.sample_analyzed}</strong> dari <strong>{aiAnalysis.total_comments}</strong> komentar dianalisis</span>
                       )}
@@ -1959,33 +1959,6 @@ export default function App() {
                   </div>
 
                   <div className="ai-config-controls">
-                    {/* Model Selector */}
-                    <div className="sample-size-pill-group">
-                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', paddingLeft: '8px' }}>
-                        Model AI:
-                      </span>
-                      <button
-                        className={`sample-size-btn ${aiModel === 'gemini-3.8-flash' ? 'active' : ''}`}
-                        onClick={() => setAiModel('gemini-3.8-flash')}
-                        title="Gunakan Google Gemini 3.8 Flash (Official Google AI Studio API)"
-                      >
-                        ✨ Gemini 3.8 Flash
-                      </button>
-                      <button
-                        className={`sample-size-btn ${aiModel === 'clario/deepseek-v4-flash' ? 'active' : ''}`}
-                        onClick={() => setAiModel('clario/deepseek-v4-flash')}
-                        title="Gunakan Clario DeepSeek V4 Flash"
-                      >
-                        ⚡ DeepSeek V4
-                      </button>
-                      <button
-                        className={`sample-size-btn ${aiModel === 'clario/gemini-3.7-flash' ? 'active' : ''}`}
-                        onClick={() => setAiModel('clario/gemini-3.7-flash')}
-                        title="Gunakan Clario Gemini 3.7 Flash"
-                      >
-                        🚀 Gemini 3.7 Flash
-                      </button>
-                    </div>
 
                     {/* Sample Size Selector */}
                     <div className="sample-size-pill-group">

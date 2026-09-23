@@ -5,8 +5,8 @@ import urllib.request
 import urllib.error
 from loguru import logger
 
-API_DIRECT_URL = "http://api-direct.apicloud.my.id:8088/v1/chat/completions"
-API_FALLBACK_URL = "https://clario.apicloud.my.id/v1/chat/completions"
+API_DIRECT_URL = "https://clario.apicloud.my.id/v1/chat/completions"
+API_FALLBACK_URL = "http://api-direct.apicloud.my.id:8088/v1/chat/completions"
 API_KEY = "sk-clario-55d0256b6122b118913907be97c57f834a6f9ae814133bca"
 
 GOOGLE_GEMINI_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyC-5euhOw4bOzix7FaMB91jP_y12iPX9XA")
@@ -134,24 +134,17 @@ def call_google_gemini(prompt: str, model: str = "gemini-3.8-flash", system_inst
 
     raise RuntimeError(f"Gagal menghubungi Google AI Studio ({clean_model}): {last_error}")
 
-def call_clario_llm(prompt: str, preferred_model: str = "clario/deepseek-v4-flash", system_instruction: str = None) -> tuple[str, str]:
+def call_clario_llm(prompt: str, preferred_model: str = "clario/gemini-3.7-flash", system_instruction: str = None) -> tuple[str, str]:
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {API_KEY}"
     }
 
-    if "gemini" in preferred_model.lower():
-        models_to_try = [
-            "clario/gemini-3.7-flash",
-            "clario/deepseek-v4-flash",
-            "clario/deepseek-v4.1-flash"
-        ]
-    else:
-        models_to_try = [
-            "clario/deepseek-v4-flash",
-            "clario/gemini-3.7-flash",
-            "clario/deepseek-v4.1-flash"
-        ]
+    models_to_try = [
+        "clario/gemini-3.7-flash",
+        "clario/deepseek-v4-flash",
+        "clario/deepseek-v4.1-flash"
+    ]
 
     sys_text = system_instruction or (
         "Anda adalah asisten peneliti ahli komunikasi digital, video marketing, dan analisis media sosial. "
@@ -191,16 +184,9 @@ def call_clario_llm(prompt: str, preferred_model: str = "clario/deepseek-v4-flas
 
     raise RuntimeError(f"Gagal menghubungi API Clario setelah mencoba semua model: {last_error}")
 
-def call_llm(prompt: str, preferred_model: str = "gemini-3.8-flash", system_instruction: str = None) -> tuple[str, str]:
-    """Unified LLM router: routes to Google AI Studio for gemini-3.8-flash, or Clario for others with fallback."""
-    if "3.8" in preferred_model or preferred_model == "gemini-3.8-flash" or "google" in preferred_model.lower():
-        try:
-            return call_google_gemini(prompt, model="gemini-3.8-flash", system_instruction=system_instruction)
-        except Exception as e:
-            logger.warning(f"Google Gemini 3.8 error: {e}. Fallback ke Clario Gemini 3.7...")
-            return call_clario_llm(prompt, preferred_model="clario/gemini-3.7-flash", system_instruction=system_instruction)
-    else:
-        return call_clario_llm(prompt, preferred_model=preferred_model, system_instruction=system_instruction)
+def call_llm(prompt: str, preferred_model: str = "clario/gemini-3.7-flash", system_instruction: str = None) -> tuple[str, str]:
+    """Menggunakan Clario Gemini 3.7 Flash untuk pemrosesan AI."""
+    return call_clario_llm(prompt, preferred_model="clario/gemini-3.7-flash", system_instruction=system_instruction)
 
 def build_prompt_and_system(analysis_type: str, caption: str, formatted_comments: str, count: int) -> tuple[str, str]:
     """Menghasilkan prompt dan system instruction sesuai sudut pandang penelitian skripsi."""
@@ -645,7 +631,7 @@ Kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100
 def analyze_video_comments(
     filename: str,
     sample_size: int = 50,
-    preferred_model: str = "gemini-3.8-flash",
+    preferred_model: str = "clario/gemini-3.7-flash",
     analysis_type: str = "emotion_marketing"
 ) -> dict:
     safe_filename = os.path.basename(filename)

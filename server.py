@@ -202,7 +202,7 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
 
         filename = body.get('filename')
         sample_size = int(body.get('sample_size', 50))
-        preferred_model = body.get('model', 'gemini-3.8-flash')
+        preferred_model = body.get('model', 'clario/gemini-3.7-flash')
         analysis_type = body.get('analysis_type', 'emotion_marketing')
 
         if not filename:
