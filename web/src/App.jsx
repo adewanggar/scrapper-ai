@@ -33,7 +33,10 @@ import {
   Sparkles,
   Lightbulb,
   FileSpreadsheet,
-  Target
+  Target,
+  Lock,
+  Unlock,
+  ShieldCheck
 } from 'lucide-react';
 
 const STOPWORDS = new Set([
@@ -46,6 +49,161 @@ const STOPWORDS = new Set([
 ]);
 
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
+const CORRECT_PIN = '112233';
+
+function PinLockScreen({ onUnlock }) {
+  const [pin, setPin] = useState('');
+  const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const submitPin = (candidatePin) => {
+    if (candidatePin === CORRECT_PIN) {
+      setIsSuccess(true);
+      setIsError(false);
+      setErrorMessage('');
+      setTimeout(() => {
+        onUnlock(CORRECT_PIN);
+      }, 400);
+    } else {
+      setIsError(true);
+      setErrorMessage('PIN salah! Silakan coba lagi.');
+      setTimeout(() => {
+        setPin('');
+        setIsError(false);
+      }, 750);
+    }
+  };
+
+  const handleDigit = (digit) => {
+    if (isSuccess || isError || pin.length >= 6) return;
+    const next = pin + digit;
+    setPin(next);
+    if (next.length === 6) {
+      submitPin(next);
+    }
+  };
+
+  const handleDelete = () => {
+    if (isSuccess || isError) return;
+    setPin((prev) => prev.slice(0, -1));
+    setErrorMessage('');
+  };
+
+  const handleClear = () => {
+    if (isSuccess || isError) return;
+    setPin('');
+    setErrorMessage('');
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key >= '0' && e.key <= '9') {
+        handleDigit(e.key);
+      } else if (e.key === 'Backspace') {
+        handleDelete();
+      } else if (e.key === 'Escape') {
+        handleClear();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [pin, isSuccess, isError]);
+
+  return (
+    <div className="pin-screen-wrapper">
+      <div className={`pin-card ${isError ? 'shake' : ''}`}>
+        <div className={`pin-icon-shield ${isSuccess ? 'success' : ''}`}>
+          {isSuccess ? <ShieldCheck size={32} /> : <Lock size={30} />}
+        </div>
+
+        <h2 className="pin-title">
+          {isSuccess ? 'Akses Diterima' : 'Masukkan PIN Akses'}
+        </h2>
+        <p className="pin-subtitle">
+          {isSuccess
+            ? 'Membuka dashboard Scraper Hub...'
+            : 'Sistem dilindungi keamanan. Masukkan PIN 6-digit untuk membuka aplikasi.'}
+        </p>
+
+        {/* 6 Dots Indicator */}
+        <div className="pin-dots-container">
+          {[0, 1, 2, 3, 4, 5].map((index) => {
+            const isFilled = pin.length > index;
+            let dotClass = 'pin-dot';
+            if (isSuccess) dotClass += ' success';
+            else if (isError) dotClass += ' error';
+            else if (isFilled) dotClass += ' filled';
+
+            return <div key={index} className={dotClass} />;
+          })}
+        </div>
+
+        {/* Feedback message */}
+        <div className={`pin-feedback ${isError ? 'error' : isSuccess ? 'success' : 'idle'}`}>
+          {errorMessage ? (
+            <>
+              <AlertCircle size={15} />
+              <span>{errorMessage}</span>
+            </>
+          ) : isSuccess ? (
+            <>
+              <CheckCircle2 size={15} />
+              <span>PIN Benar! Membuka dashboard...</span>
+            </>
+          ) : (
+            <span>Ketik PIN langsung atau gunakan keypad</span>
+          )}
+        </div>
+
+        {/* Numeric Keypad */}
+        <div className="pin-keypad">
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+            <button
+              key={num}
+              type="button"
+              className="pin-key-btn"
+              onClick={() => handleDigit(String(num))}
+              disabled={isSuccess || isError}
+            >
+              {num}
+            </button>
+          ))}
+          <button
+            type="button"
+            className="pin-key-btn action"
+            onClick={handleClear}
+            disabled={isSuccess || isError}
+            title="Reset"
+          >
+            Hapus
+          </button>
+          <button
+            type="button"
+            className="pin-key-btn"
+            onClick={() => handleDigit('0')}
+            disabled={isSuccess || isError}
+          >
+            0
+          </button>
+          <button
+            type="button"
+            className="pin-key-btn action"
+            onClick={handleDelete}
+            disabled={isSuccess || isError}
+            title="Backspace"
+          >
+            ⌫
+          </button>
+        </div>
+
+        <div className="pin-helper-note">
+          🔒 Sesi akan tersimpan aman di browser Anda
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function App() {
   // Navigation State
@@ -105,14 +263,41 @@ export default function App() {
 
   const fileInputRef = useRef(null);
 
-  // Initial files fetch
+  // Security & Authentication State
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    try {
+      return localStorage.getItem('scrapper_auth_pin') === CORRECT_PIN;
+    } catch {
+      return false;
+    }
+  });
+
+  const handleUnlock = (validPin) => {
+    try {
+      localStorage.setItem('scrapper_auth_pin', validPin);
+    } catch {}
+    setIsAuthenticated(true);
+  };
+
+  const handleLock = () => {
+    try {
+      localStorage.removeItem('scrapper_auth_pin');
+    } catch {}
+    setIsAuthenticated(false);
+  };
+
+  // Initial files fetch (only when authenticated)
   useEffect(() => {
-    fetchFilesList();
-  }, []);
+    if (isAuthenticated) {
+      fetchFilesList();
+    }
+  }, [isAuthenticated]);
 
   const fetchFilesList = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/files`);
+      const res = await fetch(`${API_BASE}/api/files`, {
+        headers: { 'X-Access-Pin': CORRECT_PIN }
+      });
       if (res.ok) {
         const json = await res.json();
         setServerOnline(true);
@@ -123,6 +308,9 @@ export default function App() {
           }
         }
       } else {
+        if (res.status === 401) {
+          handleLock();
+        }
         setServerOnline(false);
       }
     } catch {
@@ -134,7 +322,9 @@ export default function App() {
     if (!filename) return;
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/files/${encodeURIComponent(filename)}`);
+      const res = await fetch(`${API_BASE}/api/files/${encodeURIComponent(filename)}`, {
+        headers: { 'X-Access-Pin': CORRECT_PIN }
+      });
       if (res.ok) {
         const json = await res.json();
         setData(json);
@@ -155,7 +345,9 @@ export default function App() {
   const loadAiAnalysis = async (filename) => {
     if (!filename) return;
     try {
-      const res = await fetch(`${API_BASE}/api/ai/analysis/${encodeURIComponent(filename)}`);
+      const res = await fetch(`${API_BASE}/api/ai/analysis/${encodeURIComponent(filename)}`, {
+        headers: { 'X-Access-Pin': CORRECT_PIN }
+      });
       if (res.ok) {
         const json = await res.json();
         if (json.found) {
@@ -177,7 +369,10 @@ export default function App() {
     try {
       const res = await fetch(`${API_BASE}/api/ai/analyze`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Access-Pin': CORRECT_PIN
+        },
         body: JSON.stringify({
           filename: selectedFile,
           sample_size: aiSampleSize,
@@ -298,7 +493,10 @@ export default function App() {
 
       const res = await fetch(`${API_BASE}/api/scrape`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Access-Pin': CORRECT_PIN
+        },
         body: JSON.stringify(payload)
       });
 
@@ -609,6 +807,10 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  if (!isAuthenticated) {
+    return <PinLockScreen onUnlock={handleUnlock} />;
+  }
+
   return (
     <div className="app-shell">
       {/* Sidebar Navigation */}
@@ -728,6 +930,14 @@ export default function App() {
             >
               <Upload size={14} />
               Upload JSON
+            </button>
+            <button
+              className="btn-lock-nav"
+              onClick={handleLock}
+              title="Kunci Dashboard (Perlu PIN 112233 untuk masuk)"
+            >
+              <Lock size={14} />
+              <span>Kunci</span>
             </button>
             <input
               type="file"
@@ -2216,6 +2426,25 @@ export default function App() {
                       {/* <li><strong>Instagram:</strong> Modul Scraper Aktif (Didukung dengan autentikasi Cookie)</li> */}
                       {/* <li><strong>YouTube:</strong> Siap untuk integrasi YouTube Data API / Scraper</li> */}
                     </ul>
+                  </div>
+                </div>
+
+                <div className="settings-group">
+                  <div className="settings-group-title">Keamanan Akses Dashboard (PIN Protection)</div>
+                  <div className="settings-group-desc">
+                    Aplikasi ini dilindungi oleh PIN keamanan 6-digit. Sesi browser Anda saat ini aktif dan terautentikasi.
+                    <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+                      <span className="badge-status badge-status-online" style={{ padding: '4px 10px', fontSize: '12px' }}>
+                        <Lock size={12} style={{ marginRight: '4px' }} /> PIN Akses: 112233
+                      </span>
+                      <button
+                        className="btn btn-white-bordered"
+                        onClick={handleLock}
+                        style={{ color: '#DC2626', borderColor: '#FCA5A5', background: '#FEF2F2', padding: '5px 12px', fontSize: '12.5px' }}
+                      >
+                        <Lock size={13} style={{ marginRight: '4px' }} /> Kunci Dashboard Sekarang
+                      </button>
+                    </div>
                   </div>
                 </div>
 

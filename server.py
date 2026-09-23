@@ -13,11 +13,25 @@ from tiktokcomment.typing import Comments
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 os.makedirs(DATA_DIR, exist_ok=True)
 
+APP_PIN = os.environ.get('APP_PIN', '112233')
+
 class TikTokApiHandler(BaseHTTPRequestHandler):
     def _send_cors_headers(self):
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Access-Pin')
+
+    def _is_authorized(self):
+        if not APP_PIN:
+            return True
+        pin_header = self.headers.get('X-Access-Pin', '').strip()
+        if pin_header == APP_PIN:
+            return True
+        parsed = urllib.parse.urlparse(self.path)
+        params = urllib.parse.parse_qs(parsed.query)
+        if params.get('pin') and params.get('pin')[0].strip() == APP_PIN:
+            return True
+        return False
 
     def do_OPTIONS(self):
         self.send_response(204)
@@ -36,6 +50,11 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
+
+        if path.startswith('/api/') and path != '/api/status':
+            if not self._is_authorized():
+                self._send_json(401, {"error": "Unauthorized: PIN Akses diperlukan atau tidak valid."})
+                return
 
         if path == '/api/files':
             self.handle_list_files()
@@ -82,6 +101,11 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
+
+        if path.startswith('/api/'):
+            if not self._is_authorized():
+                self._send_json(401, {"error": "Unauthorized: PIN Akses diperlukan atau tidak valid."})
+                return
 
         if path == '/api/scrape':
             self.handle_scrape()
