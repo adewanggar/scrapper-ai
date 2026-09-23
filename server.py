@@ -181,15 +181,51 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
             self._send_json(400, {"error": "Invalid JSON body"})
             return
 
-        raw_id = str(body.get('aweme_id', '')).strip()
-        # Extract digits from full TikTok URL or raw ID
-        match = re.search(r"(\d{15,22})", raw_id)
+        platform = body.get('platform', 'tiktok').lower()
+        raw_input = str(body.get('url') or body.get('aweme_id', '')).strip()
+
+        if platform == 'instagram':
+            from instagramcomment import InstagramComment, extract_instagram_shortcode
+            post_id = extract_instagram_shortcode(raw_input)
+            if not post_id:
+                self._send_json(400, {"error": "Format link atau shortcode Instagram tidak valid. Contoh: https://www.instagram.com/reel/C1ACfnvh4KE/ atau Cm2cJmABD1p"})
+                return
+
+            cookie = body.get('cookie') or os.environ.get('INSTAGRAM_COOKIE', '')
+            if not cookie or not cookie.strip():
+                self._send_json(400, {"error": "Cookie Instagram diperlukan untuk mengambil komentar. Silakan masukkan Cookie akun Instagram Anda."})
+                return
+
+            try:
+                ig_scraper = InstagramComment(cookie=cookie)
+                data = ig_scraper.execute(post_id=post_id, max_comments=300)
+                final_filename = f"ig_{post_id}.json"
+                final_path = os.path.join(DATA_DIR, final_filename)
+
+                with open(final_path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=4)
+
+                logger.info(f"Instagram scraped and saved successfully: {final_path}")
+                self._send_json(200, {
+                    "success": True,
+                    "platform": "instagram",
+                    "id": post_id,
+                    "filename": final_filename,
+                    "data": data
+                })
+            except Exception as e:
+                logger.error(f"Error scraping Instagram {post_id}: {e}")
+                self._send_json(500, {"error": f"Gagal scrape Instagram: {str(e)}"})
+            return
+
+        # Default: TikTok Scraper
+        match = re.search(r"(\d{15,22})", raw_input)
         if not match:
             self._send_json(400, {"error": "Format ID atau link video TikTok tidak valid (harus mengandung 15-22 digit angka)"})
             return
 
         aweme_id = match.group(1)
-        logger.info(f"API Scrape request received for aweme_id: {aweme_id}")
+        logger.info(f"API Scrape request received for TikTok aweme_id: {aweme_id}")
 
         try:
             scraper = TiktokComment()
@@ -199,16 +235,17 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
             with open(final_path, 'w', encoding='utf-8') as f:
                 json.dump(comments.dict, f, ensure_ascii=False, indent=4)
 
-            logger.info(f"Scraped and saved successfully: {final_path}")
+            logger.info(f"TikTok scraped and saved successfully: {final_path}")
             self._send_json(200, {
                 "success": True,
+                "platform": "tiktok",
                 "aweme_id": aweme_id,
                 "filename": f"{aweme_id}.json",
                 "data": comments.dict
             })
         except Exception as e:
-            logger.error(f"Error scraping {aweme_id}: {e}")
-            self._send_json(500, {"error": f"Gagal scrape video: {str(e)}"})
+            logger.error(f"Error scraping TikTok {aweme_id}: {e}")
+            self._send_json(500, {"error": f"Gagal scrape video TikTok: {str(e)}"})
 
 def run_server(port=5000):
     server_address = ('', port)

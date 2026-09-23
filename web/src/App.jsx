@@ -54,6 +54,13 @@ export default function App() {
 
   // Platform Selector State (Prepared for multi-platform)
   const [selectedPlatform, setSelectedPlatform] = useState('tiktok');
+  const [igCookie, setIgCookie] = useState(() => {
+    try {
+      return localStorage.getItem('ig_cookie') || '';
+    } catch {
+      return '';
+    }
+  });
 
   // Backend & File State
   const [files, setFiles] = useState([]);
@@ -270,15 +277,29 @@ export default function App() {
     e.preventDefault();
     if (!scrapeInput.trim()) return;
 
+    if (selectedPlatform === 'instagram' && !igCookie.trim()) {
+      setScrapeError('Cookie Instagram wajib diisi untuk mengambil komentar Instagram.');
+      return;
+    }
+
     setIsScraping(true);
     setScrapeError('');
     setScrapeSuccess(null);
 
     try {
+      const payload = {
+        platform: selectedPlatform,
+        url: scrapeInput.trim(),
+        aweme_id: scrapeInput.trim()
+      };
+      if (selectedPlatform === 'instagram') {
+        payload.cookie = igCookie.trim();
+      }
+
       const res = await fetch(`${API_BASE}/api/scrape`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ aweme_id: scrapeInput.trim() })
+        body: JSON.stringify(payload)
       });
 
       const result = await res.json();
@@ -291,7 +312,8 @@ export default function App() {
       setScrapeSuccess({
         filename: result.filename,
         commentsCount: result.data?.comments?.length || 0,
-        caption: result.data?.caption || ''
+        caption: result.data?.caption || '',
+        platform: result.platform || selectedPlatform
       });
       loadAiAnalysis(result.filename);
       fetchFilesList();
@@ -748,6 +770,16 @@ export default function App() {
 
                     <button
                       type="button"
+                      className={`platform-chip-btn ${selectedPlatform === 'instagram' ? 'active' : ''}`}
+                      onClick={() => setSelectedPlatform('instagram')}
+                      title="Scrape komentar postingan atau Reels Instagram"
+                    >
+                      <span style={{ color: '#EC4899' }}>📸</span>
+                      Instagram
+                    </button>
+
+                    <button
+                      type="button"
                       className="platform-chip-btn disabled"
                       title="Modul YouTube segera hadir"
                       disabled
@@ -756,30 +788,27 @@ export default function App() {
                       YouTube
                       <span className="platform-badge-soon">Segera</span>
                     </button>
-
-                    <button
-                      type="button"
-                      className="platform-chip-btn disabled"
-                      title="Modul Instagram segera hadir"
-                      disabled
-                    >
-                      <span style={{ color: '#EC4899' }}>📸</span>
-                      Instagram
-                      <span className="platform-badge-soon">Segera</span>
-                    </button>
                   </div>
                 </div>
 
                 {/* Form Input Link */}
                 <form onSubmit={handleScrapeSubmit}>
-                  <label className="platform-selector-label">2. Masukkan Link Video atau Video ID:</label>
+                  <label className="platform-selector-label">
+                    {selectedPlatform === 'instagram'
+                      ? '2. Masukkan Link Postingan / Reels Instagram:'
+                      : '2. Masukkan Link Video atau Video ID TikTok:'}
+                  </label>
                   <div className="scrape-input-row">
                     <div className="scrape-input-wrapper">
                       <Search size={18} className="scrape-icon-left" />
                       <input
                         type="text"
                         className="scrape-input-field"
-                        placeholder="Tempelkan link video TikTok atau ID video (contoh: 7687448180547456277)..."
+                        placeholder={
+                          selectedPlatform === 'instagram'
+                            ? 'Tempelkan link Reels atau Postingan Instagram (contoh: https://www.instagram.com/reel/C1ACfnvh4KE/)...'
+                            : 'Tempelkan link video TikTok atau ID video (contoh: 7687448180547456277)...'
+                        }
                         value={scrapeInput}
                         onChange={(e) => setScrapeInput(e.target.value)}
                         disabled={isScraping}
@@ -806,8 +835,41 @@ export default function App() {
                     </button>
                   </div>
 
+                  {/* Cookie Input specifically for Instagram */}
+                  {selectedPlatform === 'instagram' && (
+                    <div style={{ marginTop: '14px', background: '#FDF2F8', border: '1px solid #FBCFE8', borderRadius: '8px', padding: '14px 18px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
+                        <label style={{ fontSize: '13px', fontWeight: 600, color: '#9D174D' }}>
+                          🔑 Cookie Akun Instagram (Wajib untuk Akses API Instagram):
+                        </label>
+                        <span style={{ fontSize: '11px', color: '#BE185D' }}>Tersimpan otomatis di browser Anda</span>
+                      </div>
+                      <input
+                        type="password"
+                        className="scrape-input-field"
+                        style={{ height: '40px', paddingLeft: '14px', fontSize: '12.5px', borderColor: '#F472B6', background: '#FFF' }}
+                        placeholder="Contoh: sessionid=12345678%3Aabc...; ds_user_id=12345678; (paste cookie string Anda di sini)"
+                        value={igCookie}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setIgCookie(val);
+                          try {
+                            localStorage.setItem('ig_cookie', val);
+                          } catch {}
+                        }}
+                      />
+                      <p style={{ fontSize: '11.5px', color: '#9D174D', marginTop: '6px', lineHeight: '1.5' }}>
+                        💡 <strong>Cara ambil cookie:</strong> Buka instagram.com di Google Chrome ➔ Tekan F12 (Inspect) ➔ Buka tab <strong>Application</strong> ➔ Di menu kiri klik <strong>Cookies</strong> (https://www.instagram.com) ➔ Salin nilai <code>sessionid</code>.
+                      </p>
+                    </div>
+                  )}
+
                   <div className="scrape-hint-text">
-                    Contoh format yang didukung: <code>https://www.tiktok.com/@user/video/7687448180547456277</code> atau angka ID langsung <code>7687448180547456277</code>.
+                    {selectedPlatform === 'instagram' ? (
+                      <span>Format Instagram: <code>https://www.instagram.com/reel/C1ACfnvh4KE/</code>, <code>https://www.instagram.com/p/Cm2cJmABD1p/</code>, atau shortcode <code>Cm2cJmABD1p</code>.</span>
+                    ) : (
+                      <span>Contoh format TikTok yang didukung: <code>https://www.tiktok.com/@user/video/7687448180547456277</code> atau angka ID <code>7687448180547456277</code>.</span>
+                    )}
                   </div>
                 </form>
 
@@ -2148,11 +2210,11 @@ export default function App() {
                 <div className="settings-group">
                   <div className="settings-group-title">Kesiapan Multi-Platform</div>
                   <div className="settings-group-desc">
-                    Arsitektur antarmuka telah dipersiapkan untuk integrasi platform media sosial tambahan:
+                    Arsitektur antarmuka telah mendukung integrasi platform media sosial:
                     <ul style={{ paddingLeft: '20px', marginTop: '6px' }}>
                       <li><strong>TikTok:</strong> Modul Scraper Aktif (versi 2.0)</li>
+                      <li><strong>Instagram:</strong> Modul Scraper Aktif (Didukung dengan autentikasi Cookie)</li>
                       <li><strong>YouTube:</strong> Siap untuk integrasi YouTube Data API / Scraper</li>
-                      <li><strong>Instagram:</strong> Siap untuk integrasi Instagram Graph API / Scraper</li>
                     </ul>
                   </div>
                 </div>

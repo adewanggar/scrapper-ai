@@ -1,0 +1,1 @@
+from .instagram_comment import InstagramComment, extract_instagram_shortcode
