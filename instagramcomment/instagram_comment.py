@@ -13,7 +13,13 @@ class InstagramComment:
                 "Silakan masukkan Cookie akun Instagram Anda di form atau tab Pengaturan."
             )
 
-        self.__cookie = cookie.strip()
+        # Normalize cookie string
+        cookie_clean = cookie.strip().strip('"').strip("'")
+        if "=" not in cookie_clean:
+            # If user only pasted raw sessionid token
+            cookie_clean = f"sessionid={cookie_clean}"
+
+        self.__cookie = cookie_clean
         self.__min_id = None
         self.__result = {
             "platform": "instagram",
@@ -29,7 +35,10 @@ class InstagramComment:
         self.__requests = Session()
         self.__requests.headers.update({
             "Cookie": self.__cookie,
-            "User-Agent": "Instagram 126.0.0.25.121 Android (23/6.0.1; 320dpi; 720x1280; samsung; SM-A310F; a3xelte; samsungexynos7580; en_GB; 110937453)"
+            "User-Agent": "Instagram 269.0.0.18.75 Android (26/8.0.0; 480dpi; 1080x1920; samsung; SM-G950F; dreamlte; samsungexynos8895; en_US; 443425470)",
+            "Accept": "*/*",
+            "Accept-Language": "id-ID,id;q=0.9,en-US;q=0.8,en;q=0.7",
+            "X-IG-App-ID": "936619743392459"
         })
 
     def __format_date(self, milisecond: int) -> str:
@@ -63,14 +72,19 @@ class InstagramComment:
         child_comments = []
         page_count = 0
 
-        while page_count < 5:  # Cap replies pagination to avoid rate limits
+        while page_count < 5:  # Cap replies pagination
             page_count += 1
             try:
-                url = f'https://www.instagram.com/api/v1/media/{media_id}/comments/{comment_id}/child_comments/'
+                url = f'https://i.instagram.com/api/v1/media/{media_id}/comments/{comment_id}/child_comments/'
                 params = {"min_id": min_id} if min_id else {}
                 resp = self.__requests.get(url, params=params, timeout=15)
                 if resp.status_code != 200:
                     break
+
+                text_str = resp.text.strip()
+                if not text_str.startswith('{') and not text_str.startswith('['):
+                    break
+
                 data = resp.json()
 
                 for comment in data.get('child_comments', []):
@@ -142,15 +156,35 @@ class InstagramComment:
 
         while pages < 20:  # Safety ceiling of 20 pages
             pages += 1
-            url = f'https://www.instagram.com/api/v1/media/{media_id}/comments/'
+            # Use official mobile API hostname (i.instagram.com) instead of web frontend (www.instagram.com)
+            url = f'https://i.instagram.com/api/v1/media/{media_id}/comments/'
             resp = self.__requests.get(url, params=self.__build_params(), timeout=20)
 
-            if resp.status_code == 401 or resp.status_code == 403:
+            if resp.status_code in (401, 403):
                 raise ValueError("Gagal mengambil komentar Instagram: Cookie login tidak valid atau sudah kedaluwarsa.")
             if resp.status_code != 200:
                 raise ValueError(f"Gagal mengambil komentar Instagram (Status code: {resp.status_code}).")
 
-            data = resp.json()
+            content_type = resp.headers.get('content-type', '')
+            text_str = resp.text.strip()
+
+            # Safety check: Detect if Instagram served HTML instead of JSON
+            if text_str.startswith('<!DOCTYPE html>') or text_str.startswith('<html') or 'text/html' in content_type:
+                logger.error(f"Instagram mengembalikan HTML alih-alih JSON: {text_str[:250]}")
+                raise ValueError(
+                    "Instagram mengembalikan halaman web/login HTML (bukan data komentar). "
+                    "Pastikan nilai Cookie 'sessionid' Anda masih aktif dan akun tidak terkena checkpoint verifikasi."
+                )
+
+            try:
+                data = resp.json()
+            except Exception as e:
+                logger.error(f"Gagal decode JSON dari Instagram: {e} | Text: {text_str[:200]}")
+                raise ValueError(f"Gagal membaca data komentar Instagram: {e}")
+
+            if data.get('status') == 'fail':
+                msg = data.get('message', 'Akses ditolak')
+                raise ValueError(f"Instagram menolak permintaan: {msg}. Pastikan Cookie akun Instagram masih aktif.")
 
             if not self.__result['caption']:
                 caption_obj = data.get("caption") or {}
