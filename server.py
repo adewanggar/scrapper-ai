@@ -121,6 +121,9 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
 
         if path == '/api/files':
             self.handle_list_files()
+        elif path == '/api/ai/frameworks':
+            from ai_analyzer import ANALYSIS_FRAMEWORKS
+            self._send_json(200, {"frameworks": list(ANALYSIS_FRAMEWORKS.values())})
         elif path.startswith('/api/ai/analysis/'):
             filename = urllib.parse.unquote(path[len('/api/ai/analysis/'):])
             self.handle_get_ai_analysis(filename)
@@ -179,7 +182,10 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
 
     def handle_get_ai_analysis(self, filename: str):
         from ai_analyzer import load_cached_analysis
-        cached = load_cached_analysis(filename)
+        parsed = urllib.parse.urlparse(self.path)
+        params = urllib.parse.parse_qs(parsed.query)
+        analysis_type = params.get('type', ['emotion_marketing'])[0]
+        cached = load_cached_analysis(filename, analysis_type=analysis_type)
         if cached:
             self._send_json(200, {"found": True, "analysis": cached})
         else:
@@ -197,6 +203,7 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
         filename = body.get('filename')
         sample_size = int(body.get('sample_size', 50))
         preferred_model = body.get('model', 'gemini-3.8-flash')
+        analysis_type = body.get('analysis_type', 'emotion_marketing')
 
         if not filename:
             self._send_json(400, {"error": "Nama file wajib dicantumkan."})
@@ -204,7 +211,12 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
 
         try:
             from ai_analyzer import analyze_video_comments
-            result = analyze_video_comments(filename, sample_size=sample_size, preferred_model=preferred_model)
+            result = analyze_video_comments(
+                filename,
+                sample_size=sample_size,
+                preferred_model=preferred_model,
+                analysis_type=analysis_type
+            )
             self._send_json(200, {"success": True, "analysis": result})
         except Exception as e:
             logger.error(f"Error analyzing AI comments: {e}")

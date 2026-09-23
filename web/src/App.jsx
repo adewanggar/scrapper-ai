@@ -36,7 +36,12 @@ import {
   Target,
   Lock,
   Unlock,
-  ShieldCheck
+  ShieldCheck,
+  ShoppingBag,
+  ShieldAlert,
+  Award,
+  MessageCircle,
+  BarChart3
 } from 'lucide-react';
 
 const STOPWORDS = new Set([
@@ -47,6 +52,54 @@ const STOPWORDS = new Set([
   'tak', 'yg', 'dgn', 'dr', 'dlm', 'krn', 'karena', 'bgt', 'banget', 'yah', 'si', 'ya',
   'the', 'is', 'a', 'to', 'and', 'in', 'of', 'for', 'it', 'on', 'at'
 ]);
+
+const FRAMEWORKS_LIST = [
+  {
+    id: 'emotion_marketing',
+    title: 'Pemasaran Emosi & Kontroversi',
+    badge: 'Marketing / Komunikasi',
+    icon: Flame,
+    color: '#F97316',
+    desc: 'Analisis pemanfaatan emosi, rasio audiens terkecoh drama vs sadar iklan, dan polarisasi kubu.',
+    theory: 'Affective Response Theory, Drama Baiting, Shock Advertising'
+  },
+  {
+    id: 'public_sentiment',
+    title: 'Sentimen Publik & Krisis PR',
+    badge: 'Public Relations / Humas',
+    icon: Target,
+    color: '#2563EB',
+    desc: 'Audit sentimen masyarakat, skor reputasi/kepercayaan, dan rekomendasi respons krisis PR.',
+    theory: 'Situational Crisis Communication Theory (SCCT), Public Opinion Formation'
+  },
+  {
+    id: 'consumer_behavior',
+    title: 'Perilaku Konsumen & Minat Beli',
+    badge: 'Manajemen Bisnis / E-Commerce',
+    icon: ShoppingBag,
+    color: '#059669',
+    desc: 'Evaluasi intensi beli (purchase intention), persepsi harga & kualitas, dan dinamika eWOM.',
+    theory: 'Theory of Planned Behavior (TPB), Technology Acceptance Model (TAM)'
+  },
+  {
+    id: 'digital_discourse',
+    title: 'Wacana & Netiket Netizen',
+    badge: 'Linguistik / Komunikasi Digital',
+    icon: MessageSquare,
+    color: '#7C3AED',
+    desc: 'Analisis kesantunan bahasa, penggunaan istilah gaul/slang, sarkasme, dan etika berinternet.',
+    theory: 'Politeness Theory (Brown & Levinson), Computer-Mediated Communication'
+  },
+  {
+    id: 'social_psychology',
+    title: 'Psikologi Sosial & Dinamika Kelompok',
+    badge: 'Psikologi / Sosiologi',
+    icon: Brain,
+    color: '#DB2777',
+    desc: 'Kaji konformitas (efek ikut-ikutan), kemarahan moral kolektif, empati, dan bias atribusi.',
+    theory: 'Social Identity Theory, Moral Foundations Theory, Attribution Theory'
+  }
+];
 
 const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 const CORRECT_PIN = '112233';
@@ -245,6 +298,7 @@ export default function App() {
   const [pageSize, setPageSize] = useState(20);
 
   // AI Analysis State
+  const [analysisType, setAnalysisType] = useState('emotion_marketing');
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSampleSize, setAiSampleSize] = useState(50);
@@ -329,7 +383,7 @@ export default function App() {
         const json = await res.json();
         setData(json);
         setSelectedFile(filename);
-        loadAiAnalysis(filename);
+        loadAiAnalysis(filename, analysisType);
         if (switchTab) {
           setActiveTab('results');
         }
@@ -342,10 +396,10 @@ export default function App() {
   };
 
   // Load cached AI analysis if available
-  const loadAiAnalysis = async (filename) => {
+  const loadAiAnalysis = async (filename, type = analysisType) => {
     if (!filename) return;
     try {
-      const res = await fetch(`${API_BASE}/api/ai/analysis/${encodeURIComponent(filename)}`, {
+      const res = await fetch(`${API_BASE}/api/ai/analysis/${encodeURIComponent(filename)}?type=${encodeURIComponent(type)}`, {
         headers: { 'X-Access-Pin': CORRECT_PIN }
       });
       if (res.ok) {
@@ -358,6 +412,13 @@ export default function App() {
       }
     } catch (err) {
       console.error('Error loading cached AI analysis:', err);
+    }
+  };
+
+  const handleFrameworkChange = (newType) => {
+    setAnalysisType(newType);
+    if (selectedFile) {
+      loadAiAnalysis(selectedFile, newType);
     }
   };
 
@@ -376,7 +437,8 @@ export default function App() {
         body: JSON.stringify({
           filename: selectedFile,
           sample_size: aiSampleSize,
-          model: aiModel
+          model: aiModel,
+          analysis_type: analysisType
         })
       });
       const json = await res.json();
@@ -395,42 +457,152 @@ export default function App() {
   const exportAiReportMarkdown = () => {
     if (!aiAnalysis) return;
     const r = aiAnalysis.result;
-    let md = `# Laporan Analisis AI Video Marketing (Emotion & Controversy Driven)\n\n`;
+    const type = aiAnalysis.analysis_type || 'emotion_marketing';
+    const fwMeta = FRAMEWORKS_LIST.find((f) => f.id === type) || FRAMEWORKS_LIST[0];
+
+    let md = `# Laporan Analisis AI Skripsi: ${fwMeta.title}\n\n`;
+    md += `**Fokus Bidang:** ${fwMeta.badge}\n`;
     md += `**File:** \`${aiAnalysis.filename}\`\n`;
-    md += `**Model:** \`${aiAnalysis.model_used}\` | **Sampel Dianalisis:** ${aiAnalysis.sample_analyzed} dari ${aiAnalysis.total_comments} komentar\n\n`;
+    md += `**Model AI:** \`${aiAnalysis.model_used}\` | **Sampel:** ${aiAnalysis.sample_analyzed} dari ${aiAnalysis.total_comments} komentar\n`;
+    md += `**Landasan Teori:** ${fwMeta.theory}\n\n`;
     md += `---\n\n`;
-    md += `## 1. Konteks Narasi & Strategi Pemasaran\n`;
-    md += `- **Premis Video:** ${r.video_context?.premise || '-'}\n`;
-    md += `- **Produk/Brand:** ${r.video_context?.product_or_brand || '-'}\n`;
-    md += `- **Strategi Terdeteksi:** ${r.video_context?.marketing_strategy_detected || '-'}\n\n`;
-    md += `## 2. Kesadaran Iklan (Ad-Awareness Ratio)\n`;
-    md += `- Terkecoh/Terhanyut Drama: **${r.ad_awareness?.drama_engaged_pct}%**\n`;
-    md += `- Sadar Iklan / Bongkar Marketing: **${r.ad_awareness?.marketing_aware_pct}%**\n`;
-    md += `- Membahas Produk: **${r.ad_awareness?.product_focus_pct}%**\n`;
-    md += `> ${r.ad_awareness?.analysis || ''}\n\n`;
-    md += `## 3. Distribusi Emosi Penonton\n`;
-    md += `- Kemarahan (Outrage): ${r.emotion_distribution?.anger_pct}%\n`;
-    md += `- Simpati / Iba: ${r.emotion_distribution?.sympathy_pct}%\n`;
-    md += `- Skeptis (Settingan): ${r.emotion_distribution?.skepticism_pct}%\n`;
-    md += `- Sarkasme: ${r.emotion_distribution?.sarcasm_pct}%\n`;
-    md += `- Netral: ${r.emotion_distribution?.neutral_pct}%\n`;
-    md += `*Emosi Dominan:* **${r.emotion_distribution?.dominant_emotion}** (${r.emotion_distribution?.dominant_emotion_explanation})\n\n`;
-    md += `## 4. Polarisasi Kubu (Stance Dynamics)\n`;
+
+    if (type === 'public_sentiment') {
+      md += `## 1. Konteks Isu & Audit Krisis Citra\n`;
+      md += `- **Premis Isu:** ${r.context_summary?.issue_premise || '-'}\n`;
+      md += `- **Entitas/Brand Terkait:** ${r.context_summary?.public_entity_or_brand || '-'}\n`;
+      md += `- **Tingkat Ancaman Krisis:** **${r.context_summary?.crisis_threat_level || '-'}**\n`;
+      md += `- **Skor Kepercayaan Publik:** **${r.reputation_audit?.trust_score_pct}%**\n`;
+      md += `- **Status Persepsi:** ${r.reputation_audit?.public_perception_verdict || '-'}\n\n`;
+
+      md += `## 2. Metrik Distribusi Sentimen Publik\n`;
+      md += `- Sentimen Positif: ${r.sentiment_metrics?.positive_pct}%\n`;
+      md += `- Sentimen Netral: ${r.sentiment_metrics?.neutral_pct}%\n`;
+      md += `- Sentimen Negatif: ${r.sentiment_metrics?.negative_pct}%\n`;
+      md += `- Sentimen Kritis/Menuntut: ${r.sentiment_metrics?.critical_pct}%\n`;
+      md += `*Sentimen Dominan:* **${r.sentiment_metrics?.dominant_sentiment}**\n`;
+      md += `*Dinamika Momentum:* ${r.sentiment_metrics?.sentiment_momentum}\n\n`;
+
+      if (r.reputation_audit?.key_grievances?.length) {
+        md += `### Poin Kritik & Kekecewaan Publik Terbesar:\n`;
+        r.reputation_audit.key_grievances.forEach((g) => { md += `- ${g}\n`; });
+        md += `\n`;
+      }
+      if (r.pr_crisis_recommendations) {
+        md += `## 3. Rekomendasi Manajemen Krisis PR\n`;
+        md += `- **Tipe Krisis:** ${r.pr_crisis_recommendations.crisis_type_detected}\n`;
+        md += `- **Strategi Respons Disarankan:** ${r.pr_crisis_recommendations.recommended_response_strategy}\n`;
+        if (r.pr_crisis_recommendations.holding_statement_draft) {
+          md += `\n> **Draf Pernyataan Resmi / Holding Statement:**\n> "${r.pr_crisis_recommendations.holding_statement_draft}"\n\n`;
+        }
+      }
+    } else if (type === 'consumer_behavior') {
+      md += `## 1. Konteks Produk & Nilai Manfaat\n`;
+      md += `- **Produk / Brand:** ${r.context_summary?.product_or_brand || '-'}\n`;
+      md += `- **Persepsi Nilai Manfaat:** ${r.context_summary?.value_proposition_perceived || '-'}\n`;
+      md += `- **Daya Tarik Pasar:** ${r.context_summary?.market_appeal_summary || '-'}\n\n`;
+
+      md += `## 2. Metrik Intensi Beli & Persepsi Konsumen\n`;
+      md += `- Minat Beli Tinggi: **${r.purchase_intent_metrics?.high_intent_pct}%**\n`;
+      md += `- Penasaran / Butuh Info Lanjut: **${r.purchase_intent_metrics?.moderate_curious_pct}%**\n`;
+      md += `- Skeptis Harga: **${r.purchase_intent_metrics?.price_skeptic_pct}%**\n`;
+      md += `- Menolak / Tidak Tertarik: **${r.purchase_intent_metrics?.resistant_uninterested_pct}%**\n`;
+      md += `*Kesimpulan Intensi:* **${r.purchase_intent_metrics?.purchase_intent_verdict}**\n\n`;
+
+      md += `### Persepsi Konsumen Terhadap Kualitas & Harga:\n`;
+      md += `- Persepsi Kualitas: ${r.consumer_perception?.perceived_quality || '-'}\n`;
+      md += `- Kewajaran Harga: ${r.consumer_perception?.price_fairness_perception || '-'}\n`;
+      md += `- Kredibilitas & Kepercayaan: ${r.consumer_perception?.trust_and_credibility || '-'}\n`;
+      if (r.consumer_perception?.primary_purchase_barriers?.length) {
+        md += `- **Hambatan Konversi:** ${r.consumer_perception.primary_purchase_barriers.join('; ')}\n`;
+      }
+      md += `\n`;
+    } else if (type === 'digital_discourse') {
+      md += `## 1. Konteks Situasi Komunikasi & Wacana\n`;
+      md += `- **Situasi Komunikasi:** ${r.context_summary?.communicative_situation || '-'}\n`;
+      md += `- **Wacana Sentral:** ${r.context_summary?.discourse_topic || '-'}\n`;
+      md += `- **Iklim Komunikasi:** **${r.context_summary?.communication_climate || '-'}**\n\n`;
+
+      md += `## 2. Tingkat Kesantunan & Nada Tutur Netizen\n`;
+      md += `- Santun & Konstruktif: **${r.politeness_and_tone?.polite_constructive_pct}%**\n`;
+      md += `- Netral / Informatif: **${r.politeness_and_tone?.neutral_informative_pct}%**\n`;
+      md += `- Sarkastik / Satir: **${r.politeness_and_tone?.sarcastic_satirical_pct}%**\n`;
+      md += `- Agresif / Toxic: **${r.politeness_and_tone?.aggressive_toxic_pct}%**\n`;
+      md += `*Nada Dominan:* **${r.politeness_and_tone?.dominant_tone}**\n\n`;
+
+      md += `### Karakteristik Linguistik & Netiket:\n`;
+      md += `- **Tingkat Kepatuhan Netiket:** ${r.linguistic_features?.netiquette_compliance_level || '-'}\n`;
+      md += `- **Risiko Flaming / Cyberbullying:** ${r.linguistic_features?.flaming_and_cyberbullying_risk || '-'}\n`;
+      md += `- **Gaya Bahasa Utama:** ${r.linguistic_features?.rhetorical_devices_used || '-'}\n`;
+      if (r.linguistic_features?.prominent_slang_and_jargon?.length) {
+        md += `- **Slang / Kosakata Khas Netizen:** ${r.linguistic_features.prominent_slang_and_jargon.join(', ')}\n`;
+      }
+      md += `\n`;
+    } else if (type === 'social_psychology') {
+      md += `## 1. Konteks Stimulus Sosial & Fenomena Massa\n`;
+      md += `- **Stimulus Sosial:** ${r.context_summary?.social_stimulus || '-'}\n`;
+      md += `- **Fenomena Kelompok Teramati:** ${r.context_summary?.social_phenomenon_observed || '-'}\n`;
+      md += `- **Ketegangan Psikologis:** ${r.context_summary?.psychological_tension || '-'}\n\n`;
+
+      md += `## 2. Metrik Psikologis Penonton\n`;
+      md += `- Kemarahan Moral Kolektif: **${r.psychological_metrics?.moral_outrage_pct}%**\n`;
+      md += `- Konformitas (Efek Ikut-ikutan): **${r.psychological_metrics?.conformity_bandwagon_pct}%**\n`;
+      md += `- Empati Sosial: **${r.psychological_metrics?.social_empathy_pct}%**\n`;
+      md += `- Apati / Sikap Acuh: **${r.psychological_metrics?.apathy_detachment_pct}%**\n`;
+      md += `*Kondisi Psikologis Dominan:* **${r.psychological_metrics?.dominant_psychological_state}**\n\n`;
+
+      md += `### Pola Atribusi & Bias Kognitif:\n`;
+      md += `- **Target Atribusi:** ${r.attribution_and_bias?.attribution_target || '-'}\n`;
+      md += `- **Bias Kognitif Terdeteksi:** ${r.attribution_and_bias?.cognitive_bias_detected || '-'}\n`;
+      md += `- **Pertimbangan Moralitas:** ${r.attribution_and_bias?.moral_judgment_summary || '-'}\n\n`;
+    } else {
+      // Default: Emotion-driven marketing
+      md += `## 1. Konteks Narasi & Strategi Pemasaran\n`;
+      md += `- **Premis Video:** ${r.video_context?.premise || '-'}\n`;
+      md += `- **Produk/Brand:** ${r.video_context?.product_or_brand || '-'}\n`;
+      md += `- **Strategi Terdeteksi:** ${r.video_context?.marketing_strategy_detected || '-'}\n\n`;
+
+      md += `## 2. Kesadaran Iklan (Ad-Awareness Ratio)\n`;
+      md += `- Terkecoh/Terhanyut Drama: **${r.ad_awareness?.drama_engaged_pct}%**\n`;
+      md += `- Sadar Iklan / Bongkar Marketing: **${r.ad_awareness?.marketing_aware_pct}%**\n`;
+      md += `- Membahas Produk: **${r.ad_awareness?.product_focus_pct}%**\n`;
+      md += `> ${r.ad_awareness?.analysis || ''}\n\n`;
+
+      md += `## 3. Distribusi Emosi Penonton\n`;
+      md += `- Kemarahan (Outrage): ${r.emotion_distribution?.anger_pct}%\n`;
+      md += `- Simpati / Iba: ${r.emotion_distribution?.sympathy_pct}%\n`;
+      md += `- Skeptis (Settingan): ${r.emotion_distribution?.skepticism_pct}%\n`;
+      md += `- Sarkasme: ${r.emotion_distribution?.sarcasm_pct}%\n`;
+      md += `- Netral: ${r.emotion_distribution?.neutral_pct}%\n`;
+      md += `*Emosi Dominan:* **${r.emotion_distribution?.dominant_emotion}** (${r.emotion_distribution?.dominant_emotion_explanation})\n\n`;
+    }
+
+    md += `## ${type === 'emotion_marketing' ? '4' : '3'}. Polarisasi Kubu (Stance Dynamics)\n`;
     md += `- ${r.stance_dynamics?.side_a_name}: ${r.stance_dynamics?.side_a_pct}%\n`;
     md += `- ${r.stance_dynamics?.side_b_name}: ${r.stance_dynamics?.side_b_pct}%\n`;
-    md += `- Netral: ${r.stance_dynamics?.neutral_pct}%\n\n`;
-    md += `## 5. Klaster Topik Perdebatan Netizen\n`;
+    md += `- Netral: ${r.stance_dynamics?.neutral_pct}%\n`;
+    md += `- Tingkat Kontroversi: **${r.stance_dynamics?.controversy_level || 'Sedang'}**\n`;
+    md += `> ${r.stance_dynamics?.polarization_summary || ''}\n\n`;
+
+    md += `## ${type === 'emotion_marketing' ? '5' : '4'}. Klaster Topik Pembicaraan Netizen\n`;
     (r.topic_clusters || []).forEach((tc, i) => {
       md += `### ${i+1}. ${tc.topic_name} (${tc.pct}%)\n`;
       md += `${tc.description}\n`;
-      md += `> "${tc.sample_quote}"\n\n`;
+      if (tc.sample_quote) {
+        md += `> "${tc.sample_quote}"\n\n`;
+      }
     });
-    md += `## 6. Ringkasan Temuan Skripsi (Academic Synthesis)\n`;
+
+    md += `## ${type === 'emotion_marketing' ? '6' : '5'}. Ringkasan Temuan Skripsi (Academic Synthesis)\n`;
     (r.academic_insights?.key_findings || []).forEach((kf) => {
       md += `- ${kf}\n`;
     });
-    md += `\n**Verdict Brand Hijack:** ${r.academic_insights?.brand_hijack_verdict}\n\n`;
-    md += `**Relevansi Teori:** ${r.academic_insights?.theoretical_relevance}\n\n`;
+    if (r.academic_insights?.brand_hijack_verdict) {
+      md += `\n**Verdict Brand:** ${r.academic_insights.brand_hijack_verdict}\n`;
+    }
+    if (r.academic_insights?.theoretical_relevance) {
+      md += `\n**Relevansi Teori:** ${r.academic_insights.theoretical_relevance}\n\n`;
+    }
     md += `### Paragraf Pembahasan Skripsi (Bab 4):\n`;
     md += `${r.academic_insights?.thesis_summary_paragraph}\n`;
 
@@ -438,7 +610,7 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `laporan_analisis_ai_${selectedFile.replace('.json', '')}.md`;
+    a.download = `laporan_skripsi_${type}_${selectedFile.replace('.json', '')}.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -1759,525 +1931,1130 @@ export default function App() {
           {/* ====================================================================
               TAB: ANALISIS AI SKRIPSI (CLARIO DEEPSEEK-V4 FLASH)
               ==================================================================== */}
-          {activeTab === 'ai-analysis' && (
-            <div>
-              {/* Header Card with File Picker and Controls */}
-              <div className="ai-header-card">
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                    <Brain size={22} color="#7C3AED" />
-                    <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                      Analisis AI Skripsi (Emotion-Driven Marketing)
-                    </h2>
-                  </div>
-                  <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
-                    Model: <strong>{aiAnalysis?.model_used || 'Clario DeepSeek-V4 Flash'}</strong>
-                    {aiAnalysis && (
-                      <span> • <strong>{aiAnalysis.sample_analyzed}</strong> dari <strong>{aiAnalysis.total_comments}</strong> komentar dianalisis</span>
-                    )}
-                  </p>
-                </div>
+          {/* ====================================================================
+              TAB: ANALISIS AI SKRIPSI (MULTI-FRAMEWORK / MULTI-SUDUT PANDANG)
+              ==================================================================== */}
+          {activeTab === 'ai-analysis' && (() => {
+            const currentFw = FRAMEWORKS_LIST.find((f) => f.id === analysisType) || FRAMEWORKS_LIST[0];
+            const resultType = aiAnalysis?.analysis_type || analysisType;
+            const activeResultFw = FRAMEWORKS_LIST.find((f) => f.id === resultType) || FRAMEWORKS_LIST[0];
 
-                <div className="ai-config-controls">
-                  {/* Model Selector */}
-                  <div className="sample-size-pill-group">
-                    <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', paddingLeft: '8px' }}>
-                      Model AI:
-                    </span>
-                    <button
-                      className={`sample-size-btn ${aiModel === 'gemini-3.8-flash' ? 'active' : ''}`}
-                      onClick={() => setAiModel('gemini-3.8-flash')}
-                      title="Gunakan Google Gemini 3.8 Flash (Official Google AI Studio API)"
-                    >
-                      ✨ Gemini 3.8 Flash
-                    </button>
-                    <button
-                      className={`sample-size-btn ${aiModel === 'clario/deepseek-v4-flash' ? 'active' : ''}`}
-                      onClick={() => setAiModel('clario/deepseek-v4-flash')}
-                      title="Gunakan Clario DeepSeek V4 Flash"
-                    >
-                      ⚡ DeepSeek V4
-                    </button>
-                    <button
-                      className={`sample-size-btn ${aiModel === 'clario/gemini-3.7-flash' ? 'active' : ''}`}
-                      onClick={() => setAiModel('clario/gemini-3.7-flash')}
-                      title="Gunakan Clario Gemini 3.7 Flash"
-                    >
-                      🚀 Gemini 3.7 Flash
-                    </button>
-                  </div>
-
-                  {/* Sample Size Selector */}
-                  <div className="sample-size-pill-group">
-                    <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', paddingLeft: '8px' }}>
-                      Sampel:
-                    </span>
-                    <button
-                      className={`sample-size-btn ${aiSampleSize === 30 ? 'active' : ''}`}
-                      onClick={() => setAiSampleSize(30)}
-                      title="30 komentar teratas"
-                    >
-                      30 Cepat
-                    </button>
-                    <button
-                      className={`sample-size-btn ${aiSampleSize === 50 ? 'active' : ''}`}
-                      onClick={() => setAiSampleSize(50)}
-                      title="50 komentar teratas"
-                    >
-                      50 Standar
-                    </button>
-                    <button
-                      className={`sample-size-btn ${aiSampleSize === 100 ? 'active' : ''}`}
-                      onClick={() => setAiSampleSize(100)}
-                      title="100 komentar teratas"
-                    >
-                      100
-                    </button>
-                    <button
-                      className={`sample-size-btn ${aiSampleSize === 150 ? 'active' : ''}`}
-                      onClick={() => setAiSampleSize(150)}
-                      title="150 komentar teratas"
-                    >
-                      150
-                    </button>
-                    <button
-                      className={`sample-size-btn ${aiSampleSize === 200 ? 'active' : ''}`}
-                      onClick={() => setAiSampleSize(200)}
-                      title="200 komentar teratas"
-                    >
-                      200
-                    </button>
-                    <button
-                      className={`sample-size-btn ${aiSampleSize === 0 ? 'active' : ''}`}
-                      onClick={() => setAiSampleSize(0)}
-                      title="Menganalisis seluruh komentar dalam dataset"
-                    >
-                      Semua Komentar {data?.comments?.length ? `(${data.comments.length})` : ''}
-                    </button>
-                  </div>
-
-                  <button
-                    className="btn btn-scrape-primary"
-                    style={{ height: '36px', padding: '0 16px', fontSize: '13px' }}
-                    onClick={runAiAnalysis}
-                    disabled={aiLoading || !selectedFile}
-                  >
-                    {aiLoading ? (
-                      <>
-                        <div className="spinner-icon" />
-                        <span>Menganalisis dengan AI...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Sparkles size={15} />
-                        <span>{aiAnalysis ? 'Analisis Ulang AI' : 'Mulai Analisis AI'}</span>
-                      </>
-                    )}
-                  </button>
-
-                  {aiAnalysis && (
-                    <button
-                      className="btn btn-white-bordered"
-                      onClick={exportAiReportMarkdown}
-                      title="Unduh laporan analisis format Markdown untuk bab 4 skripsi"
-                    >
-                      <Download size={14} />
-                      Ekspor Laporan (.md)
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Selector Bar */}
-              <div className="video-selector-row">
-                <div className="video-selector-bar">
-                  <div className="selector-icon">
-                    <FileJson size={18} />
-                  </div>
-                  <span className="selector-label">File yang Dianalisis:</span>
-                  {files.length > 0 ? (
-                    <select
-                      className="selector-select"
-                      value={selectedFile}
-                      onChange={(e) => loadFileContent(e.target.value)}
-                    >
-                      {files.map((f) => (
-                        <option key={f.filename} value={f.filename}>
-                          {f.filename} ({f.comments_count} komentar) {f.caption ? `- ${f.caption.slice(0, 45)}...` : ''}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', flex: 1 }}>
-                      {selectedFile ? selectedFile : 'Belum ada data'}
-                    </span>
-                  )}
-                  <ChevronDown size={16} color="var(--color-text-secondary)" style={{ pointerEvents: 'none' }} />
-                </div>
-              </div>
-
-              {/* Error Alert */}
-              {aiError && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    padding: '14px 18px',
-                    background: '#FEF2F2',
-                    border: '1px solid #FECACA',
-                    color: '#DC2626',
-                    borderRadius: '10px',
-                    fontSize: '13px',
-                    marginBottom: '20px'
-                  }}
-                >
-                  <AlertCircle size={18} />
+            return (
+              <div>
+                {/* Header Card with File Picker and Controls */}
+                <div className="ai-header-card">
                   <div>
-                    <strong>Terjadi Kesalahan Analisis AI:</strong>
-                    <div>{aiError}</div>
-                  </div>
-                </div>
-              )}
-
-              {/* Empty state when no analysis done yet */}
-              {!aiAnalysis && !aiLoading && (
-                <div className="empty-state-box">
-                  <Brain size={48} className="empty-state-icon" style={{ color: '#8B5CF6' }} />
-                  <h4>Belum Ada Analisis AI untuk Video Ini</h4>
-                  <p>
-                    AI akan mengevaluasi dimensi emosional (Kemarahan, Simpati, Skeptisisme, Sarkasme), mengukur seberapa banyak penonton yang terkecoh drama vs yang sadar iklan, dan menyusun sintesis akademik untuk draf skripsi Anda.
-                  </p>
-                  <button
-                    className="btn btn-scrape-primary"
-                    onClick={runAiAnalysis}
-                    disabled={!selectedFile}
-                    style={{ height: '40px', padding: '0 20px', margin: '0 auto' }}
-                  >
-                    <Sparkles size={16} />
-                    Jalankan Analisis AI Sekarang
-                  </button>
-                </div>
-              )}
-
-              {/* AI Analysis Content View */}
-              {aiAnalysis && (
-                <div>
-                  {/* 1. Universal Context Banner */}
-                  <div className="ai-context-banner">
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
-                      <Lightbulb size={18} color="#B45309" />
-                      <strong style={{ fontSize: '14px', color: '#92400E' }}>
-                        Konteks Narasi & Momen Marketing yang Dideteksi AI
-                      </strong>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                      <Brain size={22} color={currentFw.color} />
+                      <h2 style={{ fontSize: '18px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                        Analisis AI Skripsi: {currentFw.title}
+                      </h2>
                     </div>
-
-                    <div className="ai-context-grid">
-                      <div className="ai-context-item">
-                        <div className="ai-context-item-label">Premis / Cerita yang Dimanfaatkan</div>
-                        <div className="ai-context-item-value">
-                          {aiAnalysis.result.video_context?.premise || '-'}
-                        </div>
-                      </div>
-
-                      <div className="ai-context-item">
-                        <div className="ai-context-item-label">Produk / Merek yang Dipromosikan</div>
-                        <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#1E40AF' }}>
-                          {aiAnalysis.result.video_context?.product_or_brand || 'Tidak Terdeteksi'}
-                        </div>
-                      </div>
-
-                      <div className="ai-context-item">
-                        <div className="ai-context-item-label">Strategi Pemasaran Teridentifikasi</div>
-                        <div className="ai-context-item-value">
-                          {aiAnalysis.result.video_context?.marketing_strategy_detected || '-'}
-                        </div>
-                      </div>
-                    </div>
+                    <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
+                      Model: <strong>{aiAnalysis?.model_used || aiModel}</strong> • Fokus: <strong>{currentFw.badge}</strong>
+                      {aiAnalysis && (
+                        <span> • <strong>{aiAnalysis.sample_analyzed}</strong> dari <strong>{aiAnalysis.total_comments}</strong> komentar dianalisis</span>
+                      )}
+                    </p>
                   </div>
 
-                  {/* 2. Primary 4-Metric Grid */}
-                  <div className="stats-grid">
-                    <div className="stat-card stat-card-rose">
-                      <div className="stat-icon-wrapper">
-                        <Target size={18} />
-                      </div>
-                      <div>
-                        <div className="stat-number">{aiAnalysis.result.ad_awareness?.drama_engaged_pct}%</div>
-                        <div className="stat-label">Terkecoh / Terhanyut Drama</div>
-                      </div>
-                    </div>
-
-                    <div className="stat-card stat-card-blue">
-                      <div className="stat-icon-wrapper">
-                        <Flame size={18} />
-                      </div>
-                      <div>
-                        <div className="stat-number">{aiAnalysis.result.ad_awareness?.marketing_aware_pct}%</div>
-                        <div className="stat-label">Sadar Iklan / Bongkar Marketing</div>
-                      </div>
-                    </div>
-
-                    <div className="stat-card stat-card-violet">
-                      <div className="stat-icon-wrapper">
-                        <Brain size={18} />
-                      </div>
-                      <div>
-                        <div className="stat-number" style={{ fontSize: '18px' }}>
-                          {aiAnalysis.result.emotion_distribution?.dominant_emotion || '-'}
-                        </div>
-                        <div className="stat-label">Emosi Penonton Paling Dominan</div>
-                      </div>
-                    </div>
-
-                    <div className="stat-card stat-card-amber">
-                      <div className="stat-icon-wrapper">
-                        <Layers size={18} />
-                      </div>
-                      <div>
-                        <div className="stat-number">
-                          {aiAnalysis.result.stance_dynamics?.controversy_level || 'Tinggi'}
-                        </div>
-                        <div className="stat-label">Tingkat Kontroversi & Debat</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 3. Analytics Charts Grid */}
-                  <div className="ai-analytics-grid">
-                    {/* Emotion Breakdown Card */}
-                    <div className="ai-card">
-                      <div className="ai-card-title">
-                        <span>Klasifikasi Emosi Penonton (RQ1)</span>
-                        <span className="ai-card-badge" style={{ background: '#EDE9FE', color: '#7C3AED' }}>
-                          Model Ekman / Plutchik
-                        </span>
-                      </div>
-
-                      <div className="progress-stat-row">
-                        <div className="progress-stat-header">
-                          <span className="progress-stat-name">😡 Kemarahan / Outrage</span>
-                          <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.anger_pct}%</span>
-                        </div>
-                        <div className="progress-track">
-                          <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.emotion_distribution?.anger_pct}%` }} />
-                        </div>
-                      </div>
-
-                      <div className="progress-stat-row">
-                        <div className="progress-stat-header">
-                          <span className="progress-stat-name">😢 Rasa Iba / Simpati / Empati</span>
-                          <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.sympathy_pct}%</span>
-                        </div>
-                        <div className="progress-track">
-                          <div className="progress-fill fill-blue" style={{ width: `${aiAnalysis.result.emotion_distribution?.sympathy_pct}%` }} />
-                        </div>
-                      </div>
-
-                      <div className="progress-stat-row">
-                        <div className="progress-stat-header">
-                          <span className="progress-stat-name">🤨 Skeptis / Curiga Settingan</span>
-                          <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.skepticism_pct}%</span>
-                        </div>
-                        <div className="progress-track">
-                          <div className="progress-fill fill-amber" style={{ width: `${aiAnalysis.result.emotion_distribution?.skepticism_pct}%` }} />
-                        </div>
-                      </div>
-
-                      <div className="progress-stat-row">
-                        <div className="progress-stat-header">
-                          <span className="progress-stat-name">😂 Ejekan / Sarkasme</span>
-                          <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.sarcasm_pct}%</span>
-                        </div>
-                        <div className="progress-track">
-                          <div className="progress-fill fill-purple" style={{ width: `${aiAnalysis.result.emotion_distribution?.sarcasm_pct}%` }} />
-                        </div>
-                      </div>
-
-                      <div className="progress-stat-row">
-                        <div className="progress-stat-header">
-                          <span className="progress-stat-name">😐 Netral / Lainnya</span>
-                          <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.neutral_pct}%</span>
-                        </div>
-                        <div className="progress-track">
-                          <div className="progress-fill fill-gray" style={{ width: `${aiAnalysis.result.emotion_distribution?.neutral_pct}%` }} />
-                        </div>
-                      </div>
-
-                      <div style={{ marginTop: '14px', fontSize: '12.5px', color: 'var(--color-text-secondary)', background: '#F9FAFB', padding: '10px 12px', borderRadius: '8px' }}>
-                        <strong>Insight Emosi:</strong> {aiAnalysis.result.emotion_distribution?.dominant_emotion_explanation}
-                      </div>
-                    </div>
-
-                    {/* Stance & Ad-Awareness Card */}
-                    <div className="ai-card">
-                      <div className="ai-card-title">
-                        <span>Polarisasi & Stance Detection (RQ3 & RQ4)</span>
-                        <span className="ai-card-badge" style={{ background: '#FEF3C7', color: '#D97706' }}>
-                          Dinamika Kubu
-                        </span>
-                      </div>
-
-                      {/* Stance Dual Meter */}
-                      <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
-                        Dua Kubu Utama yang Terbelah di Komentar:
-                      </div>
-
-                      <div className="stance-meter-container">
-                        <div className="stance-meter-bar">
-                          <div
-                            className="stance-side-a"
-                            style={{ width: `${aiAnalysis.result.stance_dynamics?.side_a_pct || 45}%` }}
-                            title={aiAnalysis.result.stance_dynamics?.side_a_name}
-                          >
-                            {aiAnalysis.result.stance_dynamics?.side_a_pct}%
-                          </div>
-                          <div
-                            className="stance-side-b"
-                            style={{ width: `${aiAnalysis.result.stance_dynamics?.side_b_pct || 40}%` }}
-                            title={aiAnalysis.result.stance_dynamics?.side_b_name}
-                          >
-                            {aiAnalysis.result.stance_dynamics?.side_b_pct}%
-                          </div>
-                          <div
-                            className="stance-side-neutral"
-                            style={{ width: `${aiAnalysis.result.stance_dynamics?.neutral_pct || 15}%` }}
-                            title="Netral"
-                          >
-                            {aiAnalysis.result.stance_dynamics?.neutral_pct}%
-                          </div>
-                        </div>
-
-                        <div className="stance-legend-row">
-                          <span style={{ color: '#2563EB', fontWeight: 600 }}>
-                            ● {aiAnalysis.result.stance_dynamics?.side_a_name}
-                          </span>
-                          <span style={{ color: '#DC2626', fontWeight: 600 }}>
-                            ● {aiAnalysis.result.stance_dynamics?.side_b_name}
-                          </span>
-                          <span style={{ color: '#6B7280' }}>
-                            ● Netral
-                          </span>
-                        </div>
-                      </div>
-
-                      <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5', marginTop: '12px' }}>
-                        {aiAnalysis.result.stance_dynamics?.polarization_summary}
-                      </p>
-
-                      <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
-                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>
-                          Evaluasi Ad-Awareness:
-                        </div>
-                        <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
-                          {aiAnalysis.result.ad_awareness?.analysis}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 4. Topic Clusters */}
-                  <div className="ai-card" style={{ marginBottom: '22px' }}>
-                    <div className="ai-card-title">
-                      <span>Klaster Topik Pembicaraan Netizen (Topic Modeling)</span>
-                      <span className="ai-card-badge" style={{ background: '#DBEAFE', color: '#1E40AF' }}>
-                        {aiAnalysis.result.topic_clusters?.length || 0} Klaster Ditemukan
+                  <div className="ai-config-controls">
+                    {/* Model Selector */}
+                    <div className="sample-size-pill-group">
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', paddingLeft: '8px' }}>
+                        Model AI:
                       </span>
-                    </div>
-
-                    <div className="topic-clusters-grid">
-                      {(aiAnalysis.result.topic_clusters || []).map((cluster, idx) => (
-                        <div key={idx} className="topic-cluster-item">
-                          <div>
-                            <div className="topic-cluster-header">
-                              <span className="topic-cluster-name">{cluster.topic_name}</span>
-                              <span className="topic-cluster-pct">{cluster.pct}%</span>
-                            </div>
-                            <p className="topic-cluster-desc">{cluster.description}</p>
-                          </div>
-                          {cluster.sample_quote && (
-                            <div className="topic-quote-bubble">
-                              "{cluster.sample_quote}"
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 5. Academic Synthesis Card (Ready for Skripsi Chapter 4) */}
-                  <div className="thesis-synthesis-card">
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '8px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <Sparkles size={20} color="var(--color-primary)" />
-                        <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
-                          Sintesis Analisis Akademik (Draf Bab 4 Skripsi)
-                        </h3>
-                      </div>
-
-                      <div style={{ display: 'flex', gap: '8px' }}>
-                        <button
-                          className="btn btn-white-bordered"
-                          style={{ fontSize: '12px', padding: '6px 12px' }}
-                          onClick={() => copyThesisParagraph(aiAnalysis.result.academic_insights?.thesis_summary_paragraph)}
-                        >
-                          {copiedThesisText ? (
-                            <>
-                              <Check size={14} color="#16A34A" />
-                              <span style={{ color: '#16A34A' }}>Tersalin!</span>
-                            </>
-                          ) : (
-                            <>
-                              <Copy size={14} />
-                              <span>Salin Paragraf Skripsi</span>
-                            </>
-                          )}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Verdict Tag */}
-                    <div style={{ margin: '10px 0' }}>
-                      <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)', marginRight: '8px' }}>
-                        Status Efektivitas Brand:
-                      </span>
-                      <span
-                        style={{
-                          fontSize: '12px',
-                          fontWeight: 700,
-                          padding: '4px 10px',
-                          borderRadius: 'var(--radius-pill)',
-                          background: '#FEF2F2',
-                          color: '#DC2626',
-                          border: '1px solid #FECACA'
-                        }}
+                      <button
+                        className={`sample-size-btn ${aiModel === 'gemini-3.8-flash' ? 'active' : ''}`}
+                        onClick={() => setAiModel('gemini-3.8-flash')}
+                        title="Gunakan Google Gemini 3.8 Flash (Official Google AI Studio API)"
                       >
-                        {aiAnalysis.result.academic_insights?.brand_hijack_verdict || 'Overshadowed by Drama'}
-                      </span>
-                      <span style={{ marginLeft: '12px', fontSize: '12px', color: 'var(--color-text-secondary)' }}>
-                        Relevansi Teori: <strong>{aiAnalysis.result.academic_insights?.theoretical_relevance}</strong>
-                      </span>
+                        ✨ Gemini 3.8 Flash
+                      </button>
+                      <button
+                        className={`sample-size-btn ${aiModel === 'clario/deepseek-v4-flash' ? 'active' : ''}`}
+                        onClick={() => setAiModel('clario/deepseek-v4-flash')}
+                        title="Gunakan Clario DeepSeek V4 Flash"
+                      >
+                        ⚡ DeepSeek V4
+                      </button>
+                      <button
+                        className={`sample-size-btn ${aiModel === 'clario/gemini-3.7-flash' ? 'active' : ''}`}
+                        onClick={() => setAiModel('clario/gemini-3.7-flash')}
+                        title="Gunakan Clario Gemini 3.7 Flash"
+                      >
+                        🚀 Gemini 3.7 Flash
+                      </button>
                     </div>
 
-                    {/* Bullet Points */}
-                    <ul className="thesis-findings-list">
-                      {(aiAnalysis.result.academic_insights?.key_findings || []).map((finding, idx) => (
-                        <li key={idx} className="thesis-finding-item">
-                          <CheckCircle2 size={16} color="#2563EB" style={{ flexShrink: 0, marginTop: '2px' }} />
-                          <span>{finding}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {/* Paragraph */}
-                    <div className="thesis-paragraph-box">
-                      {aiAnalysis.result.academic_insights?.thesis_summary_paragraph}
+                    {/* Sample Size Selector */}
+                    <div className="sample-size-pill-group">
+                      <span style={{ fontSize: '11px', color: 'var(--color-text-muted)', paddingLeft: '8px' }}>
+                        Sampel:
+                      </span>
+                      <button
+                        className={`sample-size-btn ${aiSampleSize === 30 ? 'active' : ''}`}
+                        onClick={() => setAiSampleSize(30)}
+                        title="30 komentar teratas"
+                      >
+                        30 Cepat
+                      </button>
+                      <button
+                        className={`sample-size-btn ${aiSampleSize === 50 ? 'active' : ''}`}
+                        onClick={() => setAiSampleSize(50)}
+                        title="50 komentar teratas"
+                      >
+                        50 Standar
+                      </button>
+                      <button
+                        className={`sample-size-btn ${aiSampleSize === 100 ? 'active' : ''}`}
+                        onClick={() => setAiSampleSize(100)}
+                        title="100 komentar teratas"
+                      >
+                        100
+                      </button>
+                      <button
+                        className={`sample-size-btn ${aiSampleSize === 150 ? 'active' : ''}`}
+                        onClick={() => setAiSampleSize(150)}
+                        title="150 komentar teratas"
+                      >
+                        150
+                      </button>
+                      <button
+                        className={`sample-size-btn ${aiSampleSize === 200 ? 'active' : ''}`}
+                        onClick={() => setAiSampleSize(200)}
+                        title="200 komentar teratas"
+                      >
+                        200
+                      </button>
+                      <button
+                        className={`sample-size-btn ${aiSampleSize === 0 ? 'active' : ''}`}
+                        onClick={() => setAiSampleSize(0)}
+                        title="Menganalisis seluruh komentar dalam dataset"
+                      >
+                        Semua {data?.comments?.length ? `(${data.comments.length})` : ''}
+                      </button>
                     </div>
+
+                    <button
+                      className="btn btn-scrape-primary"
+                      style={{ height: '36px', padding: '0 16px', fontSize: '13px' }}
+                      onClick={runAiAnalysis}
+                      disabled={aiLoading || !selectedFile}
+                    >
+                      {aiLoading ? (
+                        <>
+                          <div className="spinner-icon" />
+                          <span>Menganalisis ({currentFw.badge.split('/')[0].trim()})...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles size={15} />
+                          <span>{aiAnalysis ? 'Analisis Ulang AI' : 'Mulai Analisis AI'}</span>
+                        </>
+                      )}
+                    </button>
+
+                    {aiAnalysis && (
+                      <button
+                        className="btn btn-white-bordered"
+                        onClick={exportAiReportMarkdown}
+                        title="Unduh draf bab 4 skripsi format Markdown (.md)"
+                      >
+                        <Download size={14} />
+                        Ekspor Draf (.md)
+                      </button>
+                    )}
                   </div>
                 </div>
-              )}
-            </div>
-          )}
+
+                {/* Selector Bar */}
+                <div className="video-selector-row">
+                  <div className="video-selector-bar">
+                    <div className="selector-icon">
+                      <FileJson size={18} />
+                    </div>
+                    <span className="selector-label">File Dataset:</span>
+                    {files.length > 0 ? (
+                      <select
+                        className="selector-select"
+                        value={selectedFile}
+                        onChange={(e) => loadFileContent(e.target.value)}
+                      >
+                        {files.map((f) => (
+                          <option key={f.filename} value={f.filename}>
+                            {f.filename} ({f.comments_count} komentar) {f.caption ? `- ${f.caption.slice(0, 45)}...` : ''}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', flex: 1 }}>
+                        {selectedFile ? selectedFile : 'Belum ada data'}
+                      </span>
+                    )}
+                    <ChevronDown size={16} color="var(--color-text-secondary)" style={{ pointerEvents: 'none' }} />
+                  </div>
+                </div>
+
+                {/* Academic Frameworks Selector */}
+                <div className="ai-frameworks-section">
+                  <div className="ai-frameworks-header">
+                    <div className="ai-frameworks-title">
+                      <Sparkles size={18} color="var(--color-primary)" />
+                      <span>Pilih Sudut Pandang / Kerangka Analisis Skripsi:</span>
+                    </div>
+                    <span className="ai-frameworks-subtitle">
+                      Pilih teori dan fokus kajian yang relevan dengan topik penelitian tugas akhir Anda
+                    </span>
+                  </div>
+
+                  <div className="ai-frameworks-grid">
+                    {FRAMEWORKS_LIST.map((fw) => {
+                      const IconComp = fw.icon;
+                      const isActive = analysisType === fw.id;
+                      return (
+                        <button
+                          key={fw.id}
+                          type="button"
+                          className={`framework-card ${isActive ? 'active' : ''}`}
+                          style={{
+                            '--card-accent': fw.color,
+                            '--card-accent-alpha': `${fw.color}25`
+                          }}
+                          onClick={() => handleFrameworkChange(fw.id)}
+                        >
+                          <div className="framework-card-top">
+                            <div className="framework-icon-wrap" style={{ background: `${fw.color}15`, color: fw.color }}>
+                              <IconComp size={18} />
+                            </div>
+                            <span className="framework-badge" style={{ background: `${fw.color}15`, color: fw.color }}>
+                              {fw.badge.split('/')[0].trim()}
+                            </span>
+                          </div>
+
+                          <div className="framework-card-body">
+                            <h4>{fw.title}</h4>
+                            <p>{fw.desc}</p>
+                          </div>
+
+                          <div className="framework-card-footer">
+                            <span className="framework-theory-tag" title={fw.theory}>
+                              {fw.theory.split(',')[0]}
+                            </span>
+                            {isActive && <div className="framework-active-indicator" />}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Error Alert */}
+                {aiError && (
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '10px',
+                      padding: '14px 18px',
+                      background: '#FEF2F2',
+                      border: '1px solid #FECACA',
+                      color: '#DC2626',
+                      borderRadius: '10px',
+                      fontSize: '13px',
+                      marginBottom: '20px'
+                    }}
+                  >
+                    <AlertCircle size={18} />
+                    <div>
+                      <strong>Terjadi Kesalahan Analisis AI:</strong>
+                      <div>{aiError}</div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty state when no analysis done yet for this framework */}
+                {!aiAnalysis && !aiLoading && (
+                  <div className="empty-state-box">
+                    <div
+                      style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '16px',
+                        background: `${currentFw.color}15`,
+                        color: currentFw.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 16px'
+                      }}
+                    >
+                      {React.createElement(currentFw.icon, { size: 28 })}
+                    </div>
+                    <h4>Belum Ada Analisis: {currentFw.title}</h4>
+                    <p style={{ maxWidth: '640px', margin: '0 auto 16px' }}>
+                      {currentFw.desc}
+                      <br />
+                      <span style={{ fontSize: '12px', color: 'var(--color-text-muted)', marginTop: '6px', display: 'inline-block' }}>
+                        <strong>Landasan Teori:</strong> {currentFw.theory}
+                      </span>
+                    </p>
+                    <button
+                      className="btn btn-scrape-primary"
+                      onClick={runAiAnalysis}
+                      disabled={!selectedFile}
+                      style={{ height: '40px', padding: '0 20px', margin: '0 auto' }}
+                    >
+                      <Sparkles size={16} />
+                      Jalankan Analisis ({currentFw.badge.split('/')[0].trim()})
+                    </button>
+                  </div>
+                )}
+
+                {/* AI Analysis Content View */}
+                {aiAnalysis && (
+                  <div>
+                    {/* 1. Context Banner (Perspective-Specific) */}
+                    <div className="ai-context-banner">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                        <Lightbulb size={18} color="#B45309" />
+                        <strong style={{ fontSize: '14px', color: '#92400E' }}>
+                          Konteks Analisis: {activeResultFw.title} ({activeResultFw.badge})
+                        </strong>
+                      </div>
+
+                      <div className="ai-context-grid">
+                        {resultType === 'public_sentiment' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Isu Utama / Topik yang Memicu Reaksi</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.issue_premise || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Tokoh / Instansi / Brand Terkait</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#1E40AF' }}>
+                                {aiAnalysis.result.context_summary?.public_entity_or_brand || 'Tidak Terdeteksi'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Tingkat Ancaman Krisis PR</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#DC2626' }}>
+                                {aiAnalysis.result.context_summary?.crisis_threat_level || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : resultType === 'consumer_behavior' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Produk / Merek yang Dibicarakan</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#059669' }}>
+                                {aiAnalysis.result.context_summary?.product_or_brand || 'Tidak Terdeteksi'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Persepsi Nilai Manfaat (Value Proposition)</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.value_proposition_perceived || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Daya Tarik Pasar & Segmen Audiens</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.market_appeal_summary || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : resultType === 'digital_discourse' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Situasi Interaksi Komunikasi</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.communicative_situation || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Topik Wacana Sentral</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#7C3AED' }}>
+                                {aiAnalysis.result.context_summary?.discourse_topic || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Iklim Komunikasi Warganet</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.communication_climate || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : resultType === 'social_psychology' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Stimulus Sosial / Pemicu Perilaku</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.social_stimulus || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Fenomena Massa Teramati</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#DB2777' }}>
+                                {aiAnalysis.result.context_summary?.social_phenomenon_observed || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Ketegangan Psikologis Penonton</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.psychological_tension || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {/* Default: Emotion-driven marketing */}
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Premis / Cerita yang Dimanfaatkan</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.video_context?.premise || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Produk / Merek yang Dipromosikan</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#1E40AF' }}>
+                                {aiAnalysis.result.video_context?.product_or_brand || 'Tidak Terdeteksi'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Strategi Pemasaran Teridentifikasi</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.video_context?.marketing_strategy_detected || '-'}
+                              </div>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 2. Primary 4-Metric Grid (Perspective-Specific) */}
+                    <div className="stats-grid">
+                      {resultType === 'public_sentiment' ? (
+                        <>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><Target size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.reputation_audit?.trust_score_pct}%</div>
+                              <div className="stat-label">Skor Kepercayaan Publik</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><AlertCircle size={18} /></div>
+                            <div>
+                              <div className="stat-number">
+                                {(aiAnalysis.result.sentiment_metrics?.negative_pct || 0) + (aiAnalysis.result.sentiment_metrics?.critical_pct || 0)}%
+                              </div>
+                              <div className="stat-label">Sentimen Negatif & Kritis</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><Flame size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.sentiment_metrics?.dominant_sentiment || '-'}
+                              </div>
+                              <div className="stat-label">Sentimen Publik Dominan</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><ShieldAlert size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '18px' }}>
+                                {aiAnalysis.result.context_summary?.crisis_threat_level || 'Sedang'}
+                              </div>
+                              <div className="stat-label">Tingkat Ancaman Krisis PR</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : resultType === 'consumer_behavior' ? (
+                        <>
+                          <div className="stat-card stat-card-emerald" style={{ background: '#ECFDF5', borderColor: '#A7F3D0' }}>
+                            <div className="stat-icon-wrapper" style={{ background: '#059669', color: '#FFF' }}><ShoppingBag size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ color: '#065F46' }}>
+                                {aiAnalysis.result.purchase_intent_metrics?.high_intent_pct}%
+                              </div>
+                              <div className="stat-label">Minat Beli Tinggi (High Intent)</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><Award size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.consumer_perception?.perceived_quality || '-'}
+                              </div>
+                              <div className="stat-label">Persepsi Kualitas Produk</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><Target size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.consumer_perception?.price_fairness_perception || '-'}
+                              </div>
+                              <div className="stat-label">Persepsi Kewajaran Harga</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><BarChart3 size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.purchase_intent_metrics?.purchase_intent_verdict || '-'}
+                              </div>
+                              <div className="stat-label">Kesimpulan Potensi Pasar</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : resultType === 'digital_discourse' ? (
+                        <>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><CheckCircle2 size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.politeness_and_tone?.polite_constructive_pct}%</div>
+                              <div className="stat-label">Tuturan Santun & Konstruktif</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><Flame size={18} /></div>
+                            <div>
+                              <div className="stat-number">
+                                {(aiAnalysis.result.politeness_and_tone?.sarcastic_satirical_pct || 0) + (aiAnalysis.result.politeness_and_tone?.aggressive_toxic_pct || 0)}%
+                              </div>
+                              <div className="stat-label">Sarkasme & Tuturan Keras</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><MessageSquare size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.politeness_and_tone?.dominant_tone || '-'}
+                              </div>
+                              <div className="stat-label">Nada Tutur Dominan</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><ShieldCheck size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.linguistic_features?.netiquette_compliance_level || '-'}
+                              </div>
+                              <div className="stat-label">Kepatuhan Netiket Warganet</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : resultType === 'social_psychology' ? (
+                        <>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><Flame size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.psychological_metrics?.moral_outrage_pct}%</div>
+                              <div className="stat-label">Kemarahan Moral Kolektif</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><Users size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.psychological_metrics?.conformity_bandwagon_pct}%</div>
+                              <div className="stat-label">Konformitas (Ikut-ikutan)</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><Brain size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.psychological_metrics?.dominant_psychological_state || '-'}
+                              </div>
+                              <div className="stat-label">Respon Psikologis Massa</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><Layers size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.attribution_and_bias?.attribution_target || '-'}
+                              </div>
+                              <div className="stat-label">Arah Atribusi (Menyalahkan)</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          {/* Default: Emotion-driven marketing */}
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><Target size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.ad_awareness?.drama_engaged_pct}%</div>
+                              <div className="stat-label">Terkecoh / Terhanyut Drama</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><Flame size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.ad_awareness?.marketing_aware_pct}%</div>
+                              <div className="stat-label">Sadar Iklan / Bongkar Marketing</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><Brain size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '18px' }}>
+                                {aiAnalysis.result.emotion_distribution?.dominant_emotion || '-'}
+                              </div>
+                              <div className="stat-label">Emosi Penonton Paling Dominan</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><Layers size={18} /></div>
+                            <div>
+                              <div className="stat-number">
+                                {aiAnalysis.result.stance_dynamics?.controversy_level || 'Tinggi'}
+                              </div>
+                              <div className="stat-label">Tingkat Kontroversi & Debat</div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* 3. Analytics Charts Grid */}
+                    <div className="ai-analytics-grid">
+                      {/* Left Card: Progress Breakdown */}
+                      <div className="ai-card">
+                        {resultType === 'public_sentiment' ? (
+                          <>
+                            <div className="ai-card-title">
+                              <span>Distribusi Sentimen Publik</span>
+                              <span className="ai-card-badge" style={{ background: '#DBEAFE', color: '#1E40AF' }}>
+                                Audit Reputasi SCCT
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">👍 Positif / Apresiasi</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.sentiment_metrics?.positive_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-green" style={{ width: `${aiAnalysis.result.sentiment_metrics?.positive_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">😐 Netral / Pengamat</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.sentiment_metrics?.neutral_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-gray" style={{ width: `${aiAnalysis.result.sentiment_metrics?.neutral_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">👎 Negatif / Kecewa</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.sentiment_metrics?.negative_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-amber" style={{ width: `${aiAnalysis.result.sentiment_metrics?.negative_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🚨 Kritis & Menuntut Pertanggungjawaban</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.sentiment_metrics?.critical_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.sentiment_metrics?.critical_pct}%` }} />
+                              </div>
+                            </div>
+
+                            {aiAnalysis.result.reputation_audit?.key_grievances?.length > 0 && (
+                              <div style={{ marginTop: '14px', fontSize: '12px', background: '#FEF2F2', padding: '10px 12px', borderRadius: '8px', border: '1px solid #FECACA' }}>
+                                <strong style={{ color: '#DC2626' }}>Poin Kekecewaan Publik Terbesar:</strong>
+                                <ul style={{ paddingLeft: '18px', marginTop: '4px', color: '#991B1B' }}>
+                                  {aiAnalysis.result.reputation_audit.key_grievances.map((g, i) => (
+                                    <li key={i}>{g}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </>
+                        ) : resultType === 'consumer_behavior' ? (
+                          <>
+                            <div className="ai-card-title">
+                              <span>Intensi Pembelian Konsumen (TPB)</span>
+                              <span className="ai-card-badge" style={{ background: '#D1FAE5', color: '#065F46' }}>
+                                E-Commerce & Perilaku
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🛍️ Minat Beli Tinggi (Siap Checkout)</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.purchase_intent_metrics?.high_intent_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-green" style={{ width: `${aiAnalysis.result.purchase_intent_metrics?.high_intent_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🔍 Tertarik / Penasaran Detail</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.purchase_intent_metrics?.moderate_curious_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-blue" style={{ width: `${aiAnalysis.result.purchase_intent_metrics?.moderate_curious_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🏷️ Skeptis Terhadap Harga</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.purchase_intent_metrics?.price_skeptic_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-amber" style={{ width: `${aiAnalysis.result.purchase_intent_metrics?.price_skeptic_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">❌ Menolak / Tidak Berminat</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.purchase_intent_metrics?.resistant_uninterested_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.purchase_intent_metrics?.resistant_uninterested_pct}%` }} />
+                              </div>
+                            </div>
+
+                            {aiAnalysis.result.consumer_perception?.primary_purchase_barriers?.length > 0 && (
+                              <div style={{ marginTop: '14px', fontSize: '12px', background: '#FFFBEB', padding: '10px 12px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
+                                <strong style={{ color: '#B45309' }}>Hambatan Konversi Pembeli:</strong>
+                                <ul style={{ paddingLeft: '18px', marginTop: '4px', color: '#92400E' }}>
+                                  {aiAnalysis.result.consumer_perception.primary_purchase_barriers.map((b, i) => (
+                                    <li key={i}>{b}</li>
+                                  ))}
+                                </ul>
+                              </div>
+                            )}
+                          </>
+                        ) : resultType === 'digital_discourse' ? (
+                          <>
+                            <div className="ai-card-title">
+                              <span>Tingkat Kesantunan Bahasa (Politeness)</span>
+                              <span className="ai-card-badge" style={{ background: '#EDE9FE', color: '#7C3AED' }}>
+                                Brown & Levinson Model
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">✨ Santun, Hormat & Konstruktif</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.politeness_and_tone?.polite_constructive_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-green" style={{ width: `${aiAnalysis.result.politeness_and_tone?.polite_constructive_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">💬 Netral / Informatif Santai</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.politeness_and_tone?.neutral_informative_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-blue" style={{ width: `${aiAnalysis.result.politeness_and_tone?.neutral_informative_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">😏 Sarkasme, Ironi & Sindiran</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.politeness_and_tone?.sarcastic_satirical_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-purple" style={{ width: `${aiAnalysis.result.politeness_and_tone?.sarcastic_satirical_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🔥 Agresif / Menyerang (Toxic)</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.politeness_and_tone?.aggressive_toxic_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.politeness_and_tone?.aggressive_toxic_pct}%` }} />
+                              </div>
+                            </div>
+
+                            {aiAnalysis.result.linguistic_features?.prominent_slang_and_jargon?.length > 0 && (
+                              <div style={{ marginTop: '14px', fontSize: '12px', background: '#F5F3FF', padding: '10px 12px', borderRadius: '8px', border: '1px solid #DDD6FE' }}>
+                                <strong style={{ color: '#6D28D9' }}>Slang & Kosakata Dominan Netizen:</strong>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
+                                  {aiAnalysis.result.linguistic_features.prominent_slang_and_jargon.map((s, i) => (
+                                    <span key={i} style={{ background: '#EDE9FE', color: '#5B21B6', padding: '2px 8px', borderRadius: '12px', fontSize: '11px', fontWeight: 600 }}>
+                                      {s}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        ) : resultType === 'social_psychology' ? (
+                          <>
+                            <div className="ai-card-title">
+                              <span>Reaksi Psikologis & Dinamika Kelompok</span>
+                              <span className="ai-card-badge" style={{ background: '#FCE7F3', color: '#BE185D' }}>
+                                Social Identity & Morality
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">⚡ Kemarahan Moral Kolektif (Outrage)</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.psychological_metrics?.moral_outrage_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.psychological_metrics?.moral_outrage_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">👥 Konformitas (Efek Ikut-ikutan)</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.psychological_metrics?.conformity_bandwagon_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-amber" style={{ width: `${aiAnalysis.result.psychological_metrics?.conformity_bandwagon_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🤝 Empati & Solidaritas Sosial</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.psychological_metrics?.social_empathy_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-blue" style={{ width: `${aiAnalysis.result.psychological_metrics?.social_empathy_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">😶 Apati / Ketidakpedulian</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.psychological_metrics?.apathy_detachment_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-gray" style={{ width: `${aiAnalysis.result.psychological_metrics?.apathy_detachment_pct}%` }} />
+                              </div>
+                            </div>
+
+                            {aiAnalysis.result.attribution_and_bias?.cognitive_bias_detected && (
+                              <div style={{ marginTop: '14px', fontSize: '12px', background: '#FDF2F8', padding: '10px 12px', borderRadius: '8px', border: '1px solid #FBCFE8' }}>
+                                <strong style={{ color: '#BE185D' }}>Bias Kognitif Teridentifikasi:</strong>
+                                <p style={{ margin: '4px 0 0', color: '#9D174D' }}>
+                                  {aiAnalysis.result.attribution_and_bias.cognitive_bias_detected}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        ) : (
+                          <>
+                            {/* Default: Emotion-driven marketing */}
+                            <div className="ai-card-title">
+                              <span>Klasifikasi Emosi Penonton (RQ1)</span>
+                              <span className="ai-card-badge" style={{ background: '#EDE9FE', color: '#7C3AED' }}>
+                                Model Ekman / Plutchik
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">😡 Kemarahan / Outrage</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.anger_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.emotion_distribution?.anger_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">😢 Rasa Iba / Simpati / Empati</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.sympathy_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-blue" style={{ width: `${aiAnalysis.result.emotion_distribution?.sympathy_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🤨 Skeptis / Curiga Settingan</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.skepticism_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-amber" style={{ width: `${aiAnalysis.result.emotion_distribution?.skepticism_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">😂 Ejekan / Sarkasme</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.sarcasm_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-purple" style={{ width: `${aiAnalysis.result.emotion_distribution?.sarcasm_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">😐 Netral / Lainnya</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.emotion_distribution?.neutral_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-gray" style={{ width: `${aiAnalysis.result.emotion_distribution?.neutral_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div style={{ marginTop: '14px', fontSize: '12.5px', color: 'var(--color-text-secondary)', background: '#F9FAFB', padding: '10px 12px', borderRadius: '8px' }}>
+                              <strong>Insight Emosi:</strong> {aiAnalysis.result.emotion_distribution?.dominant_emotion_explanation}
+                            </div>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Right Card: Stance Dynamics & Perspective-Specific Synthesis */}
+                      <div className="ai-card">
+                        <div className="ai-card-title">
+                          <span>Polarisasi & Stance Dynamics</span>
+                          <span className="ai-card-badge" style={{ background: '#FEF3C7', color: '#D97706' }}>
+                            Dinamika Kubu
+                          </span>
+                        </div>
+
+                        {/* Stance Dual Meter */}
+                        <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '6px' }}>
+                          Dua Kubu Utama yang Terbelah di Komentar:
+                        </div>
+
+                        <div className="stance-meter-container">
+                          <div className="stance-meter-bar">
+                            <div
+                              className="stance-side-a"
+                              style={{ width: `${aiAnalysis.result.stance_dynamics?.side_a_pct || 45}%` }}
+                              title={aiAnalysis.result.stance_dynamics?.side_a_name}
+                            >
+                              {aiAnalysis.result.stance_dynamics?.side_a_pct}%
+                            </div>
+                            <div
+                              className="stance-side-b"
+                              style={{ width: `${aiAnalysis.result.stance_dynamics?.side_b_pct || 40}%` }}
+                              title={aiAnalysis.result.stance_dynamics?.side_b_name}
+                            >
+                              {aiAnalysis.result.stance_dynamics?.side_b_pct}%
+                            </div>
+                            <div
+                              className="stance-side-neutral"
+                              style={{ width: `${aiAnalysis.result.stance_dynamics?.neutral_pct || 15}%` }}
+                              title="Netral"
+                            >
+                              {aiAnalysis.result.stance_dynamics?.neutral_pct}%
+                            </div>
+                          </div>
+
+                          <div className="stance-legend-row">
+                            <span style={{ color: '#2563EB', fontWeight: 600 }}>
+                              ● {aiAnalysis.result.stance_dynamics?.side_a_name}
+                            </span>
+                            <span style={{ color: '#DC2626', fontWeight: 600 }}>
+                              ● {aiAnalysis.result.stance_dynamics?.side_b_name}
+                            </span>
+                            <span style={{ color: '#6B7280' }}>
+                              ● Netral
+                            </span>
+                          </div>
+                        </div>
+
+                        <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5', marginTop: '12px' }}>
+                          {aiAnalysis.result.stance_dynamics?.polarization_summary}
+                        </p>
+
+                        {/* Perspective-Specific Bottom Evaluation */}
+                        {resultType === 'public_sentiment' && aiAnalysis.result.pr_crisis_recommendations && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#1E40AF', marginBottom: '4px' }}>
+                              Rekomendasi Respons Krisis PR:
+                            </div>
+                            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '1.5', marginBottom: '8px' }}>
+                              <strong>Strategi Disarankan:</strong> {aiAnalysis.result.pr_crisis_recommendations.recommended_response_strategy}
+                            </p>
+                            {aiAnalysis.result.pr_crisis_recommendations.holding_statement_draft && (
+                              <div style={{ background: '#F8FAFC', padding: '8px 10px', borderRadius: '6px', fontSize: '11.5px', fontStyle: 'italic', borderLeft: '3px solid #3B82F6' }}>
+                                "{aiAnalysis.result.pr_crisis_recommendations.holding_statement_draft}"
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {resultType === 'consumer_behavior' && aiAnalysis.result.ewom_dynamics && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#059669', marginBottom: '4px' }}>
+                              Dinamika eWOM (Word of Mouth):
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                              {aiAnalysis.result.ewom_dynamics.ewom_influence_summary}
+                            </p>
+                          </div>
+                        )}
+
+                        {resultType === 'digital_discourse' && aiAnalysis.result.linguistic_features && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#7C3AED', marginBottom: '4px' }}>
+                              Gaya Bahasa & Risiko Flaming:
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                              Gaya Utama: <strong>{aiAnalysis.result.linguistic_features.rhetorical_devices_used}</strong> • Risiko Cyberbullying: <strong>{aiAnalysis.result.linguistic_features.flaming_and_cyberbullying_risk}</strong>
+                            </p>
+                          </div>
+                        )}
+
+                        {resultType === 'social_psychology' && aiAnalysis.result.attribution_and_bias && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#DB2777', marginBottom: '4px' }}>
+                              Pertimbangan Moralitas Kelompok:
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                              {aiAnalysis.result.attribution_and_bias.moral_judgment_summary}
+                            </p>
+                          </div>
+                        )}
+
+                        {resultType === 'emotion_marketing' && aiAnalysis.result.ad_awareness && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: 'var(--color-text-primary)', marginBottom: '4px' }}>
+                              Evaluasi Ad-Awareness:
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                              {aiAnalysis.result.ad_awareness.analysis}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 4. Topic Clusters */}
+                    <div className="ai-card" style={{ marginBottom: '22px' }}>
+                      <div className="ai-card-title">
+                        <span>Klaster Topik Pembicaraan Netizen (Topic Modeling)</span>
+                        <span className="ai-card-badge" style={{ background: '#DBEAFE', color: '#1E40AF' }}>
+                          {aiAnalysis.result.topic_clusters?.length || 0} Klaster Ditemukan
+                        </span>
+                      </div>
+
+                      <div className="topic-clusters-grid">
+                        {(aiAnalysis.result.topic_clusters || []).map((cluster, idx) => (
+                          <div key={idx} className="topic-cluster-item">
+                            <div>
+                              <div className="topic-cluster-header">
+                                <span className="topic-cluster-name">{cluster.topic_name}</span>
+                                <span className="topic-cluster-pct">{cluster.pct}%</span>
+                              </div>
+                              <p className="topic-cluster-desc">{cluster.description}</p>
+                            </div>
+                            {cluster.sample_quote && (
+                              <div className="topic-quote-bubble">
+                                "{cluster.sample_quote}"
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 5. Academic Synthesis Card (Ready for Skripsi Chapter 4) */}
+                    <div className="thesis-synthesis-card">
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px', marginBottom: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Sparkles size={20} color="var(--color-primary)" />
+                          <h3 style={{ fontSize: '16px', fontWeight: 700, color: 'var(--color-text-primary)' }}>
+                            Sintesis Analisis Akademik (Draf Bab 4 Skripsi - {activeResultFw.title})
+                          </h3>
+                        </div>
+
+                        <div style={{ display: 'flex', gap: '8px' }}>
+                          <button
+                            className="btn btn-white-bordered"
+                            style={{ fontSize: '12px', padding: '6px 12px' }}
+                            onClick={() => copyThesisParagraph(aiAnalysis.result.academic_insights?.thesis_summary_paragraph)}
+                          >
+                            {copiedThesisText ? (
+                              <>
+                                <Check size={14} color="#16A34A" />
+                                <span style={{ color: '#16A34A' }}>Tersalin!</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy size={14} />
+                                <span>Salin Paragraf Skripsi</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Verdict Tag & Theoretical Grounding */}
+                      <div style={{ margin: '10px 0', display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                        {aiAnalysis.result.academic_insights?.brand_hijack_verdict && (
+                          <span
+                            style={{
+                              fontSize: '12px',
+                              fontWeight: 700,
+                              padding: '4px 10px',
+                              borderRadius: 'var(--radius-pill)',
+                              background: '#FEF2F2',
+                              color: '#DC2626',
+                              border: '1px solid #FECACA'
+                            }}
+                          >
+                            {aiAnalysis.result.academic_insights.brand_hijack_verdict}
+                          </span>
+                        )}
+                        <span style={{ fontSize: '12px', color: 'var(--color-text-secondary)' }}>
+                          Relevansi Teori: <strong>{aiAnalysis.result.academic_insights?.theoretical_relevance || activeResultFw.theory}</strong>
+                        </span>
+                      </div>
+
+                      {/* Bullet Points */}
+                      <ul className="thesis-findings-list">
+                        {(aiAnalysis.result.academic_insights?.key_findings || []).map((finding, idx) => (
+                          <li key={idx} className="thesis-finding-item">
+                            <CheckCircle2 size={16} color="#2563EB" style={{ flexShrink: 0, marginTop: '2px' }} />
+                            <span>{finding}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {/* Paragraph */}
+                      <div className="thesis-paragraph-box">
+                        {aiAnalysis.result.academic_insights?.thesis_summary_paragraph}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* ====================================================================
               TAB 3: RIWAYAT FILE (DATA DIRECTORY EXPLORER)
