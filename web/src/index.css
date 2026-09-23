@@ -1805,18 +1805,119 @@ a:focus-visible {
 }
 
 
+/* ==========================================================================
+   Mobile App Bottom Navigation Bar (Phone app-like UX)
+   ========================================================================== */
+.mobile-bottom-nav {
+  display: none;
+}
+
+.mobile-nav-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  padding: 4px 0;
+  transition: all 0.15s ease;
+  min-width: 0;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.mobile-nav-tab:active {
+  transform: scale(0.92);
+}
+.mobile-nav-tab.active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.mobile-nav-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 26px;
+  transition: transform 0.15s ease;
+}
+.mobile-nav-tab.active .mobile-nav-icon-wrap {
+  transform: translateY(-2px);
+}
+
+.mobile-nav-label {
+  font-size: 10.5px;
+  margin-top: 2px;
+  line-height: 1.1;
+  white-space: nowrap;
+  letter-spacing: -0.01em;
+}
+
+.mobile-nav-badge {
+  position: absolute;
+  top: -3px;
+  right: -8px;
+  background: var(--color-primary);
+  color: #FFFFFF;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: var(--radius-pill);
+  min-width: 13px;
+  text-align: center;
+  line-height: 1.2;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.mobile-nav-badge.ai {
+  background: #7C3AED;
+}
+
 /* Responsive design */
 @media (max-width: 860px) {
-  .app-sidebar {
+  /* Show fixed bottom navigation bar */
+  .mobile-bottom-nav {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-around;
     position: fixed;
-    left: -260px;
-    transition: left 0.25s ease;
-  }
-  .app-sidebar.open {
+    bottom: 0;
     left: 0;
+    right: 0;
+    height: 62px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--color-border);
+    box-shadow: 0 -3px 14px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Hide desktop sidebar and hamburger on mobile; bottom nav is primary */
+  .app-sidebar {
+    display: none !important;
   }
   .btn-mobile-menu {
-    display: inline-flex;
+    display: none !important;
+  }
+  .app-main {
+    margin-left: 0 !important;
+    width: 100% !important;
+  }
+
+  /* Ensure page content is never hidden behind the bottom bar */
+  .page-container {
+    padding: 16px 16px calc(76px + env(safe-area-inset-bottom, 0px)) 16px !important;
+  }
+
+  /* Single-column charts for small viewports */
+  .ai-analytics-grid {
+    grid-template-columns: 1fr !important;
   }
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
@@ -1833,12 +1934,16 @@ a:focus-visible {
   .replies-thread-box {
     margin-left: 0;
   }
+  .ai-header-card {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .ai-config-controls {
+    width: 100%;
+  }
 }
 
 @media (max-width: 540px) {
-  .page-container {
-    padding: 16px;
-  }
   .stats-grid {
     grid-template-columns: 1fr;
   }
