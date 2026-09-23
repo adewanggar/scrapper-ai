@@ -81,7 +81,42 @@ python main.py --aweme_id=7170139292767882522 --size=10 --output=data
     // more comments
   ]
 }
+## 🌐 Web Dashboard & AI Analysis (Skripsi Edition)
+
+Aplikasi ini dilengkapi antarmuka web modern berbasis **React (Vite)** dan backend server **Python** dengan integrasi **AI Analysis (Clario LLM - DeepSeek V4 & Gemini 3.7 Flash)** untuk riset skripsi/akademik.
+
+### Menjalankan di Lokal:
+
+```sh
+# 1. Jalankan server backend (otomatis melayani frontend di http://localhost:5000)
+python server.py
+
+# 2. Atau jalankan frontend secara terpisah (development mode)
+cd web
+npm install
+npm run dev
 ```
+
+---
+
+## 🚀 Panduan Deploy Cloud (Vercel + Render)
+
+### 1. Backend di Render.com
+1. Buat **New Web Service** di [Render.com](https://render.com).
+2. Hubungkan ke repositori GitHub ini.
+3. Konfigurasi:
+   - **Environment**: `Python`
+   - **Build Command**: `pip install -r requirements.txt`
+   - **Start Command**: `python server.py`
+4. Dapatkan URL backend Anda (misal: `https://scrapper-ai-backend.onrender.com`).
+
+### 2. Frontend di Vercel
+1. Buat **New Project** di [Vercel](https://vercel.com) dan impor repositori GitHub ini.
+2. Pada **Environment Variables**, tambahkan:
+   - `VITE_API_URL`: URL backend Render Anda (misal: `https://scrapper-ai-backend.onrender.com`).
+3. Klik **Deploy**! Vercel akan otomatis mem-build frontend dan memberikan domain HTTPS yang cepat dan aktif 24/7.
+
+---
 
 ## License
 
