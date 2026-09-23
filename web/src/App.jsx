@@ -1021,7 +1021,7 @@ export default function App() {
                         placeholder={
                           selectedPlatform === 'instagram'
                             ? 'Tempelkan link Reels atau Postingan Instagram (contoh: https://www.instagram.com/reel/C1ACfnvh4KE/)...'
-                            : 'Tempelkan link video TikTok atau ID video (contoh: 7687448180547456277)...'
+                            : 'Tempelkan link video TikTok, shortlink vt.tiktok.com, atau ID video (contoh: https://vt.tiktok.com/ZSbJY5aH9/)...'
                         }
                         value={scrapeInput}
                         onChange={(e) => setScrapeInput(e.target.value)}

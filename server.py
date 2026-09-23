@@ -5,6 +5,7 @@ import mimetypes
 import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from datetime import datetime
+import requests
 from loguru import logger
 
 from tiktokcomment import TiktokComment
@@ -14,6 +15,68 @@ DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 os.makedirs(DATA_DIR, exist_ok=True)
 
 APP_PIN = os.environ.get('APP_PIN', '112233')
+
+def resolve_tiktok_aweme_id(raw_input: str) -> str:
+    """
+    Mendukung berbagai variasi input TikTok:
+    - Angka ID langsung (misal: 7688421946832293141)
+    - URL web panjang (misal: https://www.tiktok.com/@user/video/7688421946832293141)
+    - Shortlink aplikasi (misal: https://vt.tiktok.com/ZSbJY5aH9/ atau vm.tiktok.com)
+    """
+    raw_input = raw_input.strip()
+
+    # 1. Cek langsung jika input sudah mengandung 15-22 digit angka
+    match = re.search(r"(\d{15,22})", raw_input)
+    if match:
+        return match.group(1)
+
+    # 2. Cek jika input adalah URL shortlink atau web link
+    if "tiktok.com" in raw_input or raw_input.startswith("http://") or raw_input.startswith("https://"):
+        url = raw_input
+        if not url.startswith("http://") and not url.startswith("https://"):
+            url = f"https://{url}"
+
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "en-US,en;q=0.5",
+        }
+
+        # Coba HEAD request terlebih dahulu (cepat & hemat bandwidth)
+        try:
+            resp = requests.head(url, headers=headers, allow_redirects=True, timeout=10)
+            match = re.search(r"(\d{15,22})", resp.url)
+            if match:
+                logger.info(f"Resolved TikTok shortlink {url} -> {resp.url} (aweme_id: {match.group(1)})")
+                return match.group(1)
+        except Exception as e:
+            logger.warning(f"HEAD request failed resolving TikTok URL {url}: {e}")
+
+        # Fallback ke GET request
+        try:
+            resp = requests.get(url, headers=headers, stream=True, allow_redirects=True, timeout=12)
+            match = re.search(r"(\d{15,22})", resp.url)
+            if match:
+                logger.info(f"Resolved TikTok shortlink (GET) {url} -> {resp.url} (aweme_id: {match.group(1)})")
+                return match.group(1)
+
+            for history_resp in resp.history:
+                match = re.search(r"(\d{15,22})", history_resp.url)
+                if match:
+                    return match.group(1)
+                loc = history_resp.headers.get("Location", "")
+                match = re.search(r"(\d{15,22})", loc)
+                if match:
+                    return match.group(1)
+
+            chunk = resp.raw.read(15000).decode("utf-8", errors="ignore")
+            match = re.search(r"(\d{15,22})", chunk)
+            if match:
+                return match.group(1)
+        except Exception as e:
+            logger.error(f"Error resolving TikTok shortlink {url}: {e}")
+
+    return None
 
 class TikTokApiHandler(BaseHTTPRequestHandler):
     def _send_cors_headers(self):
@@ -243,12 +306,13 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
             return
 
         # Default: TikTok Scraper
-        match = re.search(r"(\d{15,22})", raw_input)
-        if not match:
-            self._send_json(400, {"error": "Format ID atau link video TikTok tidak valid (harus mengandung 15-22 digit angka)"})
+        aweme_id = resolve_tiktok_aweme_id(raw_input)
+        if not aweme_id:
+            self._send_json(400, {
+                "error": "Format link atau ID video TikTok tidak valid. Pastikan link dapat diakses atau mengandung ID video yang benar (contoh: https://vt.tiktok.com/ZSbJY5aH9/ atau 7688421946832293141)"
+            })
             return
 
-        aweme_id = match.group(1)
         logger.info(f"API Scrape request received for TikTok aweme_id: {aweme_id}")
 
         try:
