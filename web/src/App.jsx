@@ -756,7 +756,7 @@ export default function App() {
               <section className="scraper-main-card">
                 {/* Platform Selector Chips */}
                 <div className="platform-selector-section">
-                  <span className="platform-selector-label">1. Pilih Platform Media Sosial:</span>
+                  <span className="platform-selector-label">Platform:</span>
                   <div className="platform-chips-row">
                     <button
                       type="button"
@@ -769,6 +769,8 @@ export default function App() {
                       TikTok
                     </button>
 
+                    {/* Modul Instagram dan YouTube dikomentari sementara agar fokus ke TikTok dulu */}
+                    {/*
                     <button
                       type="button"
                       className={`platform-chip-btn ${selectedPlatform === 'instagram' ? 'active' : ''}`}
@@ -789,6 +791,7 @@ export default function App() {
                       YouTube
                       <span className="platform-badge-soon">Segera</span>
                     </button>
+                    */}
                   </div>
                 </div>
 
@@ -796,8 +799,8 @@ export default function App() {
                 <form onSubmit={handleScrapeSubmit}>
                   <label className="platform-selector-label">
                     {selectedPlatform === 'instagram'
-                      ? '2. Masukkan Link Postingan / Reels Instagram:'
-                      : '2. Masukkan Link Video atau Video ID TikTok:'}
+                      ? 'Masukkan Link Postingan / Reels Instagram:'
+                      : 'Masukkan Link Video atau Video ID TikTok:'}
                   </label>
                   <div className="scrape-input-row">
                     <div className="scrape-input-wrapper">
@@ -2203,8 +2206,8 @@ export default function App() {
                     Arsitektur antarmuka telah mendukung integrasi platform media sosial:
                     <ul style={{ paddingLeft: '20px', marginTop: '6px' }}>
                       <li><strong>TikTok:</strong> Modul Scraper Aktif (versi 2.0)</li>
-                      <li><strong>Instagram:</strong> Modul Scraper Aktif (Didukung dengan autentikasi Cookie)</li>
-                      <li><strong>YouTube:</strong> Siap untuk integrasi YouTube Data API / Scraper</li>
+                      {/* <li><strong>Instagram:</strong> Modul Scraper Aktif (Didukung dengan autentikasi Cookie)</li> */}
+                      {/* <li><strong>YouTube:</strong> Siap untuk integrasi YouTube Data API / Scraper</li> */}
                     </ul>
                   </div>
                 </div>
