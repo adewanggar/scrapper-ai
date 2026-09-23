@@ -568,26 +568,34 @@ a:focus-visible {
 .video-selector-row {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   margin-bottom: 20px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .video-selector-bar {
-  flex: 1;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  padding: 10px 16px;
+  padding: 10px 14px;
   box-shadow: var(--shadow-card);
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 .selector-icon {
   color: var(--color-text-secondary);
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .selector-label {
@@ -595,10 +603,14 @@ a:focus-visible {
   font-weight: 500;
   color: var(--color-text-secondary);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .selector-select {
   flex: 1;
+  min-width: 0;
+  width: 100%;
+  max-width: 100%;
   border: none;
   background: transparent;
   color: var(--color-text-primary);
@@ -607,6 +619,16 @@ a:focus-visible {
   font-family: var(--font-family);
   outline: none;
   cursor: pointer;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selector-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 /* Caption card (§4.3) */
@@ -614,16 +636,15 @@ a:focus-visible {
   background: var(--color-caption-bg);
   border: 1px solid #FDE68A;
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 18px 22px;
   margin-bottom: 20px;
-  display: flex;
-  gap: 24px;
-  align-items: flex-start;
   box-shadow: var(--shadow-card);
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .caption-content {
-  flex: 1;
+  width: 100%;
 }
 
 .caption-header {
@@ -1915,19 +1936,38 @@ a:focus-visible {
     padding: 16px 16px calc(76px + env(safe-area-inset-bottom, 0px)) 16px !important;
   }
 
+  /* Video selector responsiveness: stack and full-width on mobile */
+  .video-selector-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .video-selector-bar {
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .selector-label {
+    display: none !important;
+  }
+  .selector-actions-group {
+    width: 100% !important;
+    display: flex !important;
+    gap: 8px !important;
+  }
+  .selector-actions-group button {
+    flex: 1 !important;
+    justify-content: center !important;
+  }
+
   /* Single-column charts for small viewports */
   .ai-analytics-grid {
     grid-template-columns: 1fr !important;
   }
   .stats-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-  .caption-card {
-    flex-direction: column;
-  }
-  .video-thumbnail-box {
-    width: 100%;
-    align-items: flex-start;
   }
   .comment-body-text,
   .comment-row-footer,

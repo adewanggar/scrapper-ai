@@ -1057,32 +1057,34 @@ export default function App() {
                       {selectedFile ? selectedFile : 'Belum ada data di folder data/'}
                     </span>
                   )}
-                  <ChevronDown size={16} color="var(--color-text-secondary)" style={{ pointerEvents: 'none' }} />
+                  <ChevronDown size={16} color="var(--color-text-secondary)" style={{ pointerEvents: 'none', flexShrink: 0 }} />
                 </div>
 
-                {serverOnline && (
+                <div className="selector-actions-group">
+                  {serverOnline && (
+                    <button
+                      className="btn btn-white-bordered"
+                      onClick={fetchFilesList}
+                      title="Refresh daftar file"
+                    >
+                      <RefreshCw size={14} />
+                      Refresh
+                    </button>
+                  )}
+
                   <button
                     className="btn btn-white-bordered"
-                    onClick={fetchFilesList}
-                    title="Refresh daftar file"
+                    onClick={() => setActiveTab('ai-analysis')}
+                    style={{ color: '#7C3AED', borderColor: '#DDD6FE', background: '#F5F3FF' }}
+                    title="Lihat analisis AI untuk video ini"
                   >
-                    <RefreshCw size={14} />
-                    Refresh
+                    <Brain size={15} />
+                    Analisis AI
                   </button>
-                )}
-
-                <button
-                  className="btn btn-white-bordered"
-                  onClick={() => setActiveTab('ai-analysis')}
-                  style={{ color: '#7C3AED', borderColor: '#DDD6FE', background: '#F5F3FF' }}
-                  title="Lihat analisis AI untuk video ini"
-                >
-                  <Brain size={15} />
-                  Buka Analisis AI
-                </button>
+                </div>
               </div>
 
-              {/* Caption Card with Video Thumbnail */}
+              {/* Caption Card */}
               {data && (
                 <section className="caption-card">
                   <div className="caption-content">
@@ -1103,19 +1105,6 @@ export default function App() {
                     <p className="caption-body">
                       {data.caption || 'Tidak ada caption dalam video ini.'}
                     </p>
-                  </div>
-
-                  {/* Video Thumbnail Preview */}
-                  <div className="video-thumbnail-box">
-                    <div className="video-thumbnail">
-                      <div className="thumbnail-play-overlay">
-                        <Play size={16} fill="currentColor" style={{ marginLeft: '2px' }} />
-                      </div>
-                      <div className="thumbnail-duration-pill">0:45</div>
-                    </div>
-                    <span className="thumbnail-caption-count">
-                      {stats.totalComments} komentar
-                    </span>
                   </div>
                 </section>
               )}
