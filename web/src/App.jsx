@@ -43,7 +43,10 @@ import {
   MessageCircle,
   BarChart3,
   Quote,
-  Calculator
+  Calculator,
+  User,
+  Link2,
+  Database
 } from 'lucide-react';
 import ExportStatsModal from './components/ExportStatsModal';
 import CitationModal from './components/CitationModal';
@@ -1033,13 +1036,14 @@ export default function App() {
     if (!isoStr) return '-';
     try {
       const d = new Date(isoStr);
-      return d.toLocaleString('id-ID', {
+      const datePart = d.toLocaleDateString('id-ID', {
         day: 'numeric',
         month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
+        year: 'numeric'
       });
+      const hours = String(d.getHours()).padStart(2, '0');
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      return `${datePart}, ${hours}.${minutes}`;
     } catch {
       return isoStr;
     }
@@ -1063,18 +1067,16 @@ export default function App() {
         {/* Brand */}
         <div className="sidebar-brand">
           <div className="brand-icon-square brand-icon-tesisori">
-            <img src="/logo.png" alt="Tesisori Logo" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
+            <img src="/logo.png" alt="Tassiori Logo" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
           </div>
           <div className="brand-title-wrap">
-            <h1 className="brand-tesisori-title">Tesisori</h1>
-            <p className="brand-tesisori-sub">AI Research Workspace</p>
+            <h1 className="brand-tesisori-title">Tassiori</h1>
+            <p className="brand-tesisori-sub">AI RESEARCH WORKSPACE</p>
           </div>
         </div>
 
         {/* Navigation Items */}
         <nav className="sidebar-nav">
-          <div className="nav-section-title">Menu Utama</div>
-
           <button
             className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
             onClick={() => handleNavClick('dashboard')}
@@ -1090,8 +1092,12 @@ export default function App() {
             <MessageSquare size={18} />
             <span>Hasil Komentar</span>
             {data?.comments?.length ? (
-              <span className="nav-badge">{data.comments.length}</span>
-            ) : null}
+              <span className="nav-badge-pill">{data.comments.length}</span>
+            ) : files.length > 0 && files[0]?.comments_count ? (
+              <span className="nav-badge-pill">{files[0].comments_count}</span>
+            ) : (
+              <span className="nav-badge-pill">0</span>
+            )}
           </button>
 
           <button
@@ -1100,7 +1106,7 @@ export default function App() {
           >
             <Brain size={18} />
             <span>Analisis AI (Skripsi)</span>
-            <span className="nav-badge" style={{ background: '#EDE9FE', color: '#7C3AED' }}>AI</span>
+            <span className="nav-badge-pill badge-ai">AI</span>
           </button>
 
           <button
@@ -1109,10 +1115,10 @@ export default function App() {
           >
             <FolderArchive size={18} />
             <span>Riwayat File</span>
-            {files.length > 0 && <span className="nav-badge">{files.length}</span>}
+            <span className="nav-badge-pill">{files.length}</span>
           </button>
 
-          <div className="nav-section-title" style={{ marginTop: '16px' }}>Sistem</div>
+          <div className="nav-section-title">SISTEM</div>
 
           <button
             className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
@@ -1125,17 +1131,17 @@ export default function App() {
 
         {/* Sidebar Footer */}
         <div className="sidebar-footer">
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <span style={{ fontSize: '11px', color: 'var(--color-text-secondary)', fontWeight: 500 }}>
-              Status Server
+          <div className="sidebar-footer-row">
+            <span className="sidebar-server-label">
+              <span className="server-dot" /> Status Server
             </span>
             {serverOnline ? (
-              <span className="badge-status badge-status-online" style={{ padding: '3px 8px', fontSize: '11px' }}>
-                <span className="dot" /> Online
+              <span className="badge-status-pill online">
+                <span className="status-dot" /> Online
               </span>
             ) : (
-              <span className="badge-status badge-status-offline" style={{ padding: '3px 8px', fontSize: '11px' }}>
-                <span className="dot" /> Offline
+              <span className="badge-status-pill offline">
+                <span className="status-dot" /> Offline
               </span>
             )}
           </div>
@@ -1145,7 +1151,7 @@ export default function App() {
       {/* Main Content Area */}
       <div className="app-main">
         {/* Top Navbar */}
-        <header className="top-navbar">
+        <header className="top-navbar-clean">
           <div className="navbar-left">
             <button
               className="btn-mobile-menu"
@@ -1154,33 +1160,25 @@ export default function App() {
             >
               <Menu size={20} />
             </button>
-            <div>
-              <div className="navbar-title">
-                {activeTab === 'dashboard' && 'Dashboard Scraper'}
-                {activeTab === 'results' && 'Hasil & Filter Komentar'}
-                {activeTab === 'ai-analysis' && 'Analisis AI (Emotion & Controversy Marketing)'}
-                {activeTab === 'files' && 'Daftar File Tersimpan'}
-                {activeTab === 'settings' && 'Pengaturan Aplikasi'}
-              </div>
-            </div>
           </div>
 
           <div className="navbar-right">
             <button
-              className="btn btn-white-bordered"
+              className="btn-pill-header"
               onClick={() => fileInputRef.current?.click()}
               title="Buka file JSON dari komputer"
             >
               <Upload size={14} />
-              Upload JSON
+              <span>Upload JSON</span>
             </button>
             <button
-              className="btn-lock-nav"
+              className="btn-pill-header"
               onClick={handleLock}
               title="Kunci Dashboard (Perlu PIN 112233 untuk masuk)"
             >
-              <Lock size={14} />
+              <User size={15} />
               <span>Kunci</span>
+              <ChevronDown size={13} style={{ opacity: 0.6 }} />
             </button>
             <input
               type="file"
@@ -1200,70 +1198,62 @@ export default function App() {
           {activeTab === 'dashboard' && (
             <div>
               {/* Hero Banner */}
-              <div className="dashboard-hero">
-                <h2>Mulai Scraping Komentar Baru</h2>
-                <p>Pilih platform dan masukkan tautan video untuk mengambil semua komentar dan balasan secara instan.</p>
+              <div className="dashboard-hero-clean">
+                <div className="dashboard-eyebrow">DASHBOARD</div>
+                <h1 className="dashboard-main-heading">Mulai Scraping Komentar Baru</h1>
+                <p className="dashboard-main-sub">
+                  Pilih platform dan masukkan tautan video untuk mengambil semua komentar dan balasan secara instan.
+                </p>
               </div>
 
               {/* Main Scraper Card */}
               <section className="scraper-main-card">
                 {/* Platform Selector Chips */}
                 <div className="platform-selector-section">
-                  <span className="platform-selector-label">Platform:</span>
+                  <span className="platform-label-clean">Platform</span>
                   <div className="platform-chips-row">
                     <button
                       type="button"
                       className={`platform-chip-btn ${selectedPlatform === 'tiktok' ? 'active' : ''}`}
                       onClick={() => setSelectedPlatform('tiktok')}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.068-.102a2.895 2.895 0 0 1 2.374-4.536c.313 0 .618.05.904.144V9.324a6.34 6.34 0 0 0-.904-.065c-3.528 0-6.387 2.86-6.387 6.388 0 3.528 2.859 6.388 6.387 6.388 3.528 0 6.388-2.86 6.388-6.388V8.653c1.53.945 3.328 1.488 5.253 1.488V6.686z" />
                       </svg>
-                      TikTok
-                    </button>
-
-                    {/* Modul Instagram dan YouTube dikomentari sementara agar fokus ke TikTok dulu */}
-                    {/*
-                    <button
-                      type="button"
-                      className={`platform-chip-btn ${selectedPlatform === 'instagram' ? 'active' : ''}`}
-                      onClick={() => setSelectedPlatform('instagram')}
-                      title="Scrape komentar postingan atau Reels Instagram"
-                    >
-                      <span style={{ color: '#EC4899' }}>📸</span>
-                      Instagram
+                      <span>TikTok</span>
                     </button>
 
                     <button
                       type="button"
-                      className="platform-chip-btn disabled"
-                      title="Modul YouTube segera hadir"
-                      disabled
+                      className={`platform-chip-btn ${selectedPlatform === 'youtube' ? 'active' : ''}`}
+                      onClick={() => {
+                        setSelectedPlatform('youtube');
+                      }}
                     >
-                      <span style={{ color: '#EF4444' }}>▶</span>
-                      YouTube
-                      <span className="platform-badge-soon">Segera</span>
+                      <Play size={14} fill="currentColor" />
+                      <span>YouTube</span>
                     </button>
-                    */}
                   </div>
                 </div>
 
                 {/* Form Input Link */}
                 <form onSubmit={handleScrapeSubmit}>
-                  <label className="platform-selector-label">
-                    {selectedPlatform === 'instagram'
-                      ? 'Masukkan Link Postingan / Reels Instagram:'
-                      : 'Masukkan Link Video atau Video ID TikTok:'}
+                  <label className="scrape-input-label">
+                    {selectedPlatform === 'youtube'
+                      ? 'Masukkan link video YouTube'
+                      : selectedPlatform === 'instagram'
+                      ? 'Masukkan link postingan atau Reels Instagram'
+                      : 'Masukkan link video TikTok'}
                   </label>
                   <div className="scrape-input-row">
                     <div className="scrape-input-wrapper">
-                      <Search size={18} className="scrape-icon-left" />
+                      <Link2 size={18} className="scrape-icon-left" />
                       <input
                         type="text"
                         className="scrape-input-field"
                         placeholder={
-                          selectedPlatform === 'instagram'
-                            ? 'Tempelkan link Reels atau Postingan Instagram (contoh: https://www.instagram.com/reel/C1ACfnvh4KE/)...'
+                          selectedPlatform === 'youtube'
+                            ? 'Tempelkan link video YouTube (contoh: https://www.youtube.com/watch?v=...)...'
                             : 'Tempelkan link video TikTok, shortlink vt.tiktok.com, atau ID video (contoh: https://vt.tiktok.com/ZSbJY5aH9/)...'
                         }
                         value={scrapeInput}
@@ -1285,7 +1275,7 @@ export default function App() {
                         </>
                       ) : (
                         <>
-                          <Play size={16} fill="currentColor" />
+                          <Play size={15} fill="currentColor" />
                           <span>Mulai Scraping Komentar</span>
                         </>
                       )}
@@ -1321,12 +1311,11 @@ export default function App() {
                     </div>
                   )}
 
-                  <div className="scrape-hint-text">
-                    {selectedPlatform === 'instagram' ? (
-                      <span>Format Instagram: <code>https://www.instagram.com/reel/C1ACfnvh4KE/</code>, <code>https://www.instagram.com/p/Cm2cJmABD1p/</code>, atau shortcode <code>Cm2cJmABD1p</code>.</span>
-                    ) : (
-                      <span>Contoh format TikTok yang didukung: <code>https://www.tiktok.com/@user/video/7687448180547456277</code> atau angka ID <code>7687448180547456277</code>.</span>
-                    )}
+                  <div className="scrape-hint-text-clean">
+                    <span>Contoh format TikTok yang didukung:</span>
+                    <code>https://www.tiktok.com/@user/video/7687448180547456277</code>
+                    <span>atau angka ID</span>
+                    <code>7687448180547456277</code>
                   </div>
                 </form>
 
@@ -1375,103 +1364,111 @@ export default function App() {
                 )}
               </section>
 
-              {/* Quick Overview Metrics Cards */}
-              <div className="stats-grid">
-                <div className="stat-card stat-card-blue">
-                  <div className="stat-icon-wrapper">
-                    <Layers size={18} />
+              {/* Quick Overview Metrics Cards (Matching Reference Screenshot) */}
+              <div className="stats-grid-dashboard">
+                {/* Card 1: Total Video Ter-scrape (Warm Peach) */}
+                <div className="stat-card-clean stat-card-peach">
+                  <div className="stat-card-icon-box peach-icon">
+                    <Database size={20} />
                   </div>
-                  <div>
-                    <div className="stat-number">{totalScrapedStats.totalVideos}</div>
-                    <div className="stat-label">Total Video Ter-scrape</div>
+                  <div className="stat-card-content">
+                    <div className="stat-card-value">{totalScrapedStats.totalVideos}</div>
+                    <div className="stat-card-title">Total Video Ter-scrape</div>
                   </div>
+                  <ArrowRight size={16} className="stat-card-arrow" />
                 </div>
 
-                <div className="stat-card stat-card-rose">
-                  <div className="stat-icon-wrapper">
-                    <MessageSquare size={18} />
+                {/* Card 2: Total Komentar Tersimpan (Soft Rose) */}
+                <div className="stat-card-clean stat-card-rose">
+                  <div className="stat-card-icon-box rose-icon">
+                    <MessageSquare size={20} />
                   </div>
-                  <div>
-                    <div className="stat-number">{totalScrapedStats.totalStoredComments.toLocaleString()}</div>
-                    <div className="stat-label">Total Komentar Tersimpan</div>
+                  <div className="stat-card-content">
+                    <div className="stat-card-value">{totalScrapedStats.totalStoredComments.toLocaleString()}</div>
+                    <div className="stat-card-title">Total Komentar Tersimpan</div>
                   </div>
+                  <ArrowRight size={16} className="stat-card-arrow" />
                 </div>
 
-                <div className="stat-card stat-card-violet">
-                  <div className="stat-icon-wrapper">
-                    <HardDrive size={18} />
+                {/* Card 3: File JSON di Folder data/ (Soft Lavender) */}
+                <div className="stat-card-clean stat-card-lavender">
+                  <div className="stat-card-icon-box lavender-icon">
+                    <FileText size={20} />
                   </div>
-                  <div>
-                    <div className="stat-number">{files.length} File</div>
-                    <div className="stat-label">File JSON di Folder data/</div>
+                  <div className="stat-card-content">
+                    <div className="stat-card-value">{files.length}</div>
+                    <div className="stat-card-title">File JSON di Folder data/</div>
                   </div>
+                  <ArrowRight size={16} className="stat-card-arrow" />
                 </div>
 
-                <div className="stat-card stat-card-amber">
-                  <div className="stat-icon-wrapper">
-                    <CheckCircle2 size={18} />
+                {/* Card 4: Status Server Lokal (Soft Mint) */}
+                <div className="stat-card-clean stat-card-mint">
+                  <div className="stat-card-icon-box mint-icon">
+                    <CheckCircle2 size={20} />
                   </div>
-                  <div>
-                    <div className="stat-number">{serverOnline ? '100% Aktif' : 'Offline'}</div>
-                    <div className="stat-label">Status Server Lokal</div>
+                  <div className="stat-card-content">
+                    <div className="stat-card-value">{serverOnline ? '100% Aktif' : 'Offline'}</div>
+                    <div className="stat-card-title">Status Server Lokal</div>
                   </div>
+                  <ArrowRight size={16} className="stat-card-arrow" />
                 </div>
               </div>
 
               {/* Recent Scrapes List */}
               {files.length > 0 && (
-                <section className="recent-section">
-                  <div className="recent-section-header">
-                    <div className="recent-section-title">Riwayat Scraping Terakhir</div>
+                <section className="recent-section-clean">
+                  <div className="recent-section-header-clean">
+                    <h2 className="recent-section-title-clean">Riwayat Scraping Terakhir</h2>
                     <button
-                      className="btn btn-white-bordered"
+                      className="btn-pill-header"
                       onClick={() => setActiveTab('files')}
-                      style={{ padding: '6px 12px', fontSize: '12px' }}
                     >
-                      Lihat Semua File
+                      <span>Lihat Semua File</span>
+                      <ArrowRight size={14} />
                     </button>
                   </div>
 
-                  <div className="recent-table-card">
-                    <table className="recent-table">
+                  <div className="recent-table-card-clean">
+                    <table className="recent-table-clean">
                       <thead>
                         <tr>
-                          <th>Nama File / Video ID</th>
-                          <th>Caption Preview</th>
-                          <th>Jumlah Komentar</th>
-                          <th>Waktu Scrape</th>
-                          <th style={{ textAlign: 'right' }}>Aksi</th>
+                          <th style={{ width: '28%' }}>NAMA FILE / VIDEO ID</th>
+                          <th style={{ width: '32%' }}>CAPTION PREVIEW</th>
+                          <th style={{ width: '16%' }}>JUMLAH KOMENTAR</th>
+                          <th style={{ width: '14%' }}>WAKTU SCRAPE</th>
+                          <th style={{ width: '10%', textAlign: 'right' }}>AKSI</th>
                         </tr>
                       </thead>
                       <tbody>
                         {files.slice(0, 5).map((f) => (
                           <tr key={f.filename}>
                             <td>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
-                                <FileJson size={16} color="var(--color-primary)" />
-                                {f.filename}
+                              <div className="file-name-cell">
+                                <FileText size={16} className="file-icon-orange" />
+                                <span className="file-name-text">{f.filename}</span>
                               </div>
                             </td>
                             <td>
-                              <span style={{ color: 'var(--color-text-secondary)', fontSize: '13px' }}>
-                                {f.caption ? `${f.caption.slice(0, 50)}...` : '-'}
+                              <span className="caption-preview-text">
+                                {f.caption ? `${f.caption.slice(0, 48)}...` : '-'}
                               </span>
                             </td>
                             <td>
-                              <span style={{ fontWeight: 600 }}>{f.comments_count} komentar</span>
+                              <span className="comment-count-text">{f.comments_count} komentar</span>
                             </td>
                             <td>
-                              <span style={{ fontSize: '12.5px', color: 'var(--color-text-muted)' }}>
+                              <span className="scrape-time-text">
                                 {formatDate(f.modified)}
                               </span>
                             </td>
                             <td style={{ textAlign: 'right' }}>
                               <button
-                                className="btn btn-white-bordered"
-                                style={{ padding: '4px 10px', fontSize: '12px' }}
+                                className="btn-pill-action"
                                 onClick={() => loadFileContent(f.filename, true)}
                               >
-                                Lihat Hasil ➔
+                                <span>Lihat Hasil</span>
+                                <ArrowRight size={13} />
                               </button>
                             </td>
                           </tr>
