@@ -664,14 +664,68 @@ a:focus-visible {
   font-size: 12px;
   font-weight: 500;
   color: #64748B;
+  line-height: 1.35;
 }
 
 .stat-card-arrow {
   position: absolute;
   right: 18px;
-  bottom: 18px;
+  top: 18px;
   color: #94A3B8;
-  opacity: 0.8;
+  opacity: 0.7;
+}
+
+/* Responsiveness for Dashboard Metric Cards */
+@media (max-width: 960px) {
+  .stats-grid-dashboard {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+}
+
+@media (max-width: 540px) {
+  .stats-grid-dashboard {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .stat-card-clean {
+    padding: 14px 13px;
+    min-height: 88px;
+    border-radius: 10px;
+  }
+
+  .stat-card-icon-box {
+    margin-bottom: 6px;
+  }
+
+  .stat-card-icon-box svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .stat-card-value {
+    font-size: 20px;
+    margin-bottom: 2px;
+  }
+
+  .stat-card-title {
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  .stat-card-arrow {
+    display: none; /* Sembunyikan panah di mobile agar teks tidak terpotong atau bertabrakan */
+  }
+}
+
+@media (max-width: 340px) {
+  .stats-grid-dashboard {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }
 
 /* Recent Scrapes List */
@@ -696,12 +750,13 @@ a:focus-visible {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
   border-radius: 12px;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
 }
 
 .recent-table-clean {
   width: 100%;
+  min-width: 580px;
   border-collapse: collapse;
   text-align: left;
   font-size: 13px;
