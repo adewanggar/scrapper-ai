@@ -317,6 +317,39 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
                 self._send_json(500, {"error": f"Gagal scrape Instagram: {str(e)}"})
             return
 
+        if platform == 'youtube':
+            from youtubecomment import YouTubeComment, extract_youtube_video_id
+            video_id = extract_youtube_video_id(raw_input)
+            if not video_id:
+                self._send_json(400, {
+                    "error": "Format link atau ID video YouTube tidak valid. Contoh: https://www.youtube.com/watch?v=dQw4w9WgXcQ atau https://youtu.be/dQw4w9WgXcQ"
+                })
+                return
+
+            api_key = body.get('api_key') or os.environ.get('YOUTUBE_API_KEY', 'AIzaSyC-mCSjAgmxEWd8SWY_3PRiDmh_lKGItz0')
+
+            try:
+                yt_scraper = YouTubeComment(api_key=api_key)
+                data = yt_scraper.execute(video_id_or_url=video_id, max_comments=500)
+                final_filename = f"yt_{video_id}.json"
+                final_path = os.path.join(DATA_DIR, final_filename)
+
+                with open(final_path, 'w', encoding='utf-8') as f:
+                    json.dump(data, f, ensure_ascii=False, indent=4)
+
+                logger.info(f"YouTube scraped and saved successfully: {final_path}")
+                self._send_json(200, {
+                    "success": True,
+                    "platform": "youtube",
+                    "id": video_id,
+                    "filename": final_filename,
+                    "data": data
+                })
+            except Exception as e:
+                logger.error(f"Error scraping YouTube {video_id}: {e}")
+                self._send_json(500, {"error": f"Gagal scrape YouTube: {str(e)}"})
+            return
+
         # Default: TikTok Scraper
         aweme_id = resolve_tiktok_aweme_id(raw_input)
         if not aweme_id:

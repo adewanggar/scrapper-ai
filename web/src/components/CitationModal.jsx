@@ -31,12 +31,14 @@ export default function CitationModal({
   // Auto-detect creator info
   const initialCreator = useMemo(() => {
     const fromUrl = parseCreatorFromUrl(data?.video_url);
-    const dateStr = data?.date_now || (data?.comments?.[0]?.create_time) || '';
+    const dateStr = data?.published_at || data?.date_now || (data?.comments?.[0]?.create_time) || '';
+    const isYt = data?.platform === 'youtube' || data?.video_url?.includes('youtube.com') || data?.video_url?.includes('youtu.be');
+    const isIg = data?.platform === 'instagram' || data?.video_url?.includes('instagram.com');
     return {
-      creatorName: fromUrl.creatorName !== 'Kreator Konten' ? fromUrl.creatorName : 'Kreator Video',
-      handle: fromUrl.handle !== 'tiktok_creator' ? fromUrl.handle : 'kreator_tiktok',
+      creatorName: data?.author_name || (fromUrl.creatorName !== 'Kreator Konten' ? fromUrl.creatorName : isYt ? 'Kreator YouTube' : 'Kreator Video'),
+      handle: fromUrl.handle !== 'tiktok_creator' ? fromUrl.handle : isYt ? 'youtube' : 'kreator_tiktok',
       publishDate: dateStr ? dateStr.slice(0, 10) : new Date().toISOString().slice(0, 10),
-      platform: data?.video_url?.includes('instagram.com') ? 'Instagram' : 'TikTok'
+      platform: isYt ? 'YouTube' : isIg ? 'Instagram' : 'TikTok'
     };
   }, [data]);
 

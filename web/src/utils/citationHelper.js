@@ -53,12 +53,21 @@ export function parseCreatorFromUrl(url) {
     return { creatorName: ttMatch[1], handle: ttMatch[1] };
   }
 
+  // YouTube: youtube.com or youtu.be
+  if (url.includes('youtube.com') || url.includes('youtu.be')) {
+    const ytChannel = url.match(/youtube\.com\/@([\w.-]+)/i);
+    if (ytChannel) {
+      return { creatorName: ytChannel[1], handle: ytChannel[1] };
+    }
+    return { creatorName: 'Kreator YouTube', handle: 'youtube_video' };
+  }
+
   // Instagram: https://www.instagram.com/reel/ID atau p/ID
   if (url.includes('instagram.com')) {
     return { creatorName: 'Kreator Instagram', handle: 'instagram_post' };
   }
 
-  return { creatorName: 'Kreator Konten', handle: 'tiktok_creator' };
+  return { creatorName: 'Kreator Konten', handle: 'kreator_video' };
 }
 
 /**
