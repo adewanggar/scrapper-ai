@@ -461,10 +461,12 @@ a:focus-visible {
   gap: 12px;
   align-items: center;
   margin-bottom: 10px;
+  width: 100%;
 }
 
 .scrape-input-wrapper {
   flex: 1;
+  width: 100%;
   position: relative;
   min-width: 0;
 }
@@ -480,6 +482,7 @@ a:focus-visible {
 
 .scrape-input-field {
   width: 100%;
+  box-sizing: border-box;
   height: 46px;
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
@@ -2540,12 +2543,28 @@ a:focus-visible {
   .filter-row-1 {
     flex-direction: column;
   }
+  .scraper-main-card {
+    padding: 18px 16px !important;
+  }
   .scrape-input-row {
-    flex-direction: column;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    width: 100% !important;
+    gap: 12px !important;
+  }
+  .scrape-input-wrapper {
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+  }
+  .scrape-input-field {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
   }
   .btn-scrape-primary {
-    width: 100%;
-    justify-content: center;
+    width: 100% !important;
+    justify-content: center !important;
   }
 }
 
