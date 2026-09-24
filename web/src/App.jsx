@@ -1831,28 +1831,32 @@ export default function App() {
                                     {formatDate(comment.create_time)}
                                   </div>
 
-                                  <button
-                                    className="comment-icon-subtle quote-btn"
-                                    title="Kutip verbatim untuk Bab 4 Skripsi (Format APA / Narasi Ilmiah)"
-                                    onClick={() => {
-                                      setVerbatimModalComment(comment);
-                                      setVerbatimModalIndex(index + 1);
-                                    }}
-                                  >
-                                    <Quote size={14} />
-                                  </button>
+                                  <div className="comment-actions-inline">
+                                    <button
+                                      className="comment-icon-subtle quote-btn"
+                                      title="Kutip verbatim untuk Bab 4 Skripsi (Format APA / Narasi Ilmiah)"
+                                      onClick={() => {
+                                        setVerbatimModalComment(comment);
+                                        setVerbatimModalIndex(index + 1);
+                                      }}
+                                      aria-label="Kutip komentar verbatim"
+                                    >
+                                      <Quote size={14} />
+                                    </button>
 
-                                  <button
-                                    className="comment-icon-subtle"
-                                    title="Salin isi komentar"
-                                    onClick={() => copyToClipboard(comment.comment, comment.comment_id || index)}
-                                  >
-                                    {copiedId === (comment.comment_id || index) ? (
-                                      <Check size={15} color="var(--color-success)" />
-                                    ) : (
-                                      <Copy size={15} />
-                                    )}
-                                  </button>
+                                    <button
+                                      className="comment-icon-subtle"
+                                      title="Salin isi komentar"
+                                      onClick={() => copyToClipboard(comment.comment, comment.comment_id || index)}
+                                      aria-label="Salin isi komentar"
+                                    >
+                                      {copiedId === (comment.comment_id || index) ? (
+                                        <Check size={15} color="var(--color-success)" />
+                                      ) : (
+                                        <Copy size={15} />
+                                      )}
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
 
@@ -1914,27 +1918,31 @@ export default function App() {
                                           <div className="comment-timestamp">
                                             {formatDate(reply.create_time)}
                                           </div>
-                                          <button
-                                            className="comment-icon-subtle quote-btn"
-                                            title="Kutip balasan untuk Bab 4 Skripsi"
-                                            onClick={() => {
-                                              setVerbatimModalComment(reply);
-                                              setVerbatimModalIndex(rIdx + 1);
-                                            }}
-                                          >
-                                            <Quote size={12} />
-                                          </button>
-                                          <button
-                                            className="comment-icon-subtle"
-                                            title="Salin balasan"
-                                            onClick={() => copyToClipboard(reply.comment, reply.comment_id || rIdx)}
-                                          >
-                                            {copiedId === (reply.comment_id || rIdx) ? (
-                                              <Check size={13} color="var(--color-success)" />
-                                            ) : (
-                                              <Copy size={13} />
-                                            )}
-                                          </button>
+                                          <div className="comment-actions-inline">
+                                            <button
+                                              className="comment-icon-subtle quote-btn"
+                                              title="Kutip balasan untuk Bab 4 Skripsi"
+                                              onClick={() => {
+                                                setVerbatimModalComment(reply);
+                                                setVerbatimModalIndex(rIdx + 1);
+                                              }}
+                                              aria-label="Kutip balasan verbatim"
+                                            >
+                                              <Quote size={12} />
+                                            </button>
+                                            <button
+                                              className="comment-icon-subtle"
+                                              title="Salin balasan"
+                                              onClick={() => copyToClipboard(reply.comment, reply.comment_id || rIdx)}
+                                              aria-label="Salin balasan"
+                                            >
+                                              {copiedId === (reply.comment_id || rIdx) ? (
+                                                <Check size={13} color="var(--color-success)" />
+                                              ) : (
+                                                <Copy size={13} />
+                                              )}
+                                            </button>
+                                          </div>
                                         </div>
                                       </div>
 

@@ -1091,12 +1091,15 @@ a:focus-visible {
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 8px;
+  min-width: 0;
 }
 
 .author-meta-wrap {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+  flex: 1;
 }
 
 .author-avatar {
@@ -1124,24 +1127,44 @@ a:focus-visible {
   display: flex;
   align-items: baseline;
   gap: 6px;
+  min-width: 0;
+  flex: 1;
 }
 
 .author-name-bold {
   font-size: 14px;
   font-weight: 600;
   color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+  display: inline-block;
 }
 
 .author-handle-gray {
   font-size: 12.5px;
   font-weight: 400;
   color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+  display: inline-block;
 }
 
 .comment-right-meta {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex-shrink: 0;
+}
+
+.comment-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
 .comment-timestamp {
@@ -1152,19 +1175,21 @@ a:focus-visible {
   align-items: center;
   gap: 4px;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .comment-icon-subtle {
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   color: var(--color-text-muted);
   cursor: pointer;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 5px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 .comment-icon-subtle:hover {
   color: var(--color-text-primary);
@@ -2084,6 +2109,83 @@ a:focus-visible {
   .replies-thread-box {
     margin-left: 0;
   }
+
+  /* Mobile Comment Row Layout - Pastikan tombol kutipan & salin selalu terlihat 100% */
+  .comment-row {
+    padding: 14px 12px !important;
+  }
+  .comment-row-top {
+    gap: 8px !important;
+    align-items: flex-start !important;
+    width: 100% !important;
+  }
+  .author-meta-wrap {
+    gap: 8px !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+  }
+  .author-avatar {
+    width: 34px !important;
+    height: 34px !important;
+    font-size: 13px !important;
+  }
+  .author-names-line {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1px !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  .author-name-bold {
+    font-size: 13px !important;
+    max-width: 130px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .author-handle-gray {
+    font-size: 11px !important;
+    max-width: 120px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  .comment-right-meta {
+    flex-direction: column !important;
+    align-items: flex-end !important;
+    gap: 4px !important;
+    flex-shrink: 0 !important;
+  }
+  .comment-actions-inline {
+    order: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  .comment-timestamp {
+    font-size: 10.5px !important;
+    color: var(--color-text-muted) !important;
+    order: 2 !important;
+  }
+  .comment-icon-subtle {
+    width: 32px !important;
+    height: 32px !important;
+    padding: 0 !important;
+    border-radius: 7px !important;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    color: var(--color-text-secondary) !important;
+  }
+  .comment-icon-subtle.quote-btn {
+    background: #ecfdf5 !important;
+    color: #059669 !important;
+    border-color: #a7f3d0 !important;
+  }
+  .comment-icon-subtle.quote-btn:hover {
+    background: #d1fae5 !important;
+    color: #047857 !important;
+  }
+
   .ai-header-card {
     flex-direction: column;
     align-items: flex-start;
@@ -2094,6 +2196,12 @@ a:focus-visible {
 }
 
 @media (max-width: 540px) {
+  .author-name-bold {
+    max-width: 105px !important;
+  }
+  .author-handle-gray {
+    max-width: 95px !important;
+  }
   .stats-grid {
     grid-template-columns: 1fr;
   }
