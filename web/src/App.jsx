@@ -181,8 +181,10 @@ function PinLockScreen({ onUnlock }) {
   return (
     <div className="pin-screen-wrapper">
       <div className={`pin-card ${isError ? 'shake' : ''}`}>
-        <div className={`pin-icon-shield ${isSuccess ? 'success' : ''}`}>
-          {isSuccess ? <ShieldCheck size={32} /> : <Lock size={30} />}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px' }}>
+          <img src="/logo.png" alt="Tesisori" style={{ width: '52px', height: '52px', objectFit: 'contain', marginBottom: '6px' }} />
+          <span style={{ fontSize: '20px', fontWeight: 800, color: '#F97316', letterSpacing: '-0.02em', lineHeight: 1.1 }}>Tesisori</span>
+          <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#EA580C' }}>AI Research Workspace</span>
         </div>
 
         <h2 className="pin-title">
@@ -1061,11 +1063,7 @@ export default function App() {
         {/* Brand */}
         <div className="sidebar-brand">
           <div className="brand-icon-square brand-icon-tesisori">
-            <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M10 22L18 13H52L46 22H10Z" fill="#F97316" />
-              <path d="M22 24H35V53L22 46V24Z" fill="#F97316" />
-              <path d="M35 24L46 19V47L35 53V24Z" fill="#EA580C" />
-            </svg>
+            <img src="/logo.png" alt="Tesisori Logo" style={{ width: '34px', height: '34px', objectFit: 'contain' }} />
           </div>
           <div className="brand-title-wrap">
             <h1 className="brand-tesisori-title">Tesisori</h1>
