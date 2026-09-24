@@ -68,6 +68,42 @@ ANALYSIS_FRAMEWORKS = {
         "description": "Analisis 4 elemen framing Entman (1993): Define Problems, Diagnose Causes, Make Moral Judgments, dan Suggest Remedies pada diskursus media sosial.",
         "theory": "Entman's Framing Theory (1993), Agenda Setting, Social Construction of Reality",
         "target_major": "Magister Ilmu Komunikasi (S2), Kajian Media, Komunikasi Politik"
+    },
+    "political_communication": {
+        "id": "political_communication",
+        "title": "Komunikasi Politik & Polarisasi Opini (Political Communication & Echo Chamber)",
+        "short_title": "Komunikasi Politik",
+        "icon": "ShieldAlert",
+        "description": "Menganalisis polarisasi kubu partisipan, echo chamber, sentimen terhadap figur/kebijakan politik, dan bias konfirmasi pemilih.",
+        "theory": "Selective Exposure, Echo Chamber, Spiral of Silence, Social Identity Theory",
+        "target_major": "Ilmu Politik, Komunikasi Politik, Kebijakan Publik"
+    },
+    "audience_reception": {
+        "id": "audience_reception",
+        "title": "Resepsi Khalayak & Dekoding Audiens (Stuart Hall Reception Analysis)",
+        "short_title": "Resepsi Stuart Hall",
+        "icon": "MessageCircle",
+        "description": "Mengklasifikasikan pemaknaan audiens ke dalam 3 posisi: Dominan-Hegemonik (menerima pesan), Negosiasi (kompromi), atau Oposisional (menolak/kritis).",
+        "theory": "Encoding/Decoding Model (Stuart Hall 1973), Active Audience Theory, Cultural Studies",
+        "target_major": "Kajian Media, Studi Budaya, Ilmu Komunikasi"
+    },
+    "parasocial_culture": {
+        "id": "parasocial_culture",
+        "title": "Budaya Digital & Interaksi Parasosial (Parasocial Interaction & Fandom)",
+        "short_title": "Interaksi Parasosial",
+        "icon": "Award",
+        "description": "Mengkaji keterikatan emosional semu khalayak pada figur kreator/selebritas, loyalitas fandom, pembelaan moral fans, dan dinamika micro-celebrity.",
+        "theory": "Parasocial Interaction (Horton & Wohl), Participatory Culture (Henry Jenkins), Micro-Celebrity",
+        "target_major": "Sosiologi Budaya, Kajian Fandom, Komunikasi Digital"
+    },
+    "public_policy": {
+        "id": "public_policy",
+        "title": "Aspirasi Warga & Kebijakan Publik (Citizen Feedback & Public Governance)",
+        "short_title": "Kebijakan Publik",
+        "icon": "CheckCircle2",
+        "description": "Evaluasi penerimaan publik terhadap kebijakan pemerintah, regulasi hukum, kritik layanan umum, dan tuntutan transparansi masyarakat.",
+        "theory": "Deliberative Democracy, Citizen Engagement, Good Governance & Accountability",
+        "target_major": "Administrasi Publik, Kebijakan Publik, Ilmu Komunikasi"
     }
 }
 
@@ -721,6 +757,293 @@ Analisis bagaimana publik mengkonstruksi realitas melalui 4 elemen pembingkaian 
     ],
     "theoretical_relevance": "Kaitan temuan dengan teori Entman (1993), Framing Effects, dan Konstruksionisme Sosial",
     "thesis_summary_paragraph": "Paragraf pembahasan Bab 4 Tesis S2 yang mendalam, komprehensif, dan siap salin."
+  }}
+}}
+"""
+        return prompt, sys_inst
+
+    # 7. KOMUNIKASI POLITIK & POLARISASI OPINI
+    elif analysis_type == "political_communication":
+        sys_inst = (
+            "Anda adalah asisten peneliti ahli komunikasi politik, opini publik, dan polarisasi media sosial. "
+            "Tugas Anda menganalisis dataset komentar warganet untuk penelitian skripsi/tugas akhir bidang Ilmu Komunikasi dan Ilmu Politik. "
+            "WAJIB memberikan output dalam format JSON murni yang valid tanpa teks pembuka/penutup."
+        )
+        prompt = f"""Analisis dataset komentar berikut dari perspektif Komunikasi Politik & Polarisasi Opini untuk skripsi:
+
+CAPTION KONTEN:
+\"\"\"{caption}\"\"\"
+
+SAMPEL KOMENTAR ({count} komentar):
+\"\"\"{formatted_comments}\"\"\"
+
+Kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100):
+
+{{
+  "context_summary": {{
+    "political_issue": "Isu politik, figur, atau kebijakan yang menjadi fokus perdebatan",
+    "polarization_level": "Rendah / Sedang / Sangat Tinggi & Mengakar",
+    "dominant_narrative": "Narasi politik yang paling vokal mengemuka di kolom komentar"
+  }},
+  "political_metrics": {{
+    "pro_stance_pct": 40,
+    "contra_stance_pct": 45,
+    "neutral_skeptical_pct": 15,
+    "dominant_stance": "Kubu Kontra / Kubu Pro / Skeptis Golput",
+    "echo_chamber_intensity": "Tinggi (Saling Menguatkan Bias) / Terbuka Dialog"
+  }},
+  "stance_dynamics": {{
+    "side_a_name": "Kubu Pro / Pembela Narasi",
+    "side_a_pct": 40,
+    "side_b_name": "Kubu Kontra / Penentang Narasi",
+    "side_b_pct": 45,
+    "neutral_pct": 15,
+    "controversy_level": "Tinggi",
+    "polarization_summary": "Bagaimana dinamika polarisasi kubu politik dan framing partisan berlangsung"
+  }},
+  "topic_clusters": [
+    {{
+      "topic_name": "Tema Debat Partisan 1",
+      "pct": 40,
+      "description": "Fokus argumen warganet pada topik ini",
+      "sample_quote": "Kutipan representatif warganet"
+    }},
+    {{
+      "topic_name": "Tema Debat Partisan 2",
+      "pct": 35,
+      "description": "Fokus argumen warganet pada topik ini",
+      "sample_quote": "Kutipan representatif warganet"
+    }},
+    {{
+      "topic_name": "Tema Debat Partisan 3",
+      "pct": 25,
+      "description": "Fokus argumen warganet pada topik ini",
+      "sample_quote": "Kutipan representatif warganet"
+    }}
+  ],
+  "academic_insights": {{
+    "key_findings": [
+      "Temuan empiris polarisasi politik 1 untuk skripsi",
+      "Temuan empiris polarisasi politik 2 untuk skripsi",
+      "Temuan empiris polarisasi politik 3 untuk skripsi"
+    ],
+    "theoretical_relevance": "Kaitan temuan dengan teori Selective Exposure, Echo Chamber, dan Spiral of Silence",
+    "thesis_summary_paragraph": "Paragraf kesimpulan akademik komprehensif yang siap disalin untuk Bab 4 Skripsi."
+  }}
+}}
+"""
+        return prompt, sys_inst
+
+    # 8. RESEPSI KHALAYAK (STUART HALL)
+    elif analysis_type == "audience_reception":
+        sys_inst = (
+            "Anda adalah asisten peneliti ahli analisis resepsi khalayak (Audience Reception Studies) dan teori kultural Stuart Hall. "
+            "Tugas Anda mengklasifikasikan pemaknaan penonton ke dalam 3 posisi pembacaan Stuart Hall (1973). "
+            "WAJIB memberikan output dalam format JSON murni yang valid tanpa teks pembuka/penutup."
+        )
+        prompt = f"""Analisis dataset komentar berikut menggunakan Model Resepsi Khalayak Stuart Hall (Encoding/Decoding) untuk skripsi:
+
+CAPTION KONTEN:
+\"\"\"{caption}\"\"\"
+
+SAMPEL KOMENTAR ({count} komentar):
+\"\"\"{formatted_comments}\"\"\"
+
+Kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100):
+
+{{
+  "context_summary": {{
+    "encoded_message": "Pesan atau nilai yang di-encode oleh pembuat konten",
+    "dominant_reception_trend": "Kecenderungan pemaknaan umum khalayak terhadap video",
+    "cultural_context": "Konteks sosial-budaya penonton yang memengaruhi pemaknaan"
+  }},
+  "hall_reception_positions": {{
+    "dominant_hegemonic_pct": 45,
+    "negotiated_pct": 30,
+    "oppositional_pct": 25,
+    "dominant_position": "Posisi Dominan-Hegemonik / Posisi Negosiasi / Posisi Oposisional",
+    "reception_verdict": "Khalayak Cenderung Menerima / Menolak Pesan Dominan"
+  }},
+  "stance_dynamics": {{
+    "side_a_name": "Pembacaan Menerima (Dominan)",
+    "side_a_pct": 45,
+    "side_b_name": "Pembacaan Menolak (Oposisional)",
+    "side_b_pct": 25,
+    "neutral_pct": 30,
+    "controversy_level": "Sedang",
+    "polarization_summary": "Pertarungan pemaknaan antara khalayak yang sepakat vs yang mendekonstruksi pesan"
+  }},
+  "topic_clusters": [
+    {{
+      "topic_name": "Pola Pemaknaan Khalayak 1",
+      "pct": 45,
+      "description": "Bagaimana penonton menafsirkan isi konten",
+      "sample_quote": "Kutipan komentar representatif dari sampel"
+    }},
+    {{
+      "topic_name": "Pola Pemaknaan Khalayak 2",
+      "pct": 35,
+      "description": "Bagaimana penonton menafsirkan isi konten",
+      "sample_quote": "Kutipan komentar representatif dari sampel"
+    }},
+    {{
+      "topic_name": "Pola Pemaknaan Khalayak 3",
+      "pct": 20,
+      "description": "Bagaimana penonton menafsirkan isi konten",
+      "sample_quote": "Kutipan komentar representatif dari sampel"
+    }}
+  ],
+  "academic_insights": {{
+    "key_findings": [
+      "Temuan empiris dekoding pesan 1 untuk skripsi",
+      "Temuan empiris dekoding pesan 2 untuk skripsi",
+      "Temuan empiris dekoding pesan 3 untuk skripsi"
+    ],
+    "theoretical_relevance": "Kaitan temuan dengan Encoding/Decoding Stuart Hall (1973) dan Active Audience Theory",
+    "thesis_summary_paragraph": "Paragraf kesimpulan akademik komprehensif yang siap disalin untuk Bab 4 Skripsi."
+  }}
+}}
+"""
+        return prompt, sys_inst
+
+    # 9. BUDAYA DIGITAL & INTERAKSI PARASOSIAL
+    elif analysis_type == "parasocial_culture":
+        sys_inst = (
+            "Anda adalah asisten peneliti ahli budaya digital, interaksi parasosial, dan studi fandom media sosial. "
+            "Tugas Anda menganalisis dataset komentar warganet untuk penelitian skripsi/tugas akhir bidang Kajian Media dan Komunikasi Digital. "
+            "WAJIB memberikan output dalam format JSON murni yang valid tanpa teks pembuka/penutup."
+        )
+        prompt = f"""Analisis dataset komentar berikut dari perspektif Interaksi Parasosial & Budaya Fandom untuk skripsi:
+
+CAPTION KONTEN:
+\"\"\"{caption}\"\"\"
+
+SAMPEL KOMENTAR ({count} komentar):
+\"\"\"{formatted_comments}\"\"\"
+
+Kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100):
+
+{{
+  "context_summary": {{
+    "creator_persona": "Persona atau citra yang dibangun kreator/figur publik",
+    "parasocial_closeness_level": "Sangat Akrab Semu / Pengagum / Netral / Kritis",
+    "fandom_dynamic": "Uraian bagaimana komunitas penggemar merespons konten"
+  }},
+  "parasocial_metrics": {{
+    "parasocial_attachment_pct": 50,
+    "fandom_loyalty_pct": 30,
+    "critical_detachment_pct": 20,
+    "dominant_attachment": "Ikatan Parasosial Afektif (Penuh Kasih & Peduli)",
+    "protective_behavior": "Tinggi (Membela Kreator Mati-matian) / Wajar / Tidak Terlihat"
+  }},
+  "stance_dynamics": {{
+    "side_a_name": "Penggemar Setia / Pembela Kreator",
+    "side_a_pct": 60,
+    "side_b_name": "Pengkritik / Penonton Kasual",
+    "side_b_pct": 30,
+    "neutral_pct": 10,
+    "controversy_level": "Sedang",
+    "polarization_summary": "Bagaimana relasi emosional memicu respon afektif dan pembelaan di kolom komentar"
+  }},
+  "topic_clusters": [
+    {{
+      "topic_name": "Bentuk Kedekatan Emosional 1",
+      "pct": 40,
+      "description": "Ungkapan rasa memiliki atau kepedulian pada kreator",
+      "sample_quote": "Kutipan representatif warganet"
+    }},
+    {{
+      "topic_name": "Bentuk Kedekatan Emosional 2",
+      "pct": 35,
+      "description": "Ungkapan rasa memiliki atau kepedulian pada kreator",
+      "sample_quote": "Kutipan representatif warganet"
+    }},
+    {{
+      "topic_name": "Bentuk Kedekatan Emosional 3",
+      "pct": 25,
+      "description": "Ungkapan rasa memiliki atau kepedulian pada kreator",
+      "sample_quote": "Kutipan representatif warganet"
+    }}
+  ],
+  "academic_insights": {{
+    "key_findings": [
+      "Temuan empiris interaksi parasosial 1 untuk skripsi",
+      "Temuan empiris interaksi parasosial 2 untuk skripsi",
+      "Temuan empiris interaksi parasosial 3 untuk skripsi"
+    ],
+    "theoretical_relevance": "Kaitan temuan dengan Parasocial Interaction Theory (Horton & Wohl) dan Participatory Culture (Jenkins)",
+    "thesis_summary_paragraph": "Paragraf kesimpulan akademik komprehensif yang siap disalin untuk Bab 4 Skripsi."
+  }}
+}}
+"""
+        return prompt, sys_inst
+
+    # 10. ASPIRASI WARGA & KEBIJAKAN PUBLIK
+    elif analysis_type == "public_policy":
+        sys_inst = (
+            "Anda adalah asisten peneliti ahli analisis kebijakan publik, akuntabilitas pemerintahan, dan aspirasi masyarakat. "
+            "Tugas Anda menganalisis dataset komentar warganet untuk penelitian skripsi/tugas akhir bidang Kebijakan Publik dan Komunikasi Pemerintahan. "
+            "WAJIB memberikan output dalam format JSON murni yang valid tanpa teks pembuka/penutup."
+        )
+        prompt = f"""Analisis dataset komentar berikut dari perspektif Kebijakan Publik & Aspirasi Warga untuk skripsi:
+
+CAPTION KONTEN:
+\"\"\"{caption}\"\"\"
+
+SAMPEL KOMENTAR ({count} komentar):
+\"\"\"{formatted_comments}\"\"\"
+
+Kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100):
+
+{{
+  "context_summary": {{
+    "policy_or_service_issue": "Isu kebijakan pemerintah, regulasi, atau pelayanan publik yang disorot",
+    "public_grievance_level": "Tinggi / Sedang / Rendah",
+    "trust_in_governance": "Tinggi / Menurun / Krisis Kepercayaan"
+  }},
+  "policy_sentiment": {{
+    "supportive_pct": 20,
+    "constructive_criticism_pct": 45,
+    "cynical_distrust_pct": 35,
+    "dominant_stance": "Kritik Konstruktif Menuntut Perbaikan Layanan / Sinisme Publik"
+  }},
+  "stance_dynamics": {{
+    "side_a_name": "Mendukung Regulasi / Pemerintah",
+    "side_a_pct": 25,
+    "side_b_name": "Menuntut Evaluasi & Transparansi",
+    "side_b_pct": 60,
+    "neutral_pct": 15,
+    "controversy_level": "Tinggi",
+    "polarization_summary": "Tuntutan warga vs pembenaran kebijakan institusi"
+  }},
+  "topic_clusters": [
+    {{
+      "topic_name": "Aspirasi / Keluhan Warga 1",
+      "pct": 40,
+      "description": "Tuntutan atau kritik konkret yang disuarakan",
+      "sample_quote": "Kutipan representatif warganet"
+    }},
+    {{
+      "topic_name": "Aspirasi / Keluhan Warga 2",
+      "pct": 35,
+      "description": "Tuntutan atau kritik konkret yang disuarakan",
+      "sample_quote": "Kutipan representatif warganet"
+    }},
+    {{
+      "topic_name": "Aspirasi / Keluhan Warga 3",
+      "pct": 25,
+      "description": "Tuntutan atau kritik konkret yang disuarakan",
+      "sample_quote": "Kutipan representatif warganet"
+    }}
+  ],
+  "academic_insights": {{
+    "key_findings": [
+      "Temuan aspirasi warga 1 untuk skripsi",
+      "Temuan aspirasi warga 2 untuk skripsi",
+      "Temuan aspirasi warga 3 untuk skripsi"
+    ],
+    "theoretical_relevance": "Kaitan temuan dengan Deliberative Democracy, Citizen Feedback, dan Good Governance",
+    "thesis_summary_paragraph": "Paragraf kesimpulan akademik komprehensif yang siap disalin untuk Bab 4 Skripsi."
   }}
 }}
 """

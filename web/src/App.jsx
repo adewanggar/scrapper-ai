@@ -75,36 +75,38 @@ const STOPWORDS = new Set([
   'the', 'is', 'a', 'to', 'and', 'in', 'of', 'for', 'it', 'on', 'at'
 ]);
 
+const FRAMEWORK_CATEGORIES = [
+  { id: 'all', label: 'Semua Bidang' },
+  { id: 'komunikasi', label: 'Komunikasi & Media' },
+  { id: 'sosial_politik', label: 'Politik & Kebijakan' },
+  { id: 'pr_budaya', label: 'Humas & Budaya Digital' },
+  { id: 'bisnis_marketing', label: 'Pemasaran & Bisnis' }
+];
+
 const FRAMEWORKS_LIST = [
   {
-    id: 'emotion_marketing',
-    title: 'Pemasaran Emosi & Kontroversi',
-    badge: 'Marketing / Komunikasi',
-    icon: Flame,
-    color: '#F97316',
-    desc: 'Analisis pemanfaatan emosi, rasio audiens terkecoh drama vs sadar iklan, dan polarisasi kubu.',
-    theory: 'Affective Response Theory, Drama Baiting, Shock Advertising'
+    id: 'entman_framing',
+    category: 'komunikasi',
+    title: 'Analisis Framing Robert Entman',
+    badge: 'Tesis S2 / Ilmu Komunikasi',
+    icon: Layers,
+    color: '#0D9488',
+    desc: 'Analisis 4 elemen pembingkaian Entman (1993): Define Problems, Diagnose Causes, Make Moral Judgments, dan Suggest Remedies.',
+    theory: 'Entman Framing Theory (1993), Agenda Setting, Social Construction of Reality'
   },
   {
-    id: 'public_sentiment',
-    title: 'Sentimen Publik & Krisis PR',
-    badge: 'Public Relations / Humas',
-    icon: Target,
-    color: '#2563EB',
-    desc: 'Audit sentimen masyarakat, skor reputasi/kepercayaan, dan rekomendasi respons krisis PR.',
-    theory: 'Situational Crisis Communication Theory (SCCT), Public Opinion Formation'
-  },
-  {
-    id: 'consumer_behavior',
-    title: 'Perilaku Konsumen & Minat Beli',
-    badge: 'Manajemen Bisnis / E-Commerce',
-    icon: ShoppingBag,
-    color: '#059669',
-    desc: 'Evaluasi intensi beli (purchase intention), persepsi harga & kualitas, dan dinamika eWOM.',
-    theory: 'Theory of Planned Behavior (TPB), Technology Acceptance Model (TAM)'
+    id: 'audience_reception',
+    category: 'komunikasi',
+    title: 'Resepsi Khalayak (Stuart Hall)',
+    badge: 'Studi Media / Kultural',
+    icon: MessageCircle,
+    color: '#D97706',
+    desc: 'Klasifikasi 3 posisi pembacaan audiens: Dominan-Hegemonik (menerima), Negosiasi (kompromi), atau Oposisional (menolak pesan).',
+    theory: 'Encoding/Decoding (Stuart Hall 1973), Active Audience Theory'
   },
   {
     id: 'digital_discourse',
+    category: 'komunikasi',
     title: 'Wacana & Netiket Netizen',
     badge: 'Linguistik / Komunikasi Digital',
     icon: MessageSquare,
@@ -113,7 +115,28 @@ const FRAMEWORKS_LIST = [
     theory: 'Politeness Theory (Brown & Levinson), Computer-Mediated Communication'
   },
   {
+    id: 'political_communication',
+    category: 'sosial_politik',
+    title: 'Komunikasi Politik & Polarisasi Opini',
+    badge: 'Politik / Komunikasi Publik',
+    icon: ShieldAlert,
+    color: '#DC2626',
+    desc: 'Kaji polarisasi kubu partisipan, echo chamber, sentimen terhadap figur/kebijakan, dan bias konfirmasi politik.',
+    theory: 'Selective Exposure, Echo Chamber, Spiral of Silence, Social Identity Theory'
+  },
+  {
+    id: 'public_policy',
+    category: 'sosial_politik',
+    title: 'Aspirasi Warga & Kebijakan Publik',
+    badge: 'Kebijakan Publik / Administrasi',
+    icon: CheckCircle2,
+    color: '#0284C7',
+    desc: 'Evaluasi penerimaan publik terhadap regulasi pemerintah, kritik layanan umum, dan tuntutan transparansi masyarakat.',
+    theory: 'Deliberative Democracy, Citizen Engagement, Good Governance & Accountability'
+  },
+  {
     id: 'social_psychology',
+    category: 'sosial_politik',
     title: 'Psikologi Sosial & Dinamika Kelompok',
     badge: 'Psikologi / Sosiologi',
     icon: Brain,
@@ -122,13 +145,44 @@ const FRAMEWORKS_LIST = [
     theory: 'Social Identity Theory, Moral Foundations Theory, Attribution Theory'
   },
   {
-    id: 'entman_framing',
-    title: 'Analisis Framing Robert Entman',
-    badge: 'Tesis S2 / Ilmu Komunikasi',
-    icon: Layers,
-    color: '#0D9488',
-    desc: 'Analisis 4 elemen pembingkaian Entman (1993): Define Problems, Diagnose Causes, Make Moral Judgments, dan Suggest Remedies.',
-    theory: 'Entman Framing Theory (1993), Agenda Setting, Social Construction of Reality'
+    id: 'public_sentiment',
+    category: 'pr_budaya',
+    title: 'Sentimen Publik & Krisis PR',
+    badge: 'Public Relations / Humas',
+    icon: Target,
+    color: '#2563EB',
+    desc: 'Audit sentimen masyarakat, skor reputasi/kepercayaan, dan rekomendasi respons krisis PR.',
+    theory: 'Situational Crisis Communication Theory (SCCT), Public Opinion Formation'
+  },
+  {
+    id: 'parasocial_culture',
+    category: 'pr_budaya',
+    title: 'Budaya Digital & Interaksi Parasosial',
+    badge: 'Kajian Fandom / Budaya Selebritas',
+    icon: Award,
+    color: '#8B5CF6',
+    desc: 'Kaji keterikatan emosional khalayak pada figur kreator/selebritas (parasosial), loyalitas fans, dan dinamika micro-celebrity.',
+    theory: 'Parasocial Interaction (Horton & Wohl), Participatory Culture (Henry Jenkins)'
+  },
+  {
+    id: 'emotion_marketing',
+    category: 'bisnis_marketing',
+    title: 'Pemasaran Emosi & Kontroversi',
+    badge: 'Marketing / Komunikasi',
+    icon: Flame,
+    color: '#F97316',
+    desc: 'Analisis pemanfaatan emosi, rasio audiens terkecoh drama vs sadar iklan, dan polarisasi kubu.',
+    theory: 'Affective Response Theory, Drama Baiting, Shock Advertising'
+  },
+  {
+    id: 'consumer_behavior',
+    category: 'bisnis_marketing',
+    title: 'Perilaku Konsumen & Minat Beli',
+    badge: 'Manajemen Bisnis / E-Commerce',
+    icon: ShoppingBag,
+    color: '#059669',
+    desc: 'Evaluasi intensi beli (purchase intention), persepsi harga & kualitas, dan dinamika eWOM.',
+    theory: 'Theory of Planned Behavior (TPB), Technology Acceptance Model (TAM)'
   }
 ];
 
@@ -331,13 +385,31 @@ export default function App() {
   const [pageSize, setPageSize] = useState(20);
 
   // AI Analysis State
-  const [analysisType, setAnalysisType] = useState('emotion_marketing');
+  const [analysisType, setAnalysisType] = useState('entman_framing');
+  const [fwCategoryFilter, setFwCategoryFilter] = useState('all');
+  const [fwSearchQuery, setFwSearchQuery] = useState('');
   const [aiAnalysis, setAiAnalysis] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiSampleSize, setAiSampleSize] = useState(50);
   const [aiModel, setAiModel] = useState('clario/gemini-3.7-flash');
   const [aiError, setAiError] = useState('');
   const [copiedThesisText, setCopiedThesisText] = useState(false);
+
+  // Filtered Frameworks based on category & search input
+  const filteredFrameworks = useMemo(() => {
+    return FRAMEWORKS_LIST.filter((fw) => {
+      const matchCat = fwCategoryFilter === 'all' || fw.category === fwCategoryFilter;
+      if (!matchCat) return false;
+      if (!fwSearchQuery.trim()) return true;
+      const q = fwSearchQuery.toLowerCase();
+      return (
+        fw.title.toLowerCase().includes(q) ||
+        fw.desc.toLowerCase().includes(q) ||
+        fw.theory.toLowerCase().includes(q) ||
+        fw.badge.toLowerCase().includes(q)
+      );
+    });
+  }, [fwCategoryFilter, fwSearchQuery]);
 
   // Reset page when any filter or selected file changes
   useEffect(() => {
@@ -716,6 +788,53 @@ export default function App() {
         md += `- **Nama Frame Tandingan:** ${r.counter_frames.counter_frame_name} (${r.counter_frames.counter_frame_pct}%)\n`;
         md += `> ${r.counter_frames.counter_frame_argument || ''}\n\n`;
       }
+    } else if (type === 'political_communication') {
+      md += `## 1. Konteks Isu & Polarisasi Politik\n`;
+      md += `- **Isu / Figur Politik:** ${r.context_summary?.political_issue || '-'}\n`;
+      md += `- **Tingkat Polarisasi:** **${r.context_summary?.polarization_level || '-'}**\n`;
+      md += `- **Narasi Dominan:** ${r.context_summary?.dominant_narrative || '-'}\n\n`;
+
+      md += `## 2. Metrik Sikap Politik & Polarisasi Partisan\n`;
+      md += `- Kubu Pro / Pendukung: **${r.political_metrics?.pro_stance_pct}%**\n`;
+      md += `- Kubu Kontra / Penentang: **${r.political_metrics?.contra_stance_pct}%**\n`;
+      md += `- Skeptis / Golput / Netral: **${r.political_metrics?.neutral_skeptical_pct}%**\n`;
+      md += `*Stance Dominan:* **${r.political_metrics?.dominant_stance}**\n`;
+      md += `*Intensitas Echo Chamber:* ${r.political_metrics?.echo_chamber_intensity}\n\n`;
+    } else if (type === 'audience_reception') {
+      md += `## 1. Konteks Pesan & Analisis Resepsi (Stuart Hall)\n`;
+      md += `- **Pesan Ter-encode:** ${r.context_summary?.encoded_message || '-'}\n`;
+      md += `- **Tren Penerimaan:** **${r.context_summary?.dominant_reception_trend || '-'}**\n`;
+      md += `- **Konteks Sosial Budaya:** ${r.context_summary?.cultural_context || '-'}\n\n`;
+
+      md += `## 2. Tiga Posisi Pembacaan Stuart Hall (1973)\n`;
+      md += `- Posisi Dominan-Hegemonik (Menerima): **${r.hall_reception_positions?.dominant_hegemonic_pct}%**\n`;
+      md += `- Posisi Negosiasi (Kompromi): **${r.hall_reception_positions?.negotiated_pct}%**\n`;
+      md += `- Posisi Oposisional (Menolak/Mendekonstruksi): **${r.hall_reception_positions?.oppositional_pct}%**\n`;
+      md += `*Posisi Dominan:* **${r.hall_reception_positions?.dominant_position}**\n`;
+      md += `*Kesimpulan Dekoding:* ${r.hall_reception_positions?.reception_verdict}\n\n`;
+    } else if (type === 'parasocial_culture') {
+      md += `## 1. Konteks Persona Kreator & Dinamika Fandom\n`;
+      md += `- **Persona Kreator:** ${r.context_summary?.creator_persona || '-'}\n`;
+      md += `- **Kedekatan Parasosial:** **${r.context_summary?.parasocial_closeness_level || '-'}**\n`;
+      md += `- **Dinamika Fandom:** ${r.context_summary?.fandom_dynamic || '-'}\n\n`;
+
+      md += `## 2. Metrik Interaksi Parasosial (Horton & Wohl)\n`;
+      md += `- Keterikatan Emosional Semu: **${r.parasocial_metrics?.parasocial_attachment_pct}%**\n`;
+      md += `- Loyalitas Fandom Komunitas: **${r.parasocial_metrics?.fandom_loyalty_pct}%**\n`;
+      md += `- Kritis / Lepas (Detached): **${r.parasocial_metrics?.critical_detachment_pct}%**\n`;
+      md += `*Bentuk Ikatan Dominan:* **${r.parasocial_metrics?.dominant_attachment}**\n`;
+      md += `*Tingkat Pembelaan Protektif:* ${r.parasocial_metrics?.protective_behavior}\n\n`;
+    } else if (type === 'public_policy') {
+      md += `## 1. Konteks Kebijakan Publik & Pelayanan Warga\n`;
+      md += `- **Isu Kebijakan / Layanan:** ${r.context_summary?.policy_or_service_issue || '-'}\n`;
+      md += `- **Tingkat Keluhan Warga:** **${r.context_summary?.public_grievance_level || '-'}**\n`;
+      md += `- **Kepercayaan Tata Kelola:** ${r.context_summary?.trust_in_governance || '-'}\n\n`;
+
+      md += `## 2. Metrik Sentimen Sikap Publik\n`;
+      md += `- Kritik Konstruktif & Solutif: **${r.policy_sentiment?.constructive_criticism_pct}%**\n`;
+      md += `- Sinisme / Krisis Kepercayaan: **${r.policy_sentiment?.cynical_distrust_pct}%**\n`;
+      md += `- Mendukung Regulasi: **${r.policy_sentiment?.supportive_pct}%**\n`;
+      md += `*Sikap Dominan:* **${r.policy_sentiment?.dominant_stance}**\n\n`;
     } else {
       // Default: Emotion-driven marketing
       md += `## 1. Konteks Narasi & Strategi Pemasaran\n`;
@@ -2407,49 +2526,110 @@ export default function App() {
                       <span>Pilih Sudut Pandang / Kerangka Analisis Skripsi:</span>
                     </div>
                     <span className="ai-frameworks-subtitle">
-                      Pilih teori dan fokus kajian yang relevan dengan topik penelitian tugas akhir Anda
+                      Pilih teori dan fokus kajian yang relevan dengan topik penelitian tugas akhir Anda ({filteredFrameworks.length} dari {FRAMEWORKS_LIST.length} kerangka teori)
                     </span>
                   </div>
 
-                  <div className="ai-frameworks-grid">
-                    {FRAMEWORKS_LIST.map((fw) => {
-                      const IconComp = fw.icon;
-                      const isActive = analysisType === fw.id;
-                      return (
+                  {/* Filter Toolbar: Category Pills & Instant Search */}
+                  <div className="frameworks-filter-toolbar">
+                    <div className="frameworks-cat-pills">
+                      {FRAMEWORK_CATEGORIES.map((cat) => {
+                        const count = cat.id === 'all'
+                          ? FRAMEWORKS_LIST.length
+                          : FRAMEWORKS_LIST.filter((f) => f.category === cat.id).length;
+                        const isCatActive = fwCategoryFilter === cat.id;
+                        return (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            className={`cat-pill-btn ${isCatActive ? 'active' : ''}`}
+                            onClick={() => setFwCategoryFilter(cat.id)}
+                          >
+                            <span>{cat.label}</span>
+                            <span className="cat-pill-count">{count}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="frameworks-search-box">
+                      <Search size={14} className="fw-search-icon" />
+                      <input
+                        type="text"
+                        className="fw-search-input"
+                        placeholder="Cari teori, topik, kata kunci..."
+                        value={fwSearchQuery}
+                        onChange={(e) => setFwSearchQuery(e.target.value)}
+                      />
+                      {fwSearchQuery && (
                         <button
-                          key={fw.id}
                           type="button"
-                          className={`framework-card ${isActive ? 'active' : ''}`}
-                          style={{
-                            '--card-accent': fw.color,
-                            '--card-accent-alpha': `${fw.color}25`
-                          }}
-                          onClick={() => handleFrameworkChange(fw.id)}
+                          className="fw-search-clear"
+                          onClick={() => setFwSearchQuery('')}
+                          title="Hapus pencarian"
                         >
-                          <div className="framework-card-top">
-                            <div className="framework-icon-wrap" style={{ background: `${fw.color}15`, color: fw.color }}>
-                              <IconComp size={18} />
-                            </div>
-                            <span className="framework-badge" style={{ background: `${fw.color}15`, color: fw.color }}>
-                              {fw.badge.split('/')[0].trim()}
-                            </span>
-                          </div>
-
-                          <div className="framework-card-body">
-                            <h4>{fw.title}</h4>
-                            <p>{fw.desc}</p>
-                          </div>
-
-                          <div className="framework-card-footer">
-                            <span className="framework-theory-tag" title={fw.theory}>
-                              {fw.theory.split(',')[0]}
-                            </span>
-                            {isActive && <div className="framework-active-indicator" />}
-                          </div>
+                          <X size={13} />
                         </button>
-                      );
-                    })}
+                      )}
+                    </div>
                   </div>
+
+                  {filteredFrameworks.length === 0 ? (
+                    <div className="empty-frameworks-notice">
+                      <p>Tidak ada kerangka analisis yang cocok dengan filter "<strong>{fwSearchQuery}</strong>".</p>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        style={{ marginTop: '8px' }}
+                        onClick={() => {
+                          setFwCategoryFilter('all');
+                          setFwSearchQuery('');
+                        }}
+                      >
+                        Reset Filter & Tampilkan Semua
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="ai-frameworks-grid">
+                      {filteredFrameworks.map((fw) => {
+                        const IconComp = fw.icon;
+                        const isActive = analysisType === fw.id;
+                        return (
+                          <button
+                            key={fw.id}
+                            type="button"
+                            className={`framework-card ${isActive ? 'active' : ''}`}
+                            style={{
+                              '--card-accent': fw.color,
+                              '--card-accent-alpha': `${fw.color}25`
+                            }}
+                            onClick={() => handleFrameworkChange(fw.id)}
+                          >
+                            <div className="framework-card-top">
+                              <div className="framework-icon-wrap" style={{ background: `${fw.color}15`, color: fw.color }}>
+                                <IconComp size={18} />
+                              </div>
+                              <span className="framework-badge" style={{ background: `${fw.color}15`, color: fw.color }}>
+                                {fw.badge.split('/')[0].trim()}
+                              </span>
+                            </div>
+
+                            <div className="framework-card-body">
+                              <h4>{fw.title}</h4>
+                              <p>{fw.desc}</p>
+                            </div>
+
+                            <div className="framework-card-footer">
+                              <span className="framework-theory-tag" title={fw.theory}>
+                                {fw.theory.split(',')[0]}
+                              </span>
+                              {isActive && <div className="framework-active-indicator" />}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
 
                 {/* Error Alert */}
@@ -2629,6 +2809,90 @@ export default function App() {
                               <div className="ai-context-item-label">Intensitas Pembingkaian</div>
                               <div className="ai-context-item-value">
                                 {aiAnalysis.result.framing_overview?.framing_intensity || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : resultType === 'political_communication' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Isu / Figur Politik Diperdebatkan</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#DC2626' }}>
+                                {aiAnalysis.result.context_summary?.political_issue || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Tingkat Polarisasi Opini</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.polarization_level || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Narasi Partisan Dominan</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.dominant_narrative || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : resultType === 'audience_reception' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Pesan yang Di-encode Kreator</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.encoded_message || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Kecenderungan Resepsi Khalayak</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#D97706' }}>
+                                {aiAnalysis.result.context_summary?.dominant_reception_trend || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Konteks Sosial Budaya Audiens</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.cultural_context || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : resultType === 'parasocial_culture' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Persona Kreator / Figur Publik</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#8B5CF6' }}>
+                                {aiAnalysis.result.context_summary?.creator_persona || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Tingkat Keakraban Semu (Parasosial)</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.parasocial_closeness_level || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Dinamika Komunitas Penggemar</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.fandom_dynamic || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : resultType === 'public_policy' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Isu Kebijakan / Layanan Publik</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#0284C7' }}>
+                                {aiAnalysis.result.context_summary?.policy_or_service_issue || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Tingkat Keluhan / Aspirasi Warga</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.public_grievance_level || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Kepercayaan Tata Kelola (Governance)</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.trust_in_governance || '-'}
                               </div>
                             </div>
                           </>
@@ -2836,6 +3100,148 @@ export default function App() {
                             <div>
                               <div className="stat-number">{aiAnalysis.result.entman_dimensions?.suggest_remedies?.remedy_proposals?.[0]?.pct || 50}%</div>
                               <div className="stat-label">Suggest Remedies</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : resultType === 'political_communication' ? (
+                        <>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><Users size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.political_metrics?.pro_stance_pct}%</div>
+                              <div className="stat-label">Kubu Pro / Pendukung</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><ShieldAlert size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.political_metrics?.contra_stance_pct}%</div>
+                              <div className="stat-label">Kubu Kontra / Penentang</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><BarChart3 size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '15px' }}>
+                                {aiAnalysis.result.political_metrics?.dominant_stance || '-'}
+                              </div>
+                              <div className="stat-label">Stance Politik Dominan</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><Layers size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '15px' }}>
+                                {aiAnalysis.result.political_metrics?.echo_chamber_intensity || 'Tinggi'}
+                              </div>
+                              <div className="stat-label">Intensitas Echo Chamber</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : resultType === 'audience_reception' ? (
+                        <>
+                          <div className="stat-card stat-card-emerald" style={{ background: '#ECFDF5', borderColor: '#A7F3D0' }}>
+                            <div className="stat-icon-wrapper" style={{ background: '#059669', color: '#FFF' }}><CheckCircle2 size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ color: '#065F46' }}>
+                                {aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct}%
+                              </div>
+                              <div className="stat-label">Dominan-Hegemonik (Menerima)</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><MessageCircle size={18} /></div>
+                            <div>
+                              <div className="stat-number">
+                                {aiAnalysis.result.hall_reception_positions?.negotiated_pct}%
+                              </div>
+                              <div className="stat-label">Posisi Negosiasi (Kompromi)</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><AlertCircle size={18} /></div>
+                            <div>
+                              <div className="stat-number">
+                                {aiAnalysis.result.hall_reception_positions?.oppositional_pct}%
+                              </div>
+                              <div className="stat-label">Posisi Oposisional (Menolak)</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><Award size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '14px' }}>
+                                {aiAnalysis.result.hall_reception_positions?.reception_verdict || '-'}
+                              </div>
+                              <div className="stat-label">Kesimpulan Resepsi Audiens</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : resultType === 'parasocial_culture' ? (
+                        <>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><Award size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.parasocial_metrics?.parasocial_attachment_pct}%</div>
+                              <div className="stat-label">Keterikatan Parasosial</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><Users size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.parasocial_metrics?.fandom_loyalty_pct}%</div>
+                              <div className="stat-label">Loyalitas Fandom Aktif</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><ShieldCheck size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '15px' }}>
+                                {aiAnalysis.result.parasocial_metrics?.protective_behavior || 'Wajar'}
+                              </div>
+                              <div className="stat-label">Tingkat Sikap Protektif</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><MessageSquare size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '13.5px' }}>
+                                {aiAnalysis.result.parasocial_metrics?.dominant_attachment || '-'}
+                              </div>
+                              <div className="stat-label">Bentuk Relasi Dominan</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : resultType === 'public_policy' ? (
+                        <>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><CheckCircle2 size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.policy_sentiment?.constructive_criticism_pct}%</div>
+                              <div className="stat-label">Kritik Konstruktif & Solutif</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><AlertCircle size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.policy_sentiment?.cynical_distrust_pct}%</div>
+                              <div className="stat-label">Sinisme / Distrust Warga</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-emerald" style={{ background: '#ECFDF5', borderColor: '#A7F3D0' }}>
+                            <div className="stat-icon-wrapper" style={{ background: '#059669', color: '#FFF' }}><Target size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ color: '#065F46' }}>{aiAnalysis.result.policy_sentiment?.supportive_pct}%</div>
+                              <div className="stat-label">Mendukung Regulasi</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><Layers size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '14px' }}>
+                                {aiAnalysis.result.policy_sentiment?.dominant_stance || '-'}
+                              </div>
+                              <div className="stat-label">Sikap Publik Dominan</div>
                             </div>
                           </div>
                         </>
@@ -3122,6 +3528,189 @@ export default function App() {
                               </div>
                             )}
                           </>
+                        ) : resultType === 'political_communication' ? (
+                          <>
+                            <div className="ai-card-title">
+                              <span>Distribusi Sikap & Polarisasi Politik</span>
+                              <span className="ai-card-badge" style={{ background: '#FEE2E2', color: '#DC2626' }}>
+                                Selective Exposure & Echo Chamber
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🏛️ Kubu Pro / Pendukung Narasi</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.political_metrics?.pro_stance_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-blue" style={{ width: `${aiAnalysis.result.political_metrics?.pro_stance_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🛑 Kubu Kontra / Penentang Narasi</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.political_metrics?.contra_stance_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.political_metrics?.contra_stance_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">⚖️ Netral / Skeptis Golput</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.political_metrics?.neutral_skeptical_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-gray" style={{ width: `${aiAnalysis.result.political_metrics?.neutral_skeptical_pct}%` }} />
+                              </div>
+                            </div>
+
+                            {aiAnalysis.result.political_metrics?.echo_chamber_intensity && (
+                              <div style={{ marginTop: '14px', fontSize: '12px', background: '#FEF2F2', padding: '10px 12px', borderRadius: '8px', border: '1px solid #FECACA' }}>
+                                <strong style={{ color: '#DC2626' }}>Indikasi Echo Chamber:</strong>
+                                <p style={{ margin: '4px 0 0', color: '#991B1B' }}>
+                                  {aiAnalysis.result.political_metrics.echo_chamber_intensity}
+                                </p>
+                              </div>
+                            )}
+                          </>
+                        ) : resultType === 'audience_reception' ? (
+                          <>
+                            <div className="ai-card-title">
+                              <span>Tiga Posisi Pembacaan Stuart Hall (1973)</span>
+                              <span className="ai-card-badge" style={{ background: '#FEF3C7', color: '#D97706' }}>
+                                Encoding / Decoding Model
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">✅ Dominan-Hegemonik (Menerima Pesan)</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-green" style={{ width: `${aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🤝 Posisi Negosiasi (Kompromi / Syarat)</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.negotiated_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-amber" style={{ width: `${aiAnalysis.result.hall_reception_positions?.negotiated_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">❌ Posisi Oposisional (Mendekonstruksi/Menolak)</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.oppositional_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.hall_reception_positions?.oppositional_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div style={{ marginTop: '14px', fontSize: '12.5px', color: 'var(--color-text-secondary)', background: '#FFFBEB', padding: '10px 12px', borderRadius: '8px', border: '1px solid #FDE68A' }}>
+                              <strong style={{ color: '#B45309' }}>Kesimpulan Dekoding:</strong> {aiAnalysis.result.hall_reception_positions?.reception_verdict}
+                            </div>
+                          </>
+                        ) : resultType === 'parasocial_culture' ? (
+                          <>
+                            <div className="ai-card-title">
+                              <span>Derajat Keterikatan Parasosial & Fandom</span>
+                              <span className="ai-card-badge" style={{ background: '#EDE9FE', color: '#7C3AED' }}>
+                                Horton & Wohl / Jenkins (1992)
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">💖 Ikatan Afektif Parasosial</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.parasocial_metrics?.parasocial_attachment_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-purple" style={{ width: `${aiAnalysis.result.parasocial_metrics?.parasocial_attachment_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🛡️ Loyalitas Fandom Komunitas</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.parasocial_metrics?.fandom_loyalty_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-blue" style={{ width: `${aiAnalysis.result.parasocial_metrics?.fandom_loyalty_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">🧐 Pengamat Kasual / Kritis Lepas</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.parasocial_metrics?.critical_detachment_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-gray" style={{ width: `${aiAnalysis.result.parasocial_metrics?.critical_detachment_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div style={{ marginTop: '14px', fontSize: '12px', background: '#F5F3FF', padding: '10px 12px', borderRadius: '8px', border: '1px solid #DDD6FE' }}>
+                              <strong style={{ color: '#6D28D9' }}>Karakter Relasi Parasosial:</strong>
+                              <p style={{ margin: '4px 0 0', color: '#5B21B6' }}>
+                                {aiAnalysis.result.parasocial_metrics?.dominant_attachment}
+                              </p>
+                            </div>
+                          </>
+                        ) : resultType === 'public_policy' ? (
+                          <>
+                            <div className="ai-card-title">
+                              <span>Sentimen Aspirasi & Kebijakan Publik</span>
+                              <span className="ai-card-badge" style={{ background: '#E0F2FE', color: '#0369A1' }}>
+                                Deliberative Democracy & Akuntabilitas
+                              </span>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">💡 Kritik Konstruktif & Tuntutan Layanan</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.policy_sentiment?.constructive_criticism_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-blue" style={{ width: `${aiAnalysis.result.policy_sentiment?.constructive_criticism_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">⚠️ Sinisme & Krisis Kepercayaan</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.policy_sentiment?.cynical_distrust_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.policy_sentiment?.cynical_distrust_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div className="progress-stat-row">
+                              <div className="progress-stat-header">
+                                <span className="progress-stat-name">✅ Mendukung / Apresiasi Kebijakan</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.policy_sentiment?.supportive_pct}%</span>
+                              </div>
+                              <div className="progress-track">
+                                <div className="progress-fill fill-green" style={{ width: `${aiAnalysis.result.policy_sentiment?.supportive_pct}%` }} />
+                              </div>
+                            </div>
+
+                            <div style={{ marginTop: '14px', fontSize: '12px', background: '#F0F9FF', padding: '10px 12px', borderRadius: '8px', border: '1px solid #BAE6FD' }}>
+                              <strong style={{ color: '#0369A1' }}>Sikap Kolektif Warga:</strong>
+                              <p style={{ margin: '4px 0 0', color: '#075985' }}>
+                                {aiAnalysis.result.policy_sentiment?.dominant_stance}
+                              </p>
+                            </div>
+                          </>
                         ) : (
                           <>
                             {/* Default: Emotion-driven marketing */}
@@ -3302,6 +3891,54 @@ export default function App() {
                             </div>
                             <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
                               {aiAnalysis.result.ad_awareness.analysis}
+                            </p>
+                          </div>
+                        )}
+
+                        {resultType === 'political_communication' && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#DC2626', marginBottom: '4px' }}>
+                              Dinamika Komunikasi Politik:
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                              {aiAnalysis.result.political_metrics?.echo_chamber_intensity ? `Indikasi Echo Chamber: ${aiAnalysis.result.political_metrics.echo_chamber_intensity}. ` : ''}
+                              Dinamika pembelahan opini partisipan mencerminkan polarisasi identitas politik dalam ruang publik digital.
+                            </p>
+                          </div>
+                        )}
+
+                        {resultType === 'audience_reception' && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#D97706', marginBottom: '4px' }}>
+                              Analisis Dekoding Khalayak (Stuart Hall):
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                              {aiAnalysis.result.hall_reception_positions?.reception_verdict ? `Kesimpulan: ${aiAnalysis.result.hall_reception_positions.reception_verdict}. ` : ''}
+                              Pola pembacaan menunjukkan bagaimana audiens aktif menegosiasikan atau mengkritisi pesan dominan pembuat konten.
+                            </p>
+                          </div>
+                        )}
+
+                        {resultType === 'parasocial_culture' && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#8B5CF6', marginBottom: '4px' }}>
+                              Dinamika Relasi Parasosial & Fandom:
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                              {aiAnalysis.result.parasocial_metrics?.dominant_attachment ? `Karakter Relasi: ${aiAnalysis.result.parasocial_metrics.dominant_attachment}. ` : ''}
+                              Kedekatan semu mendorong keterlibatan emosional tinggi dan kecenderungan loyalitas protektif dalam pembelaan citra figur publik.
+                            </p>
+                          </div>
+                        )}
+
+                        {resultType === 'public_policy' && (
+                          <div style={{ marginTop: '16px', paddingTop: '12px', borderTop: '1px solid var(--color-border)' }}>
+                            <div style={{ fontSize: '13px', fontWeight: 600, color: '#0284C7', marginBottom: '4px' }}>
+                              Evaluasi Respons Kebijakan Publik:
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: 'var(--color-text-secondary)', lineHeight: '1.5' }}>
+                              {aiAnalysis.result.policy_sentiment?.dominant_stance ? `Sikap Warga: ${aiAnalysis.result.policy_sentiment.dominant_stance}. ` : ''}
+                              Kritik dan aspirasi warganet mencerminkan ekspektasi transparansi dan kebutuhan reformasi layanan publik.
                             </p>
                           </div>
                         )}
