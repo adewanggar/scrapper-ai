@@ -3721,4 +3721,501 @@ a:focus-visible {
   }
 }
 
+/* ====================================================================
+   ANALISIS FRAMING ROBERT ENTMAN (1993) - KHUSUS S2 ILMU KOMUNIKASI
+   ==================================================================== */
+
+.entman-quadrant-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.entman-quadrant-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.entman-quadrant-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: var(--quadrant-accent, var(--color-primary));
+}
+
+.entman-quadrant-card.q-problem {
+  --quadrant-accent: #0284c7;
+}
+
+.entman-quadrant-card.q-cause {
+  --quadrant-accent: #d97706;
+}
+
+.entman-quadrant-card.q-moral {
+  --quadrant-accent: #e11d48;
+}
+
+.entman-quadrant-card.q-remedy {
+  --quadrant-accent: #059669;
+}
+
+.quadrant-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.quadrant-badge {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--quadrant-accent, var(--color-primary));
+}
+
+.quadrant-main-highlight {
+  background: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  line-height: 1.45;
+  border-left: 3px solid var(--quadrant-accent, var(--color-primary));
+}
+
+.quadrant-main-highlight strong {
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: 2px;
+}
+
+.quadrant-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.quadrant-sub-item {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 8px 10px;
+  font-size: 12px;
+}
+
+.quadrant-sub-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.quadrant-quote {
+  font-size: 11px;
+  font-style: italic;
+  color: var(--color-text-secondary);
+  background: #f8fafc;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+  display: block;
+}
+
+.entman-counter-frame-card {
+  margin-top: 14px;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  border-left: 4px solid #f59e0b;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.counter-frame-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #b45309;
+  margin-bottom: 4px;
+}
+
+/* ====================================================================
+   INTER-CODER RELIABILITY (COHEN'S KAPPA) MODAL
+   ==================================================================== */
+
+.kappa-score-dashboard {
+  padding: 18px 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-bottom: 1px solid var(--color-border);
+  display: grid;
+  grid-template-columns: 1.2fr 2fr;
+  gap: 20px;
+  align-items: center;
+}
+
+.kappa-main-gauge {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.03);
+}
+
+.kappa-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.5px;
+}
+
+.kappa-number-row {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin: 6px 0;
+  flex-wrap: wrap;
+}
+
+.kappa-big-number {
+  font-size: 36px;
+  font-weight: 800;
+  color: #0891b2;
+  font-family: monospace;
+}
+
+.kappa-level-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.kappa-level-badge.almost-perfect {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.kappa-level-badge.substantial {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.kappa-level-badge.moderate {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.kappa-level-badge.fair,
+.kappa-level-badge.slight,
+.kappa-level-badge.poor {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.kappa-verdict-desc {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+}
+
+.kappa-metrics-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.kappa-metric-box {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.metric-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.kappa-metric-box strong {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.metric-sub {
+  font-size: 10.5px;
+  color: var(--color-text-muted);
+}
+
+/* Interactive Panel */
+.kappa-interactive-panel {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.kappa-sample-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.sample-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.selector-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.btn-sample-chip {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  border: 1px solid var(--color-border);
+  background: #ffffff;
+  cursor: pointer;
+}
+
+.btn-sample-chip.active {
+  background: #0891b2;
+  color: #ffffff;
+  border-color: #0891b2;
+  font-weight: 600;
+}
+
+.coder-names-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.coder-names-row input {
+  font-size: 11.5px;
+  padding: 4px 8px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  width: 160px;
+}
+
+.kappa-code-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-code-opt {
+  padding: 2px 7px;
+  font-size: 10.5px;
+  border: 1px solid var(--color-border);
+  background: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-code-opt:hover {
+  background: #f1f5f9;
+}
+
+.btn-code-opt.selected.positif {
+  background: #dcfce7;
+  color: #15803d;
+  border-color: #86efac;
+  font-weight: 700;
+}
+
+.btn-code-opt.selected.netral {
+  background: #f1f5f9;
+  color: #334155;
+  border-color: #cbd5e1;
+  font-weight: 700;
+}
+
+.btn-code-opt.selected.negatif {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fca5a5;
+  font-weight: 700;
+}
+
+.match-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.match-pill.match {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.match-pill.diff {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* Matrix Manual Panel */
+.kappa-matrix-panel {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.matrix-instruction {
+  background: #f0f9ff;
+  border: 1px solid #bae6fd;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #0369a1;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.matrix-input-table-wrap {
+  overflow-x: auto;
+}
+
+.matrix-input-table {
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 12.5px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+}
+
+.matrix-input-table th,
+.matrix-input-table td {
+  border: 1px solid var(--color-border);
+  padding: 8px 10px;
+}
+
+.matrix-row-header-side {
+  background: #fef3c7;
+  color: #b45309;
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.matrix-row-label {
+  background: #f8fafc;
+  font-weight: 600;
+  text-align: left;
+}
+
+.cell-diagonal {
+  background: #f0fdf4 !important;
+}
+
+.matrix-input-table input {
+  width: 55px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 5px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 6px;
+  background: #ffffff;
+}
+
+.cell-total {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.matrix-total-row {
+  background: #f8fafc;
+  font-weight: 700;
+}
+
+.cell-grand-total {
+  background: #0891b2;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 14px;
+}
+
+/* Action Bar */
+.kappa-action-bar {
+  padding: 14px 24px;
+  background: #f8fafc;
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.kappa-action-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.kappa-action-info strong {
+  font-size: 13px;
+  color: var(--color-text-primary);
+  display: block;
+}
+
+.kappa-action-info p {
+  font-size: 11.5px;
+  color: var(--color-text-secondary);
+  line-height: 1.45;
+}
+
+@media (max-width: 860px) {
+  .entman-quadrant-grid {
+    grid-template-columns: 1fr;
+  }
+  .kappa-score-dashboard {
+    grid-template-columns: 1fr;
+  }
+  .kappa-metrics-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
 

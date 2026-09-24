@@ -81,9 +81,15 @@ python main.py --aweme_id=7170139292767882522 --size=10 --output=data
     // more comments
   ]
 }
-## 🌐 Web Dashboard & AI Analysis (Skripsi Edition)
+## 🌐 Web Dashboard & AI Analysis (Skripsi & Tesis S2 Edition)
 
-Aplikasi ini dilengkapi antarmuka web modern berbasis **React (Vite)** dan backend server **Python** dengan integrasi **AI Analysis (Clario LLM - DeepSeek V4 & Gemini 3.7 Flash)** untuk riset skripsi/akademik.
+Aplikasi ini dilengkapi antarmuka web modern berbasis **React (Vite)** dan backend server **Python** dengan integrasi **AI Analysis (Clario LLM - DeepSeek V4 & Gemini 3.7 Flash)** untuk riset skripsi dan tesis:
+
+### 🎓 Fitur Akademik Unggulan:
+- **Analisis Framing Robert Entman (1993)**: Membedah 4 kuadran framing media (*Define Problems, Diagnose Causes, Make Moral Judgments, Suggest Remedies*) untuk ketajaman Bab 4 Pembahasan.
+- **Kalkulator Inter-Coder Reliability (Cohen's Kappa $\kappa$)**: Uji reliabilitas reliabel 2 rater (AI vs Manusia / Rater A vs Rater B) lengkap dengan interpretasi Landis & Koch (1977) dan narasi siap tempel untuk Bab 3 Metodologi.
+- **Export Multi-Format Software Statistik**: 1-klik ekspor ke **SPSS** (.sav syntax / datamap), **SmartPLS / PLS-SEM** (.csv bersih siap olah), **JASP**, dan **Excel** (.xlsx).
+- **Sitasi Otomatis & Kutipan Verbatim**: Format sitasi APA 7th, Harvard, Mendeley/BibTeX dan kutipan verbatim terformat akademis untuk narasi skripsi/tesis.
 
 ### Menjalankan di Lokal:
 

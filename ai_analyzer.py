@@ -59,6 +59,15 @@ ANALYSIS_FRAMEWORKS = {
         "description": "Mengkaji konformitas (efek ikut-ikutan), moral outrage (kemarahan moral kolektif), empati sosial, polarisasi kelompok, dan bias atribusi.",
         "theory": "Social Identity Theory, Moral Foundations Theory, Attribution Theory",
         "target_major": "Psikologi, Sosiologi, Humaniora Digital"
+    },
+    "entman_framing": {
+        "id": "entman_framing",
+        "title": "Analisis Framing Robert Entman (Media & Communication Framing)",
+        "short_title": "Framing Entman (S2)",
+        "icon": "Layers",
+        "description": "Analisis 4 elemen framing Entman (1993): Define Problems, Diagnose Causes, Make Moral Judgments, dan Suggest Remedies pada diskursus media sosial.",
+        "theory": "Entman's Framing Theory (1993), Agenda Setting, Social Construction of Reality",
+        "target_major": "Magister Ilmu Komunikasi (S2), Kajian Media, Komunikasi Politik"
     }
 }
 
@@ -620,6 +629,98 @@ Kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100
     ],
     "theoretical_relevance": "Kaitan temuan dengan teori (misal: Social Identity Theory (Tajfel), Deindividuation Theory (Zimbardo), Moral Foundations Theory (Haidt))",
     "thesis_summary_paragraph": "Paragraf ringkasan kesimpulan akademik komprehensif yang siap disalin untuk Bab 4 Skripsi."
+  }}
+}}
+"""
+        return prompt, sys_inst
+
+    # 6. ANALISIS FRAMING ROBERT ENTMAN (KHUSUS TESIS S2 ILMU KOMUNIKASI)
+    elif analysis_type == "entman_framing":
+        sys_inst = (
+            "Anda adalah pakar analisis teks dan wacana media untuk penelitian tesis jenjang Magister (S2) Ilmu Komunikasi. "
+            "Tugas Anda menganalisis dataset komentar warganet menggunakan model framing Robert Entman (1993) "
+            "dengan 4 dimensi inti: define problems, diagnose causes, make moral judgments, dan suggest remedies. "
+            "WAJIB memberikan output dalam format JSON murni yang valid tanpa teks pembuka/penutup."
+        )
+        prompt = f"""Lakukan Analisis Framing Robert Entman (1993) pada dataset komentar penonton video media sosial berikut untuk penulisan tesis S2 Ilmu Komunikasi:
+
+CAPTION KONTEN:
+\"\"\"{caption}\"\"\"
+
+SAMPEL KOMENTAR ({count} komentar):
+\"\"\"{formatted_comments}\"\"\"
+
+Analisis bagaimana publik mengkonstruksi realitas melalui 4 elemen pembingkaian Entman dan kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100):
+
+{{
+  "framing_overview": {{
+    "central_issue": "Isu atau peristiwa utama yang menjadi objek pembingkaian publik",
+    "dominant_frame_name": "Nama Frame Dominan (misal: Frame Pelanggaran Etika & Akuntabilitas / Frame Korban vs Pelaku / Frame Teatrikal Drama)",
+    "framing_intensity": "Sangat Kuat / Terbelah Polarisasi / Terfragmentasi",
+    "framing_summary": "Penjelasan komprehensif bagaimana warganet membingkai realitas peristiwa"
+  }},
+  "entman_dimensions": {{
+    "define_problems": {{
+      "dimension_name": "Define Problems (Mendefinisikan Masalah)",
+      "explanation": "Uraian bagaimana warganet mengidentifikasi apa yang menjadi masalah utama",
+      "dominant_definition": "Definisi masalah paling dominan",
+      "problem_aspects": [
+        {{"aspect": "Aspek masalah utama 1", "pct": 60, "sample_quote": "Kutipan representatif warganet"}},
+        {{"aspect": "Aspek masalah utama 2", "pct": 40, "sample_quote": "Kutipan representatif warganet"}}
+      ]
+    }},
+    "diagnose_causes": {{
+      "dimension_name": "Diagnose Causes (Mendiagnosis Penyebab & Aktor)",
+      "explanation": "Uraian pihak, faktor, atau aktor yang diatribusikan sebagai biang masalah",
+      "primary_culprit": "Aktor atau faktor utama yang dituding/disalahkan",
+      "cause_attributions": [
+        {{"cause": "Faktor penyebab/aktor 1", "pct": 55, "sample_quote": "Kutipan representatif warganet"}},
+        {{"cause": "Faktor penyebab/aktor 2", "pct": 45, "sample_quote": "Kutipan representatif warganet"}}
+      ]
+    }},
+    "make_moral_judgments": {{
+      "dimension_name": "Make Moral Judgments (Membuat Penilaian Moral)",
+      "explanation": "Penilaian etika dan nilai moral yang dilontarkan audiens terhadap tindakan para aktor",
+      "moral_verdict": "Kecaman Keras / Simpati & Iba / Skeptisisme Moral / Terbelah",
+      "moral_evaluations": [
+        {{"judgment": "Penilaian etis 1", "pct": 65, "sample_quote": "Kutipan representatif warganet"}},
+        {{"judgment": "Penilaian etis 2", "pct": 35, "sample_quote": "Kutipan representatif warganet"}}
+      ]
+    }},
+    "suggest_remedies": {{
+      "dimension_name": "Suggest Remedies (Menekankan Solusi & Tuntutan)",
+      "explanation": "Rekomendasi tindakan, tuntutan, sanksi, atau solusi yang diinginkan warganet",
+      "dominant_remedy": "Tuntutan atau solusi paling disuarakan",
+      "remedy_proposals": [
+        {{"proposal": "Tuntutan/solusi 1", "pct": 50, "sample_quote": "Kutipan representatif warganet"}},
+        {{"proposal": "Tuntutan/solusi 2", "pct": 30, "sample_quote": "Kutipan representatif warganet"}},
+        {{"proposal": "Tuntutan/solusi 3", "pct": 20, "sample_quote": "Kutipan representatif warganet"}}
+      ]
+    }}
+  }},
+  "counter_frames": {{
+    "has_counter_frame": true,
+    "counter_frame_name": "Nama Frame Tandingan (Pembelaan/Alternatif)",
+    "counter_frame_pct": 25,
+    "counter_frame_argument": "Uraian bagaimana kubu tandingan mencoba merebut narasi di kolom komentar"
+  }},
+  "stance_dynamics": {{
+    "side_a_name": "Kubu Frame Dominan",
+    "side_a_pct": 65,
+    "side_b_name": "Kubu Frame Alternatif / Tandingan",
+    "side_b_pct": 25,
+    "neutral_pct": 10,
+    "controversy_level": "Tinggi",
+    "polarization_summary": "Pertarungan wacana antara frame dominan vs frame tandingan"
+  }},
+  "academic_insights": {{
+    "key_findings": [
+      "Temuan empiris 1 untuk Bab 4 Tesis S2",
+      "Temuan empiris 2 untuk Bab 4 Tesis S2",
+      "Temuan empiris 3 untuk Bab 4 Tesis S2"
+    ],
+    "theoretical_relevance": "Kaitan temuan dengan teori Entman (1993), Framing Effects, dan Konstruksionisme Sosial",
+    "thesis_summary_paragraph": "Paragraf pembahasan Bab 4 Tesis S2 yang mendalam, komprehensif, dan siap salin."
   }}
 }}
 """

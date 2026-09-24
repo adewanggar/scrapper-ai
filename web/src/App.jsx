@@ -42,11 +42,13 @@ import {
   Award,
   MessageCircle,
   BarChart3,
-  Quote
+  Quote,
+  Calculator
 } from 'lucide-react';
 import ExportStatsModal from './components/ExportStatsModal';
 import CitationModal from './components/CitationModal';
 import VerbatimQuoteModal from './components/VerbatimQuoteModal';
+import InterCoderModal from './components/InterCoderModal';
 
 const STOPWORDS = new Set([
   'di', 'ke', 'dari', 'yang', 'dan', 'ini', 'itu', 'ada', 'aku', 'kau', 'dia', 'mereka',
@@ -102,6 +104,15 @@ const FRAMEWORKS_LIST = [
     color: '#DB2777',
     desc: 'Kaji konformitas (efek ikut-ikutan), kemarahan moral kolektif, empati, dan bias atribusi.',
     theory: 'Social Identity Theory, Moral Foundations Theory, Attribution Theory'
+  },
+  {
+    id: 'entman_framing',
+    title: 'Analisis Framing Robert Entman',
+    badge: 'Tesis S2 / Ilmu Komunikasi',
+    icon: Layers,
+    color: '#0D9488',
+    desc: 'Analisis 4 elemen pembingkaian Entman (1993): Define Problems, Diagnose Causes, Make Moral Judgments, dan Suggest Remedies.',
+    theory: 'Entman Framing Theory (1993), Agenda Setting, Social Construction of Reality'
   }
 ];
 
@@ -320,6 +331,7 @@ export default function App() {
   const [copiedId, setCopiedId] = useState(null);
   const [showExportStatsModal, setShowExportStatsModal] = useState(false);
   const [showCitationModal, setShowCitationModal] = useState(false);
+  const [showInterCoderModal, setShowInterCoderModal] = useState(false);
   const [verbatimModalComment, setVerbatimModalComment] = useState(null);
   const [verbatimModalIndex, setVerbatimModalIndex] = useState(1);
 
@@ -563,6 +575,57 @@ export default function App() {
       md += `- **Target Atribusi:** ${r.attribution_and_bias?.attribution_target || '-'}\n`;
       md += `- **Bias Kognitif Terdeteksi:** ${r.attribution_and_bias?.cognitive_bias_detected || '-'}\n`;
       md += `- **Pertimbangan Moralitas:** ${r.attribution_and_bias?.moral_judgment_summary || '-'}\n\n`;
+    } else if (type === 'entman_framing') {
+      md += `## 1. Ikhtisar Pembingkaian Wacana (Framing Overview)\n`;
+      md += `- **Isu Sentral:** ${r.framing_overview?.central_issue || '-'}\n`;
+      md += `- **Frame Dominan:** **${r.framing_overview?.dominant_frame_name || '-'}**\n`;
+      md += `- **Intensitas Framing:** ${r.framing_overview?.framing_intensity || '-'}\n`;
+      md += `> ${r.framing_overview?.framing_summary || ''}\n\n`;
+
+      md += `## 2. Analisis 4 Dimensi Robert Entman (1993)\n\n`;
+      const dims = r.entman_dimensions || {};
+      if (dims.define_problems) {
+        md += `### A. Define Problems (Mendefinisikan Masalah)\n`;
+        md += `- **Definisi Dominan:** ${dims.define_problems.dominant_definition}\n`;
+        md += `${dims.define_problems.explanation}\n`;
+        (dims.define_problems.problem_aspects || []).forEach(a => {
+          md += `  - ${a.aspect} (${a.pct}%)${a.sample_quote ? ` — "${a.sample_quote}"` : ''}\n`;
+        });
+        md += `\n`;
+      }
+      if (dims.diagnose_causes) {
+        md += `### B. Diagnose Causes (Mendiagnosis Penyebab & Aktor)\n`;
+        md += `- **Aktor/Faktor Utama:** **${dims.diagnose_causes.primary_culprit}**\n`;
+        md += `${dims.diagnose_causes.explanation}\n`;
+        (dims.diagnose_causes.cause_attributions || []).forEach(c => {
+          md += `  - ${c.cause} (${c.pct}%)${c.sample_quote ? ` — "${c.sample_quote}"` : ''}\n`;
+        });
+        md += `\n`;
+      }
+      if (dims.make_moral_judgments) {
+        md += `### C. Make Moral Judgments (Membuat Penilaian Moral)\n`;
+        md += `- **Sikap Moral Publik:** **${dims.make_moral_judgments.moral_verdict}**\n`;
+        md += `${dims.make_moral_judgments.explanation}\n`;
+        (dims.make_moral_judgments.moral_evaluations || []).forEach(m => {
+          md += `  - ${m.judgment} (${m.pct}%)${m.sample_quote ? ` — "${m.sample_quote}"` : ''}\n`;
+        });
+        md += `\n`;
+      }
+      if (dims.suggest_remedies) {
+        md += `### D. Suggest Remedies (Menekankan Solusi & Tuntutan)\n`;
+        md += `- **Tuntutan Dominan:** **${dims.suggest_remedies.dominant_remedy}**\n`;
+        md += `${dims.suggest_remedies.explanation}\n`;
+        (dims.suggest_remedies.remedy_proposals || []).forEach(rp => {
+          md += `  - ${rp.proposal} (${rp.pct}%)${rp.sample_quote ? ` — "${rp.sample_quote}"` : ''}\n`;
+        });
+        md += `\n`;
+      }
+
+      if (r.counter_frames) {
+        md += `### Frame Tandingan (Counter-Frame):\n`;
+        md += `- **Nama Frame Tandingan:** ${r.counter_frames.counter_frame_name} (${r.counter_frames.counter_frame_pct}%)\n`;
+        md += `> ${r.counter_frames.counter_frame_argument || ''}\n\n`;
+      }
     } else {
       // Default: Emotion-driven marketing
       md += `## 1. Konteks Narasi & Strategi Pemasaran\n`;
@@ -1675,6 +1738,14 @@ export default function App() {
 
                     <div className="export-actions-group">
                       <button
+                        className="btn btn-white-bordered"
+                        onClick={() => setShowInterCoderModal(true)}
+                        title="Kalkulator uji reliabilitas antar-pengkode (Cohen's Kappa) untuk Bab 3"
+                      >
+                        <Calculator size={14} color="#0891b2" />
+                        <span>Uji Cohen's Kappa</span>
+                      </button>
+                      <button
                         className="btn btn-stat-export"
                         onClick={() => setShowExportStatsModal(true)}
                         title="Ekspor dataset terstandarisasi untuk SPSS, Excel, SmartPLS, dan JASP"
@@ -2097,6 +2168,14 @@ export default function App() {
                           <span>Sitasi Video (APA)</span>
                         </button>
                         <button
+                          className="btn btn-white-bordered"
+                          onClick={() => setShowInterCoderModal(true)}
+                          title="Kalkulator uji reliabilitas antar-pengkode (Cohen's Kappa) untuk Bab 3"
+                        >
+                          <Calculator size={14} color="#0891b2" />
+                          <span>Uji Cohen's Kappa</span>
+                        </button>
+                        <button
                           className="btn btn-stat-export"
                           onClick={() => setShowExportStatsModal(true)}
                           title="Ekspor data komentar & metrik statistik untuk SPSS, Excel, SmartPLS, JASP"
@@ -2349,6 +2428,27 @@ export default function App() {
                               </div>
                             </div>
                           </>
+                        ) : resultType === 'entman_framing' ? (
+                          <>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Isu Sentral yang Dibingkai</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.framing_overview?.central_issue || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Frame Dominan Publik</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#0D9488' }}>
+                                {aiAnalysis.result.framing_overview?.dominant_frame_name || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Intensitas Pembingkaian</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.framing_overview?.framing_intensity || '-'}
+                              </div>
+                            </div>
+                          </>
                         ) : (
                           <>
                             {/* Default: Emotion-driven marketing */}
@@ -2522,6 +2622,37 @@ export default function App() {
                                 {aiAnalysis.result.attribution_and_bias?.attribution_target || '-'}
                               </div>
                               <div className="stat-label">Arah Atribusi (Menyalahkan)</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : resultType === 'entman_framing' ? (
+                        <>
+                          <div className="stat-card stat-card-blue">
+                            <div className="stat-icon-wrapper"><Target size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.entman_dimensions?.define_problems?.problem_aspects?.[0]?.pct || 60}%</div>
+                              <div className="stat-label">Define Problems</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><Layers size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.entman_dimensions?.diagnose_causes?.cause_attributions?.[0]?.pct || 55}%</div>
+                              <div className="stat-label">Diagnose Causes</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><Award size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.entman_dimensions?.make_moral_judgments?.moral_evaluations?.[0]?.pct || 65}%</div>
+                              <div className="stat-label">Moral Judgment</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><CheckCircle2 size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.entman_dimensions?.suggest_remedies?.remedy_proposals?.[0]?.pct || 50}%</div>
+                              <div className="stat-label">Suggest Remedies</div>
                             </div>
                           </div>
                         </>
@@ -2994,6 +3125,143 @@ export default function App() {
                       </div>
                     </div>
 
+                    {/* Entman Framing 4 Quadrant Display (Khusus S2 Ilmu Komunikasi) */}
+                    {resultType === 'entman_framing' && aiAnalysis.result.entman_dimensions && (
+                      <div className="ai-card" style={{ marginBottom: '22px' }}>
+                        <div className="ai-card-title">
+                          <span>Matriks 4 Dimensi Framing Robert Entman (1993)</span>
+                          <span className="ai-card-badge" style={{ background: '#CCFBF1', color: '#0F766E' }}>
+                            Model Analisis Tesis S2
+                          </span>
+                        </div>
+
+                        <div className="entman-quadrant-grid">
+                          {/* 1. Define Problems */}
+                          <div className="entman-quadrant-card q-problem">
+                            <div className="quadrant-head">
+                              <span className="quadrant-badge">1. Define Problems</span>
+                              <span className="stat-pill-sm" style={{ background: '#E0F2FE', color: '#0369A1' }}>Masalah</span>
+                            </div>
+                            <div className="quadrant-main-highlight">
+                              <strong>Definisi Dominan:</strong>
+                              {aiAnalysis.result.entman_dimensions.define_problems?.dominant_definition}
+                            </div>
+                            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>
+                              {aiAnalysis.result.entman_dimensions.define_problems?.explanation}
+                            </p>
+                            <div className="quadrant-items-list">
+                              {(aiAnalysis.result.entman_dimensions.define_problems?.problem_aspects || []).map((item, idx) => (
+                                <div key={idx} className="quadrant-sub-item">
+                                  <div className="quadrant-sub-item-header">
+                                    <span>{item.aspect}</span>
+                                    <span>{item.pct}%</span>
+                                  </div>
+                                  {item.sample_quote && (
+                                    <span className="quadrant-quote">"{item.sample_quote}"</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 2. Diagnose Causes */}
+                          <div className="entman-quadrant-card q-cause">
+                            <div className="quadrant-head">
+                              <span className="quadrant-badge">2. Diagnose Causes</span>
+                              <span className="stat-pill-sm" style={{ background: '#FEF3C7', color: '#B45309' }}>Penyebab</span>
+                            </div>
+                            <div className="quadrant-main-highlight">
+                              <strong>Aktor / Faktor Kunci:</strong>
+                              {aiAnalysis.result.entman_dimensions.diagnose_causes?.primary_culprit}
+                            </div>
+                            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>
+                              {aiAnalysis.result.entman_dimensions.diagnose_causes?.explanation}
+                            </p>
+                            <div className="quadrant-items-list">
+                              {(aiAnalysis.result.entman_dimensions.diagnose_causes?.cause_attributions || []).map((item, idx) => (
+                                <div key={idx} className="quadrant-sub-item">
+                                  <div className="quadrant-sub-item-header">
+                                    <span>{item.cause}</span>
+                                    <span>{item.pct}%</span>
+                                  </div>
+                                  {item.sample_quote && (
+                                    <span className="quadrant-quote">"{item.sample_quote}"</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 3. Make Moral Judgments */}
+                          <div className="entman-quadrant-card q-moral">
+                            <div className="quadrant-head">
+                              <span className="quadrant-badge">3. Make Moral Judgments</span>
+                              <span className="stat-pill-sm" style={{ background: '#FFE4E6', color: '#BE123C' }}>Sikap Moral</span>
+                            </div>
+                            <div className="quadrant-main-highlight">
+                              <strong>Penilaian Moral:</strong>
+                              {aiAnalysis.result.entman_dimensions.make_moral_judgments?.moral_verdict}
+                            </div>
+                            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>
+                              {aiAnalysis.result.entman_dimensions.make_moral_judgments?.explanation}
+                            </p>
+                            <div className="quadrant-items-list">
+                              {(aiAnalysis.result.entman_dimensions.make_moral_judgments?.moral_evaluations || []).map((item, idx) => (
+                                <div key={idx} className="quadrant-sub-item">
+                                  <div className="quadrant-sub-item-header">
+                                    <span>{item.judgment}</span>
+                                    <span>{item.pct}%</span>
+                                  </div>
+                                  {item.sample_quote && (
+                                    <span className="quadrant-quote">"{item.sample_quote}"</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* 4. Suggest Remedies */}
+                          <div className="entman-quadrant-card q-remedy">
+                            <div className="quadrant-head">
+                              <span className="quadrant-badge">4. Suggest Remedies</span>
+                              <span className="stat-pill-sm" style={{ background: '#DCFCE7', color: '#15803D' }}>Solusi</span>
+                            </div>
+                            <div className="quadrant-main-highlight">
+                              <strong>Tuntutan Utama:</strong>
+                              {aiAnalysis.result.entman_dimensions.suggest_remedies?.dominant_remedy}
+                            </div>
+                            <p style={{ fontSize: '12px', color: 'var(--color-text-secondary)', lineHeight: '1.4' }}>
+                              {aiAnalysis.result.entman_dimensions.suggest_remedies?.explanation}
+                            </p>
+                            <div className="quadrant-items-list">
+                              {(aiAnalysis.result.entman_dimensions.suggest_remedies?.remedy_proposals || []).map((item, idx) => (
+                                <div key={idx} className="quadrant-sub-item">
+                                  <div className="quadrant-sub-item-header">
+                                    <span>{item.proposal}</span>
+                                    <span>{item.pct}%</span>
+                                  </div>
+                                  {item.sample_quote && (
+                                    <span className="quadrant-quote">"{item.sample_quote}"</span>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+
+                        {aiAnalysis.result.counter_frames?.has_counter_frame && (
+                          <div className="entman-counter-frame-card">
+                            <div className="counter-frame-head">
+                              <span>Frame Tandingan (Counter-Frame): {aiAnalysis.result.counter_frames.counter_frame_name} ({aiAnalysis.result.counter_frames.counter_frame_pct}%)</span>
+                            </div>
+                            <p style={{ fontSize: '12.5px', color: '#92400e', lineHeight: '1.45' }}>
+                              {aiAnalysis.result.counter_frames.counter_frame_argument}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     {/* 4. Topic Clusters */}
                     <div className="ai-card" style={{ marginBottom: '22px' }}>
                       <div className="ai-card-title">
@@ -3367,6 +3635,14 @@ export default function App() {
         commentIndex={verbatimModalIndex}
         videoTitle={data?.caption || ''}
         videoUrl={data?.video_url || ''}
+      />
+
+      {/* Modal Kalkulator Inter-Coder Reliability (Cohen's Kappa) */}
+      <InterCoderModal
+        isOpen={showInterCoderModal}
+        onClose={() => setShowInterCoderModal(false)}
+        allComments={data?.comments || []}
+        selectedFileName={selectedFile || 'dataset'}
       />
     </div>
   );
