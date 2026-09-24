@@ -4819,5 +4819,444 @@ a:focus-visible {
   }
 }
 
+/* ==========================================================================
+   Firebase Authentication Screen & User Dropdown
+   ========================================================================== */
+
+.auth-screen-wrapper {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at 50% 15%, #FFF7ED 0%, #F8FAFC 75%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 18px;
+  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 4px 12px rgba(15, 23, 42, 0.03);
+  padding: 34px 36px;
+  box-sizing: border-box;
+}
+
+.auth-brand-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.auth-brand-logo-wrap {
+  width: 52px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.auth-brand-logo-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.auth-brand-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #1E293B;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.auth-brand-sub {
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #94A3B8;
+  margin-top: 3px;
+}
+
+.auth-welcome-text {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.auth-welcome-text h2 {
+  font-size: 19px;
+  font-weight: 700;
+  color: #0F172A;
+  margin-bottom: 6px;
+}
+
+.auth-welcome-text p {
+  font-size: 13px;
+  color: #64748B;
+  line-height: 1.5;
+}
+
+.btn-google-auth {
+  width: 100%;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #1E293B;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.btn-google-auth:hover:not(:disabled) {
+  background: #F8FAFC;
+  border-color: #94A3B8;
+  transform: translateY(-1px);
+}
+
+.btn-google-auth:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.google-icon-svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.auth-divider {
+  display: flex;
+  align-items: center;
+  margin: 18px 0;
+  text-align: center;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #E2E8F0;
+}
+
+.auth-divider span {
+  padding: 0 12px;
+  font-size: 11.5px;
+  color: #94A3B8;
+  text-transform: lowercase;
+}
+
+.auth-tab-toggle {
+  display: flex;
+  background: #F1F5F9;
+  padding: 4px;
+  border-radius: 10px;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #64748B;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.auth-tab-btn.active {
+  background: #FFFFFF;
+  color: #0F172A;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.auth-error-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-radius: 8px;
+  color: #DC2626;
+  font-size: 12.5px;
+  margin-bottom: 16px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.auth-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.auth-input-group label {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+}
+
+.auth-hint-min {
+  font-size: 11px;
+  color: #94A3B8;
+}
+
+.auth-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth-input-icon {
+  position: absolute;
+  left: 12px;
+  color: #94A3B8;
+  pointer-events: none;
+}
+
+.auth-input-box input {
+  width: 100%;
+  height: 42px;
+  padding: 0 40px 0 38px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  border-radius: 9px;
+  font-size: 13px;
+  color: #0F172A;
+  font-family: var(--font-family);
+  outline: none;
+  transition: border-color 0.15s ease;
+  box-sizing: border-box;
+}
+
+.auth-input-box input:focus {
+  border-color: #F97316;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12);
+}
+
+.btn-toggle-pw {
+  position: absolute;
+  right: 10px;
+  background: transparent;
+  border: none;
+  color: #94A3B8;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-toggle-pw:hover {
+  color: #475569;
+}
+
+.btn-auth-submit {
+  height: 44px;
+  margin-top: 6px;
+  background: #F97316;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
+  transition: all 0.15s ease;
+}
+
+.btn-auth-submit:hover:not(:disabled) {
+  background: #EA580C;
+  transform: translateY(-1px);
+}
+
+.btn-auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.auth-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #FFFFFF;
+  border-radius: 50%;
+  animation: authSpin 0.7s linear infinite;
+}
+
+@keyframes authSpin {
+  to { transform: rotate(360deg); }
+}
+
+.auth-privacy-note {
+  margin-top: 22px;
+  padding-top: 16px;
+  border-top: 1px solid #F1F5F9;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 11.5px;
+  color: #64748B;
+  line-height: 1.45;
+}
+
+/* User Profile Navbar Dropdown */
+.user-menu-wrapper {
+  position: relative;
+}
+
+.btn-pill-user {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px 4px 5px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #1E293B;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+.btn-pill-user:hover {
+  background: #F8FAFC;
+  border-color: #CBD5E1;
+}
+
+.user-avatar-img {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.user-avatar-placeholder {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #FFF7ED;
+  color: #EA580C;
+  font-weight: 700;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #FFEDD5;
+}
+
+.user-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 250px;
+  background: #FFFFFF;
+  border: 1px solid #E2E8F0;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.03);
+  padding: 8px 0;
+  z-index: 100;
+  animation: fadeInDrop 0.15s ease;
+}
+
+@keyframes fadeInDrop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.user-dropdown-header {
+  padding: 10px 16px 12px;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.user-dropdown-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #0F172A;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-dropdown-email {
+  font-size: 11.5px;
+  color: #64748B;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-dropdown-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: #DCFCE7;
+  color: #16A34A;
+  font-size: 10.5px;
+  font-weight: 600;
+}
+
+.user-dropdown-action {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: #DC2626;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  text-align: left;
+}
+
+.user-dropdown-action:hover {
+  background: #FEF2F2;
+}
+
 
 

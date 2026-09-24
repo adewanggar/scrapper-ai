@@ -1,0 +1,250 @@
+import { initializeApp } from 'firebase/app';
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged,
+  updateProfile
+} from 'firebase/auth';
+import {
+  getFirestore,
+  collection,
+  doc,
+  setDoc,
+  getDoc,
+  getDocs,
+  deleteDoc,
+  query,
+  orderBy,
+  serverTimestamp
+} from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB2Ba-sftKNkFYT6hHq-AXCvHM65detOpU",
+  authDomain: "data-ori.firebaseapp.com",
+  projectId: "data-ori",
+  storageBucket: "data-ori.firebasestorage.app",
+  messagingSenderId: "734542474899",
+  appId: "1:734542474899:web:6fbaa99d9b587fba37a766",
+  measurementId: "G-K2S5BG42H5"
+};
+
+// Initialize Firebase
+export const app = initializeApp(firebaseConfig);
+export const auth = getAuth(app);
+export const db = getFirestore(app);
+
+const googleProvider = new GoogleAuthProvider();
+googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+// ==========================================
+// Authentication Helpers
+// ==========================================
+
+export async function loginWithGoogle() {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    return { user: result.user, error: null };
+  } catch (error) {
+    return { user: null, error: getAuthErrorMessage(error) };
+  }
+}
+
+export async function loginWithEmail(email, password) {
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    return { user: result.user, error: null };
+  } catch (error) {
+    return { user: null, error: getAuthErrorMessage(error) };
+  }
+}
+
+export async function registerWithEmail(email, password, displayName = '') {
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    if (displayName && result.user) {
+      await updateProfile(result.user, { displayName });
+    }
+    return { user: result.user, error: null };
+  } catch (error) {
+    return { user: null, error: getAuthErrorMessage(error) };
+  }
+}
+
+export async function logoutUser() {
+  try {
+    await signOut(auth);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+}
+
+export function subscribeToAuth(callback) {
+  return onAuthStateChanged(auth, callback);
+}
+
+function getAuthErrorMessage(error) {
+  const code = error?.code || '';
+  switch (code) {
+    case 'auth/invalid-email':
+      return 'Format email tidak valid.';
+    case 'auth/user-disabled':
+      return 'Akun ini telah dinonaktifkan.';
+    case 'auth/user-not-found':
+    case 'auth/wrong-password':
+    case 'auth/invalid-credential':
+      return 'Email atau kata sandi salah. Silakan periksa kembali.';
+    case 'auth/email-already-in-use':
+      return 'Email sudah terdaftar. Silakan login atau gunakan email lain.';
+    case 'auth/weak-password':
+      return 'Kata sandi terlalu lemah. Gunakan minimal 6 karakter.';
+    case 'auth/popup-closed-by-user':
+      return 'Jendela login Google ditutup sebelum selesai.';
+    case 'auth/cancelled-popup-request':
+      return 'Permintaan login dibatalkan.';
+    case 'auth/network-request-failed':
+      return 'Gagal terhubung ke server Firebase. Periksa koneksi internet Anda.';
+    default:
+      return error?.message || 'Terjadi kesalahan saat autentikasi.';
+  }
+}
+
+// ==========================================
+// Firestore Private Per-User Data Helpers
+// ==========================================
+
+function getDocIdFromFilename(filename) {
+  // Firestore doc IDs shouldn't have '/'
+  return encodeURIComponent(filename || `scrape_${Date.now()}`);
+}
+
+/**
+ * Save scraping result privately under users/{userId}/scrapes/{docId}
+ */
+export async function saveUserScrape(userId, scrapeData) {
+  if (!userId) throw new Error('User ID wajib untuk menyimpan data private.');
+
+  const filename = scrapeData.filename || `scrape_${Date.now()}.json`;
+  const docId = getDocIdFromFilename(filename);
+  const docRef = doc(db, 'users', userId, 'scrapes', docId);
+
+  const payload = {
+    filename,
+    userId,
+    caption: scrapeData.caption || '',
+    video_url: scrapeData.video_url || '',
+    comments_count: scrapeData.comments ? scrapeData.comments.length : (scrapeData.comments_count || 0),
+    comments: scrapeData.comments || [],
+    platform: scrapeData.platform || 'tiktok',
+    modified: new Date().toISOString(),
+    updatedAt: serverTimestamp(),
+    createdAt: scrapeData.createdAt || new Date().toISOString()
+  };
+
+  await setDoc(docRef, payload, { merge: true });
+  return { id: docId, ...payload };
+}
+
+/**
+ * Fetch all private scrapes belonging to a specific user
+ */
+export async function getUserScrapes(userId) {
+  if (!userId) return [];
+
+  const scrapesCol = collection(db, 'users', userId, 'scrapes');
+  try {
+    const q = query(scrapesCol, orderBy('updatedAt', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        filename: data.filename || d.id,
+        caption: data.caption || '',
+        video_url: data.video_url || '',
+        comments_count: data.comments_count || (data.comments ? data.comments.length : 0),
+        modified: data.modified || (data.updatedAt?.toDate?.()?.toISOString()) || new Date().toISOString(),
+        comments: data.comments || []
+      };
+    });
+  } catch (err) {
+    // If orderBy index is still building or missing, fallback to unordered getDocs
+    console.warn('Fallback getUserScrapes without orderBy:', err);
+    const snapshot = await getDocs(scrapesCol);
+    const list = snapshot.docs.map((d) => {
+      const data = d.data();
+      return {
+        id: d.id,
+        filename: data.filename || d.id,
+        caption: data.caption || '',
+        video_url: data.video_url || '',
+        comments_count: data.comments_count || (data.comments ? data.comments.length : 0),
+        modified: data.modified || new Date().toISOString(),
+        comments: data.comments || []
+      };
+    });
+    // Sort in memory by modified descending
+    return list.sort((a, b) => new Date(b.modified) - new Date(a.modified));
+  }
+}
+
+/**
+ * Get full private scrape document by filename or docId
+ */
+export async function getUserScrapeContent(userId, filename) {
+  if (!userId || !filename) return null;
+  const docId = getDocIdFromFilename(filename);
+  const docRef = doc(db, 'users', userId, 'scrapes', docId);
+  const snap = await getDoc(docRef);
+  if (!snap.exists()) return null;
+  return snap.data();
+}
+
+/**
+ * Delete a private scrape document
+ */
+export async function deleteUserScrape(userId, filename) {
+  if (!userId || !filename) return false;
+  const docId = getDocIdFromFilename(filename);
+  const docRef = doc(db, 'users', userId, 'scrapes', docId);
+  await deleteDoc(docRef);
+  return true;
+}
+
+/**
+ * Save cached AI analysis for a specific scrape
+ */
+export async function saveUserAiAnalysis(userId, filename, analysisType, analysis) {
+  if (!userId || !filename) return;
+  const docId = getDocIdFromFilename(filename);
+  const docRef = doc(db, 'users', userId, 'scrapes', docId);
+  await setDoc(
+    docRef,
+    {
+      analyses: {
+        [analysisType]: {
+          result: analysis,
+          updatedAt: new Date().toISOString()
+        }
+      }
+    },
+    { merge: true }
+  );
+}
+
+/**
+ * Get cached AI analysis from the user's private scrape doc
+ */
+export async function getUserAiAnalysis(userId, filename, analysisType) {
+  if (!userId || !filename) return null;
+  const docId = getDocIdFromFilename(filename);
+  const docRef = doc(db, 'users', userId, 'scrapes', docId);
+  const snap = await getDoc(docRef);
+  if (!snap.exists()) return null;
+  const data = snap.data();
+  return data?.analyses?.[analysisType]?.result || null;
+}

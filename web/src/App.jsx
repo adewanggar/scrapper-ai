@@ -46,12 +46,25 @@ import {
   Calculator,
   User,
   Link2,
-  Database
+  Database,
+  LogOut,
+  Trash2
 } from 'lucide-react';
 import ExportStatsModal from './components/ExportStatsModal';
 import CitationModal from './components/CitationModal';
 import VerbatimQuoteModal from './components/VerbatimQuoteModal';
 import InterCoderModal from './components/InterCoderModal';
+import AuthScreen from './components/AuthScreen';
+import {
+  subscribeToAuth,
+  logoutUser,
+  saveUserScrape,
+  getUserScrapes,
+  getUserScrapeContent,
+  deleteUserScrape,
+  saveUserAiAnalysis,
+  getUserAiAnalysis
+} from './firebase';
 
 const STOPWORDS = new Set([
   'di', 'ke', 'dari', 'yang', 'dan', 'ini', 'itu', 'ada', 'aku', 'kau', 'dia', 'mereka',
@@ -342,65 +355,96 @@ export default function App() {
 
   const fileInputRef = useRef(null);
 
-  // Security & Authentication State
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    try {
-      return localStorage.getItem('scrapper_auth_pin') === CORRECT_PIN;
-    } catch {
-      return false;
-    }
-  });
+  // Firebase Authentication & User State
+  const [currentUser, setCurrentUser] = useState(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [showUserDropdown, setShowUserDropdown] = useState(false);
+  const userMenuRef = useRef(null);
 
-  const handleUnlock = (validPin) => {
-    try {
-      localStorage.setItem('scrapper_auth_pin', validPin);
-    } catch {}
-    setIsAuthenticated(true);
-  };
-
-  const handleLock = () => {
-    try {
-      localStorage.removeItem('scrapper_auth_pin');
-    } catch {}
-    setIsAuthenticated(false);
-  };
-
-  // Initial files fetch (only when authenticated)
+  // Close user dropdown when clicking outside
   useEffect(() => {
-    if (isAuthenticated) {
+    const handleOutsideClick = (e) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) {
+        setShowUserDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, []);
+
+  // Listen to Firebase Auth state changes
+  useEffect(() => {
+    const unsubscribe = subscribeToAuth((user) => {
+      setCurrentUser(user);
+      setAuthLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    setShowUserDropdown(false);
+    await logoutUser();
+    setCurrentUser(null);
+    setFiles([]);
+    setData(null);
+    setSelectedFile('');
+    setAiAnalysis(null);
+  };
+
+  // Fetch private files belonging to current user from Firestore
+  useEffect(() => {
+    if (currentUser) {
       fetchFilesList();
     }
-  }, [isAuthenticated]);
+  }, [currentUser]);
 
   const fetchFilesList = async () => {
+    if (!currentUser) return;
     try {
-      const res = await fetch(`${API_BASE}/api/files`, {
-        headers: { 'X-Access-Pin': CORRECT_PIN }
-      });
-      if (res.ok) {
-        const json = await res.json();
-        setServerOnline(true);
-        if (json.files && json.files.length > 0) {
-          setFiles(json.files);
-          if (!selectedFile) {
-            loadFileContent(json.files[0].filename);
-          }
-        }
-      } else {
-        if (res.status === 401) {
-          handleLock();
-        }
+      // 1. Fetch user's private scrapes from Firestore
+      const userScrapes = await getUserScrapes(currentUser.uid);
+
+      // 2. Check local server connection in background
+      try {
+        const ping = await fetch(`${API_BASE}/api/status`);
+        if (ping.ok) setServerOnline(true);
+        else setServerOnline(false);
+      } catch {
         setServerOnline(false);
       }
-    } catch {
-      setServerOnline(false);
+
+      setFiles(userScrapes);
+
+      if (userScrapes.length > 0) {
+        if (!selectedFile || !userScrapes.some((f) => f.filename === selectedFile)) {
+          loadFileContent(userScrapes[0].filename);
+        }
+      } else {
+        setData(null);
+        setSelectedFile('');
+      }
+    } catch (err) {
+      console.error('Error fetching private user files:', err);
     }
   };
 
   const loadFileContent = async (filename, switchTab = false) => {
-    if (!filename) return;
+    if (!filename || !currentUser) return;
     setLoading(true);
     try {
+      // 1. Check user's private Firestore document first
+      const docData = await getUserScrapeContent(currentUser.uid, filename);
+      if (docData && docData.comments && docData.comments.length > 0) {
+        setData(docData);
+        setSelectedFile(filename);
+        loadAiAnalysis(filename, analysisType);
+        if (switchTab) {
+          setActiveTab('results');
+        }
+        return;
+      }
+
+      // 2. Fallback to local server API if not yet synced
       const res = await fetch(`${API_BASE}/api/files/${encodeURIComponent(filename)}`, {
         headers: { 'X-Access-Pin': CORRECT_PIN }
       });
@@ -408,6 +452,15 @@ export default function App() {
         const json = await res.json();
         setData(json);
         setSelectedFile(filename);
+
+        // Auto-save to user's private Firestore collection
+        await saveUserScrape(currentUser.uid, {
+          filename,
+          caption: json.caption || '',
+          video_url: json.video_url || '',
+          comments: json.comments || []
+        });
+
         loadAiAnalysis(filename, analysisType);
         if (switchTab) {
           setActiveTab('results');
@@ -420,10 +473,18 @@ export default function App() {
     }
   };
 
-  // Load cached AI analysis if available
+  // Load cached AI analysis from Firestore or server
   const loadAiAnalysis = async (filename, type = analysisType) => {
-    if (!filename) return;
+    if (!filename || !currentUser) return;
     try {
+      // 1. Check user's private Firestore document for cached AI result
+      const cached = await getUserAiAnalysis(currentUser.uid, filename, type);
+      if (cached) {
+        setAiAnalysis(cached);
+        return;
+      }
+
+      // 2. Check local server API cache
       const res = await fetch(`${API_BASE}/api/ai/analysis/${encodeURIComponent(filename)}?type=${encodeURIComponent(type)}`, {
         headers: { 'X-Access-Pin': CORRECT_PIN }
       });
@@ -431,6 +492,8 @@ export default function App() {
         const json = await res.json();
         if (json.found) {
           setAiAnalysis(json.analysis);
+          // Persist to user's private Firestore document
+          await saveUserAiAnalysis(currentUser.uid, filename, type, json.analysis);
         } else {
           setAiAnalysis(null);
         }
@@ -447,9 +510,9 @@ export default function App() {
     }
   };
 
-  // Trigger fresh AI analysis
+  // Trigger fresh AI analysis and save privately to Firestore
   const runAiAnalysis = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || !currentUser) return;
     setAiLoading(true);
     setAiError('');
     try {
@@ -471,10 +534,31 @@ export default function App() {
         throw new Error(json.error || 'Gagal melakukan analisis AI');
       }
       setAiAnalysis(json.analysis);
+
+      // Save analysis privately to Firestore
+      await saveUserAiAnalysis(currentUser.uid, selectedFile, analysisType, json.analysis);
     } catch (err) {
       setAiError(err.message);
     } finally {
       setAiLoading(false);
+    }
+  };
+
+  // Delete a private file from Firestore
+  const handleDeleteUserFile = async (filename) => {
+    if (!currentUser) return;
+    if (!confirm(`Hapus file "${filename}" dari akun Anda? Data ini akan dihapus permanen dari Firestore.`)) {
+      return;
+    }
+    try {
+      await deleteUserScrape(currentUser.uid, filename);
+      if (selectedFile === filename) {
+        setData(null);
+        setSelectedFile('');
+      }
+      fetchFilesList();
+    } catch (err) {
+      alert('Gagal menghapus file: ' + err.message);
     }
   };
 
@@ -691,19 +775,29 @@ export default function App() {
     URL.revokeObjectURL(url);
   };
 
-  // Drag & drop or file upload handler (offline support)
+  // Drag & drop or file upload handler (persists privately to user's Firestore)
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !currentUser) return;
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
         const parsed = JSON.parse(event.target.result);
         if (parsed.comments && Array.isArray(parsed.comments)) {
+          // Persist privately in Firestore
+          await saveUserScrape(currentUser.uid, {
+            filename: file.name,
+            caption: parsed.caption || '',
+            video_url: parsed.video_url || '',
+            comments: parsed.comments,
+            platform: parsed.platform || 'tiktok'
+          });
+
           setData(parsed);
           setSelectedFile(file.name);
           loadAiAnalysis(file.name);
+          await fetchFilesList();
           setActiveTab('results');
         } else {
           alert('Format JSON tidak sesuai: tidak ditemukan field comments.');
@@ -719,6 +813,7 @@ export default function App() {
   const handleScrapeSubmit = async (e) => {
     e.preventDefault();
     if (!scrapeInput.trim()) return;
+    if (!currentUser) return;
 
     if (selectedPlatform === 'instagram' && !igCookie.trim()) {
       setScrapeError('Cookie Instagram wajib diisi untuk mengambil komentar Instagram.');
@@ -753,6 +848,15 @@ export default function App() {
         throw new Error(result.error || 'Scraping gagal');
       }
 
+      // Save privately to Firestore for this specific user account
+      await saveUserScrape(currentUser.uid, {
+        filename: result.filename,
+        caption: result.data?.caption || '',
+        video_url: result.data?.video_url || '',
+        comments: result.data?.comments || [],
+        platform: result.platform || selectedPlatform
+      });
+
       setData(result.data);
       setSelectedFile(result.filename);
       setScrapeSuccess({
@@ -762,7 +866,7 @@ export default function App() {
         platform: result.platform || selectedPlatform
       });
       loadAiAnalysis(result.filename);
-      fetchFilesList();
+      await fetchFilesList();
     } catch (err) {
       setScrapeError(err.message);
     } finally {
@@ -1056,8 +1160,17 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (!isAuthenticated) {
-    return <PinLockScreen onUnlock={handleUnlock} />;
+  if (authLoading) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#F8FAFC' }}>
+        <img src="/logo.png" alt="Tassiori Logo" style={{ width: '48px', height: '48px', objectFit: 'contain', marginBottom: '12px' }} />
+        <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748B' }}>Menghubungkan ke Firebase...</span>
+      </div>
+    );
+  }
+
+  if (!currentUser) {
+    return <AuthScreen onAuthSuccess={(user) => setCurrentUser(user)} />;
   }
 
   return (
@@ -1166,20 +1279,56 @@ export default function App() {
             <button
               className="btn-pill-header"
               onClick={() => fileInputRef.current?.click()}
-              title="Buka file JSON dari komputer"
+              title="Buka file JSON dari komputer ke akun privat Anda"
             >
               <Upload size={14} />
               <span>Upload JSON</span>
             </button>
-            <button
-              className="btn-pill-header"
-              onClick={handleLock}
-              title="Kunci Dashboard (Perlu PIN 112233 untuk masuk)"
-            >
-              <User size={15} />
-              <span>Kunci</span>
-              <ChevronDown size={13} style={{ opacity: 0.6 }} />
-            </button>
+
+            {/* User Profile Menu with Google / Email Dropdown */}
+            <div className="user-menu-wrapper" ref={userMenuRef}>
+              <button
+                className="btn-pill-user"
+                onClick={() => setShowUserDropdown(!showUserDropdown)}
+                title={`Akun: ${currentUser.email}`}
+              >
+                {currentUser.photoURL ? (
+                  <img src={currentUser.photoURL} alt="Avatar" className="user-avatar-img" />
+                ) : (
+                  <div className="user-avatar-placeholder">
+                    {(currentUser.displayName || currentUser.email || 'U')[0].toUpperCase()}
+                  </div>
+                )}
+                <span>
+                  {currentUser.displayName
+                    ? currentUser.displayName.split(' ')[0]
+                    : currentUser.email.split('@')[0]}
+                </span>
+                <ChevronDown size={13} style={{ opacity: 0.6 }} />
+              </button>
+
+              {showUserDropdown && (
+                <div className="user-dropdown-menu">
+                  <div className="user-dropdown-header">
+                    <div className="user-dropdown-name">
+                      {currentUser.displayName || 'Peneliti'}
+                    </div>
+                    <div className="user-dropdown-email">{currentUser.email}</div>
+                    <div className="user-dropdown-badge">
+                      <ShieldCheck size={12} />
+                      <span>Firestore Private Cloud</span>
+                    </div>
+                  </div>
+                  <button
+                    className="user-dropdown-action"
+                    onClick={handleLogout}
+                  >
+                    <LogOut size={15} />
+                    <span>Keluar (Logout)</span>
+                  </button>
+                </div>
+              )}
+            </div>
             <input
               type="file"
               ref={fileInputRef}
@@ -3377,15 +3526,15 @@ export default function App() {
           {activeTab === 'files' && (
             <div>
               <div className="dashboard-hero">
-                <h2>Riwayat File Scraping</h2>
-                <p>Seluruh file data komentar yang tersimpan di direktori lokal <code>h:\tiktok-comment-scrapper\data\</code>.</p>
+                <h2>Riwayat File Scraping (Privat Akun)</h2>
+                <p>Seluruh file data komentar milik akun Anda yang tersimpan aman secara privat di cloud Firestore (<code>data-ori</code>).</p>
               </div>
 
               {files.length === 0 ? (
                 <div className="empty-state-box">
                   <FolderArchive size={42} className="empty-state-icon" />
-                  <h4>Belum ada file data tersimpan</h4>
-                  <p>Gunakan tab Dashboard untuk memulai scraping video TikTok pertama Anda.</p>
+                  <h4>Belum ada file data tersimpan di akun Anda</h4>
+                  <p>Gunakan tab Dashboard untuk memulai scraping video TikTok pertama Anda atau upload file JSON.</p>
                   <button className="btn btn-scrape-primary" onClick={() => setActiveTab('dashboard')} style={{ height: '38px', padding: '0 16px' }}>
                     Mulai Scraping
                   </button>
@@ -3398,7 +3547,6 @@ export default function App() {
                         <th>File JSON</th>
                         <th>Caption Video</th>
                         <th>Komentar</th>
-                        <th>Ukuran File</th>
                         <th>Waktu Diperbarui</th>
                         <th style={{ textAlign: 'right' }}>Aksi</th>
                       </tr>
@@ -3419,11 +3567,6 @@ export default function App() {
                           </td>
                           <td>
                             <span style={{ fontWeight: 600 }}>{f.comments_count} komentar</span>
-                          </td>
-                          <td>
-                            <span style={{ fontSize: '12.5px', color: 'var(--color-text-muted)' }}>
-                              {(f.size / 1024).toFixed(1)} KB
-                            </span>
                           </td>
                           <td>
                             <span style={{ fontSize: '12.5px', color: 'var(--color-text-muted)' }}>
@@ -3449,6 +3592,14 @@ export default function App() {
                               >
                                 Analisis AI ➔
                               </button>
+                              <button
+                                className="btn btn-white-bordered"
+                                style={{ padding: '6px 10px', fontSize: '12px', color: '#DC2626', borderColor: '#FECACA' }}
+                                onClick={() => handleDeleteUserFile(f.filename)}
+                                title="Hapus file dari akun Firestore Anda"
+                              >
+                                <Trash2 size={13} />
+                              </button>
                             </div>
                           </td>
                         </tr>
@@ -3467,12 +3618,42 @@ export default function App() {
             <div>
               <div className="dashboard-hero">
                 <h2>Pengaturan Aplikasi</h2>
-                <p>Konfigurasi sistem, status backend API, dan informasi modul multi-platform.</p>
+                <p>Konfigurasi sistem, akun Firebase, status backend API, dan penyimpanan Firestore.</p>
               </div>
 
               <div className="settings-card">
                 <div className="settings-group">
-                  <div className="settings-group-title">Status Backend API</div>
+                  <div className="settings-group-title">Autentikasi Akun & Database Firestore (data-ori)</div>
+                  <div className="settings-group-desc">
+                    Akun Anda terhubung dengan Firebase Authentication dan Firestore Cloud Database. Semua data scraping, dataset, dan riwayat analisis AI disimpan secara <strong>privat dan terisolasi</strong> hanya untuk akun Anda.
+                    <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <div style={{ fontSize: '13px' }}>
+                        👤 <strong>Nama:</strong> {currentUser.displayName || '-'}
+                      </div>
+                      <div style={{ fontSize: '13px' }}>
+                        ✉️ <strong>Email:</strong> {currentUser.email}
+                      </div>
+                      <div style={{ fontSize: '13px' }}>
+                        🔑 <strong>User ID (UID):</strong> <code>{currentUser.uid}</code>
+                      </div>
+                      <div style={{ fontSize: '13px' }}>
+                        ☁️ <strong>Project ID Firestore:</strong> <code>data-ori</code>
+                      </div>
+                      <div style={{ marginTop: '6px' }}>
+                        <button
+                          className="btn btn-white-bordered"
+                          onClick={handleLogout}
+                          style={{ color: '#DC2626', borderColor: '#FCA5A5', background: '#FEF2F2', padding: '6px 14px', fontSize: '12.5px' }}
+                        >
+                          <LogOut size={13} style={{ marginRight: '6px' }} /> Keluar dari Akun (Logout)
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="settings-group">
+                  <div className="settings-group-title">Status Backend API Localhost</div>
                   <div className="settings-group-desc">
                     Backend Python berjalan pada endpoint <code>{API_BASE || 'http://localhost:5000'}/api</code>.
                     <div style={{ marginTop: '8px' }}>
@@ -3482,7 +3663,7 @@ export default function App() {
                         </span>
                       ) : (
                         <span className="badge-status badge-status-offline">
-                          <span className="dot" /> Server Terputus (Mode Offline)
+                          <span className="dot" /> Server Terputus (Mode Cloud Firestore Saja)
                         </span>
                       )}
                     </div>
@@ -3500,50 +3681,19 @@ export default function App() {
                 </div>
 
                 <div className="settings-group">
-                  <div className="settings-group-title">Direktori Penyimpanan Data</div>
-                  <div className="settings-group-desc">
-                    Semua hasil scraping dan cache analisis AI otomatis disimpan ke:
-                    <div style={{ marginTop: '4px' }}>
-                      <code>h:\tiktok-comment-scrapper\data\</code>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="settings-group">
                   <div className="settings-group-title">Kesiapan Multi-Platform</div>
                   <div className="settings-group-desc">
                     Arsitektur antarmuka telah mendukung integrasi platform media sosial:
                     <ul style={{ paddingLeft: '20px', marginTop: '6px' }}>
                       <li><strong>TikTok:</strong> Modul Scraper Aktif (versi 2.0)</li>
-                      {/* <li><strong>Instagram:</strong> Modul Scraper Aktif (Didukung dengan autentikasi Cookie)</li> */}
-                      {/* <li><strong>YouTube:</strong> Siap untuk integrasi YouTube Data API / Scraper</li> */}
                     </ul>
-                  </div>
-                </div>
-
-                <div className="settings-group">
-                  <div className="settings-group-title">Keamanan Akses Dashboard (PIN Protection)</div>
-                  <div className="settings-group-desc">
-                    Aplikasi ini dilindungi oleh PIN keamanan 6-digit. Sesi browser Anda saat ini aktif dan terautentikasi.
-                    <div style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                      <span className="badge-status badge-status-online" style={{ padding: '4px 10px', fontSize: '12px' }}>
-                        <Lock size={12} style={{ marginRight: '4px' }} /> PIN Akses: 112233
-                      </span>
-                      <button
-                        className="btn btn-white-bordered"
-                        onClick={handleLock}
-                        style={{ color: '#DC2626', borderColor: '#FCA5A5', background: '#FEF2F2', padding: '5px 12px', fontSize: '12.5px' }}
-                      >
-                        <Lock size={13} style={{ marginRight: '4px' }} /> Kunci Dashboard Sekarang
-                      </button>
-                    </div>
                   </div>
                 </div>
 
                 <div className="settings-group">
                   <div className="settings-group-title">Versi & Lisensi</div>
                   <div className="settings-group-desc">
-                    Tesisori — AI Research Workspace v2.1 • Berlisensi MIT.
+                    Tassiori — AI Research Workspace v2.2 • Berlisensi MIT.
                   </div>
                 </div>
               </div>
