@@ -60,7 +60,7 @@ export default function SettingsPage({
             <ul style={{ paddingLeft: '20px', marginTop: '8px', lineHeight: '1.7' }}>
               <li><strong>YouTube:</strong> Video Reguler & YouTube Shorts</li>
               <li><strong>TikTok:</strong> Video Publik, Caption & Balasan Komentar Bertingkat</li>
-              <li><strong>Instagram:</strong> Postingan Feed & Reels</li>
+              {/* <li><strong>Instagram:</strong> Postingan Feed & Reels (Dinonaktifkan sementara)</li> */}
             </ul>
           </div>
         </div>

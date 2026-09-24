@@ -4,7 +4,7 @@ import CitationModal from './components/CitationModal';
 import VerbatimQuoteModal from './components/VerbatimQuoteModal';
 import InterCoderModal from './components/InterCoderModal';
 import AuthScreen from './components/AuthScreen';
-import PinLockScreen from './components/PinLockScreen';
+// PinLockScreen dihapus
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 import MobileNav from './components/layout/MobileNav';
@@ -17,7 +17,6 @@ import SettingsPage from './pages/SettingsPage';
 import {
   STOPWORDS,
   API_BASE,
-  CORRECT_PIN,
   TAB_ROUTES,
   ROUTE_TABS,
   getInitialTab
@@ -68,15 +67,9 @@ export default function App() {
     return () => window.removeEventListener('popstate', onPopState);
   }, [activeTab]);
 
-  // Platform Selector State (Prepared for multi-platform)
+  // Platform Selector State (Fokus TikTok & YouTube - Instagram dinonaktifkan sementara)
   const [selectedPlatform, setSelectedPlatform] = useState('tiktok');
-  const [igCookie, setIgCookie] = useState(() => {
-    try {
-      return localStorage.getItem('ig_cookie') || '';
-    } catch {
-      return '';
-    }
-  });
+  // const [igCookie, setIgCookie] = useState('');
 
   // Backend & File State
   const [files, setFiles] = useState([]);
@@ -157,14 +150,7 @@ export default function App() {
     }
   };
 
-  // PIN Lock Screen State
-  const [isUnlocked, setIsUnlocked] = useState(() => {
-    try {
-      return sessionStorage.getItem('scrapper_unlocked') === 'true';
-    } catch {
-      return false;
-    }
-  });
+  // PIN Lock Screen telah dihapus sesuai permintaan
 
   // Fetch list of saved files from Firestore (private per-user)
   const fetchFilesList = async () => {
@@ -332,9 +318,10 @@ export default function App() {
         video_url: scrapeInput.trim()
       };
 
-      if (selectedPlatform === 'instagram') {
-        payload.cookie = igCookie.trim();
-      }
+      // Scraper Instagram dinonaktifkan sementara (fokus ke TikTok dan YouTube)
+      // if (selectedPlatform === 'instagram') {
+      //   payload.cookie = (igCookie || '').trim();
+      // }
 
       const res = await fetch(`${API_BASE}/api/scrape`, {
         method: 'POST',
@@ -660,20 +647,7 @@ export default function App() {
     setIsMobileMenuOpen(false);
   };
 
-  // PIN Unlock Handler
-  const handlePinUnlock = (enteredPin) => {
-    if (enteredPin === CORRECT_PIN) {
-      try {
-        sessionStorage.setItem('scrapper_unlocked', 'true');
-      } catch {}
-      setIsUnlocked(true);
-    }
-  };
-
-  // Render PIN lock screen if locked
-  if (!isUnlocked) {
-    return <PinLockScreen onUnlock={handlePinUnlock} />;
-  }
+  // PIN lock screen telah dihapus
 
   // Auth Loading Screen
   if (authLoading) {

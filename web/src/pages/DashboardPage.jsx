@@ -69,6 +69,7 @@ export default function DashboardPage({
               <span>YouTube</span>
             </button>
 
+            {/* Scraper Instagram dikomentari sementara - fokus TikTok & YouTube terlebih dahulu
             <button
               type="button"
               className={`platform-chip-btn ${selectedPlatform === 'instagram' ? 'active' : ''}`}
@@ -80,6 +81,7 @@ export default function DashboardPage({
               </svg>
               <span>Instagram</span>
             </button>
+            */}
           </div>
         </div>
 
@@ -88,8 +90,6 @@ export default function DashboardPage({
           <label className="scrape-input-label">
             {selectedPlatform === 'youtube'
               ? 'Masukkan link video YouTube / Shorts'
-              : selectedPlatform === 'instagram'
-              ? 'Masukkan link postingan atau Reels Instagram'
               : 'Masukkan link video TikTok'}
           </label>
           <div className="scrape-input-row">
@@ -101,8 +101,6 @@ export default function DashboardPage({
                 placeholder={
                   selectedPlatform === 'youtube'
                     ? 'Tempelkan link video YouTube, Shorts, atau ID video (contoh: https://www.youtube.com/watch?v=...)...'
-                    : selectedPlatform === 'instagram'
-                    ? 'Tempelkan link postingan / Reels Instagram (contoh: https://www.instagram.com/reel/...)...'
                     : 'Tempelkan link video TikTok, shortlink vt.tiktok.com, atau ID video (contoh: https://vt.tiktok.com/ZSbJY5aH9/)...'
                 }
                 value={scrapeInput}
@@ -131,7 +129,7 @@ export default function DashboardPage({
             </button>
           </div>
 
-          {/* Cookie Input specifically for Instagram */}
+          {/* Cookie Input specifically for Instagram - dinonaktifkan sementara (fokus TikTok & YouTube)
           {selectedPlatform === 'instagram' && (
             <div style={{ marginTop: '14px', background: '#FDF2F8', border: '1px solid #FBCFE8', borderRadius: '8px', padding: '14px 18px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '6px' }}>
@@ -159,6 +157,7 @@ export default function DashboardPage({
               </p>
             </div>
           )}
+          */}
 
           <div className="scrape-hint-text-clean">
             {selectedPlatform === 'youtube' ? (
@@ -169,13 +168,6 @@ export default function DashboardPage({
                 <code>https://www.youtube.com/shorts/...</code>
                 <span>atau youtu.be</span>
                 <code>https://youtu.be/...</code>
-              </>
-            ) : selectedPlatform === 'instagram' ? (
-              <>
-                <span>Contoh format Instagram:</span>
-                <code>https://www.instagram.com/reel/C1ACfnvh4KE/</code>
-                <span>atau shortcode</span>
-                <code>C1ACfnvh4KE</code>
               </>
             ) : (
               <>

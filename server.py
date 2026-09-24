@@ -14,7 +14,7 @@ from tiktokcomment.typing import Comments
 DATA_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data')
 os.makedirs(DATA_DIR, exist_ok=True)
 
-APP_PIN = os.environ.get('APP_PIN', '112233')
+APP_PIN = os.environ.get('APP_PIN', '')
 
 def resolve_tiktok_aweme_id(raw_input: str) -> str:
     """
@@ -283,38 +283,42 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
         platform = body.get('platform', 'tiktok').lower()
         raw_input = str(body.get('url') or body.get('aweme_id', '')).strip()
 
+        # Scraper Instagram dinonaktifkan sementara (fokus ke TikTok dan YouTube)
+        # if platform == 'instagram':
+        #     from instagramcomment import InstagramComment, extract_instagram_shortcode
+        #     post_id = extract_instagram_shortcode(raw_input)
+        #     if not post_id:
+        #         self._send_json(400, {"error": "Format link atau shortcode Instagram tidak valid. Contoh: https://www.instagram.com/reel/C1ACfnvh4KE/ atau Cm2cJmABD1p"})
+        #         return
+        #
+        #     cookie = body.get('cookie') or os.environ.get('INSTAGRAM_COOKIE', '')
+        #     if not cookie or not cookie.strip():
+        #         self._send_json(400, {"error": "Cookie Instagram diperlukan untuk mengambil komentar. Silakan masukkan Cookie akun Instagram Anda."})
+        #         return
+        #
+        #     try:
+        #         ig_scraper = InstagramComment(cookie=cookie)
+        #         data = ig_scraper.execute(post_id=post_id, max_comments=300)
+        #         final_filename = f"ig_{post_id}.json"
+        #         final_path = os.path.join(DATA_DIR, final_filename)
+        #
+        #         with open(final_path, 'w', encoding='utf-8') as f:
+        #             json.dump(data, f, ensure_ascii=False, indent=4)
+        #
+        #         logger.info(f"Instagram scraped and saved successfully: {final_path}")
+        #         self._send_json(200, {
+        #             "success": True,
+        #             "platform": "instagram",
+        #             "id": post_id,
+        #             "filename": final_filename,
+        #             "data": data
+        #         })
+        #     except Exception as e:
+        #         logger.error(f"Error scraping Instagram {post_id}: {e}")
+        #         self._send_json(500, {"error": f"Gagal scrape Instagram: {str(e)}"})
+        #     return
         if platform == 'instagram':
-            from instagramcomment import InstagramComment, extract_instagram_shortcode
-            post_id = extract_instagram_shortcode(raw_input)
-            if not post_id:
-                self._send_json(400, {"error": "Format link atau shortcode Instagram tidak valid. Contoh: https://www.instagram.com/reel/C1ACfnvh4KE/ atau Cm2cJmABD1p"})
-                return
-
-            cookie = body.get('cookie') or os.environ.get('INSTAGRAM_COOKIE', '')
-            if not cookie or not cookie.strip():
-                self._send_json(400, {"error": "Cookie Instagram diperlukan untuk mengambil komentar. Silakan masukkan Cookie akun Instagram Anda."})
-                return
-
-            try:
-                ig_scraper = InstagramComment(cookie=cookie)
-                data = ig_scraper.execute(post_id=post_id, max_comments=300)
-                final_filename = f"ig_{post_id}.json"
-                final_path = os.path.join(DATA_DIR, final_filename)
-
-                with open(final_path, 'w', encoding='utf-8') as f:
-                    json.dump(data, f, ensure_ascii=False, indent=4)
-
-                logger.info(f"Instagram scraped and saved successfully: {final_path}")
-                self._send_json(200, {
-                    "success": True,
-                    "platform": "instagram",
-                    "id": post_id,
-                    "filename": final_filename,
-                    "data": data
-                })
-            except Exception as e:
-                logger.error(f"Error scraping Instagram {post_id}: {e}")
-                self._send_json(500, {"error": f"Gagal scrape Instagram: {str(e)}"})
+            self._send_json(400, {"error": "Scraper Instagram sedang dinonaktifkan sementara. Fokus saat ini pada platform TikTok dan YouTube."})
             return
 
         if platform == 'youtube':
