@@ -43,6 +43,7 @@ import {
   MessageCircle,
   BarChart3
 } from 'lucide-react';
+import ExportStatsModal from './components/ExportStatsModal';
 
 const STOPWORDS = new Set([
   'di', 'ke', 'dari', 'yang', 'dan', 'ini', 'itu', 'ada', 'aku', 'kau', 'dia', 'mereka',
@@ -314,6 +315,7 @@ export default function App() {
   // Comments Thread UI State
   const [expandedReplies, setExpandedReplies] = useState(new Set());
   const [copiedId, setCopiedId] = useState(null);
+  const [showExportStatsModal, setShowExportStatsModal] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -1657,9 +1659,17 @@ export default function App() {
 
                     <div className="export-actions-group">
                       <button
+                        className="btn btn-stat-export"
+                        onClick={() => setShowExportStatsModal(true)}
+                        title="Ekspor dataset terstandarisasi untuk SPSS, Excel, SmartPLS, dan JASP"
+                      >
+                        <FileSpreadsheet size={15} />
+                        <span>Ekspor Statistik (SPSS, Excel, PLS, JASP)</span>
+                      </button>
+                      <button
                         className="btn btn-white-bordered"
                         onClick={exportToCSV}
-                        title="Ekspor ke format Excel / CSV"
+                        title="Ekspor ke format Excel / CSV standar"
                       >
                         <Download size={14} />
                         Ekspor CSV
@@ -2036,6 +2046,17 @@ export default function App() {
                       >
                         <Download size={14} />
                         Ekspor Draf (.md)
+                      </button>
+                    )}
+
+                    {data && (
+                      <button
+                        className="btn btn-stat-export"
+                        onClick={() => setShowExportStatsModal(true)}
+                        title="Ekspor data komentar & metrik statistik untuk SPSS, Excel, SmartPLS, JASP"
+                      >
+                        <FileSpreadsheet size={14} />
+                        <span>Ekspor Statistik</span>
                       </button>
                     )}
                   </div>
@@ -3272,6 +3293,16 @@ export default function App() {
           <span className="mobile-nav-label">Pengaturan</span>
         </button>
       </nav>
+
+      {/* Modal Ekspor Statistik Multi-Format (SPSS, Excel, SmartPLS, JASP) */}
+      <ExportStatsModal
+        isOpen={showExportStatsModal}
+        onClose={() => setShowExportStatsModal(false)}
+        allComments={data?.comments || []}
+        filteredComments={filteredComments || []}
+        selectedFileName={selectedFile || 'dataset'}
+        searchKeyword={searchKeyword}
+      />
     </div>
   );
 }
