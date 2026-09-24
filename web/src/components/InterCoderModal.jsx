@@ -144,7 +144,7 @@ export default function InterCoderModal({
               <Calculator size={22} color="#0891b2" />
             </div>
             <div>
-              <h3 className="stat-modal-title">Kalkulator Inter-Coder Reliability (Cohen's Kappa &kappa;)</h3>
+              <h3 className="stat-modal-title">Kalkulator Inter-Coder Reliability (Cohen's Kappa κ)</h3>
               <p className="stat-modal-subtitle">
                 Uji validitas & reliabilitas metodologis analisis isi data teks komentar untuk Bab 3 Tesis S2 & Skripsi.
               </p>
@@ -167,7 +167,7 @@ export default function InterCoderModal({
           {/* Top Score Dashboard */}
           <div className="kappa-score-dashboard">
             <div className="kappa-main-gauge">
-              <span className="kappa-label">Koefisien Cohen's Kappa (&kappa;)</span>
+              <span className="kappa-label">Koefisien Cohen's Kappa (κ)</span>
               <div className="kappa-number-row">
                 <span className="kappa-big-number">{k >= 0 ? `+${k.toFixed(3)}` : k.toFixed(3)}</span>
                 <span className={`kappa-level-badge ${interp.badgeClass}`}>
@@ -193,7 +193,7 @@ export default function InterCoderModal({
               <div className="kappa-metric-box">
                 <span className="metric-title">Standar Kelolosan S2</span>
                 <strong style={{ color: interp.accepted ? '#16a34a' : '#dc2626' }}>
-                  {interp.accepted ? 'MEMENUHI (&ge; 0.61)' : 'BELUM LOLOS'}
+                  {interp.accepted ? 'MEMENUHI (≥ 0.61)' : 'BELUM LOLOS'}
                 </strong>
                 <span className="metric-sub">Batas Ambang Landis & Koch</span>
               </div>
@@ -201,21 +201,23 @@ export default function InterCoderModal({
           </div>
 
           {/* Mode Tabs */}
-          <div className="citation-tab-bar" style={{ marginTop: '4px' }}>
+          <div className="citation-tab-bar kappa-tab-bar" style={{ marginTop: '4px' }}>
             <button
               className={`citation-tab ${activeTab === 'interactive' ? 'active' : ''}`}
               onClick={() => setActiveTab('interactive')}
             >
               <Users size={14} />
-              <span>Mode 1: Uji Sampel Data Nyata (AI vs Peneliti)</span>
-              <span className="cite-badge">{sampledComments.length} Sampel</span>
+              <span className="tab-text-desktop">Mode 1: Uji Sampel Data Nyata (AI vs Peneliti)</span>
+              <span className="tab-text-mobile">Mode 1: Sampel Nyata</span>
+              <span className="cite-badge">{sampledComments.length}</span>
             </button>
             <button
               className={`citation-tab ${activeTab === 'matrix' ? 'active' : ''}`}
               onClick={() => setActiveTab('matrix')}
             >
               <Table size={14} />
-              <span>Mode 2: Input Matriks Kontingensi 3&times;3 Manual</span>
+              <span className="tab-text-desktop">Mode 2: Input Matriks Kontingensi 3×3 Manual</span>
+              <span className="tab-text-mobile">Mode 2: Matriks 3×3</span>
             </button>
           </div>
 
@@ -224,7 +226,7 @@ export default function InterCoderModal({
             <div className="kappa-interactive-panel">
               <div className="kappa-sample-toolbar">
                 <div className="sample-size-selector">
-                  <span className="selector-text">Ukuran Sampel Uji:</span>
+                  <span className="selector-text">Ukuran Sampel:</span>
                   {[20, 30, 50].map((sz) => (
                     <button
                       key={sz}
@@ -243,7 +245,7 @@ export default function InterCoderModal({
                     placeholder="Nama Pengkode 1 (Peneliti)"
                     title="Pengkode 1"
                   />
-                  <span>vs</span>
+                  <span className="coder-vs-divider">vs</span>
                   <input
                     type="text"
                     value={coder2Name}
@@ -254,8 +256,8 @@ export default function InterCoderModal({
                 </div>
               </div>
 
-              {/* Table of samples */}
-              <div className="stat-table-wrapper" style={{ maxHeight: '220px' }}>
+              {/* Table of samples (Desktop) */}
+              <div className="stat-table-wrapper kappa-desktop-table" style={{ maxHeight: '240px' }}>
                 <table className="stat-preview-table">
                   <thead>
                     <tr>
@@ -306,6 +308,52 @@ export default function InterCoderModal({
                     })}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Card List (Thumb-friendly & 0 horizontal scroll) */}
+              <div className="kappa-mobile-sample-list">
+                {sampledComments.map((sc, idx) => {
+                  const userChoice = humanCodes[sc.id] || sc.aiCode;
+                  const isMatch = userChoice === sc.aiCode;
+                  return (
+                    <div className="km-sample-card" key={sc.id}>
+                      <div className="km-card-top">
+                        <div className="km-author-line">
+                          <span className="km-badge-num">#{idx + 1}</span>
+                          <span className="km-username">@{sc.username}</span>
+                        </div>
+                        {isMatch ? (
+                          <span className="match-pill match">Sepakat</span>
+                        ) : (
+                          <span className="match-pill diff">Beda</span>
+                        )}
+                      </div>
+                      <p className="km-comment-text">{sc.comment}</p>
+                      <div className="km-coding-bar">
+                        <div className="km-ai-side">
+                          <span className="km-tag-label">AI:</span>
+                          <span className={`stat-pill-sm sent-${sc.aiCode === 'Positif' ? '3' : sc.aiCode === 'Negatif' ? '1' : '2'}`}>
+                            {sc.aiCode}
+                          </span>
+                        </div>
+                        <div className="km-user-side">
+                          <span className="km-tag-label">Anda:</span>
+                          <div className="kappa-code-buttons">
+                            {['Positif', 'Netral', 'Negatif'].map((opt) => (
+                              <button
+                                key={opt}
+                                className={`btn-code-opt ${userChoice === opt ? 'selected ' + opt.toLowerCase() : ''}`}
+                                onClick={() => handleHumanCodeChange(sc.id, opt)}
+                              >
+                                {opt}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

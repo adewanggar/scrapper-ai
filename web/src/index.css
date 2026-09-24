@@ -4364,15 +4364,232 @@ a:focus-visible {
   line-height: 1.45;
 }
 
+/* Mobile & Desktop Switching for InterCoder Samples */
+.kappa-desktop-table {
+  display: block;
+}
+
+.kappa-mobile-sample-list {
+  display: none;
+}
+
+.tab-text-mobile {
+  display: none;
+}
+
+.tab-text-desktop {
+  display: inline;
+}
+
+/* Mobile Sample Card Styling */
+.km-sample-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.15s ease;
+}
+
+.km-sample-card:hover {
+  border-color: #cbd5e1;
+}
+
+.km-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.km-author-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.km-badge-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: #f1f5f9;
+  padding: 1px 6px;
+  border-radius: 4px;
+}
+
+.km-username {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.km-comment-text {
+  font-size: 12.5px;
+  color: #334155;
+  line-height: 1.45;
+  background: #f8fafc;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border-left: 3px solid #0891b2;
+  word-break: break-word;
+}
+
+.km-coding-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding-top: 4px;
+  border-top: 1px dashed #e2e8f0;
+}
+
+.km-ai-side,
+.km-user-side {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.km-tag-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
 @media (max-width: 860px) {
   .entman-quadrant-grid {
     grid-template-columns: 1fr;
   }
   .kappa-score-dashboard {
     grid-template-columns: 1fr;
+    padding: 14px 16px;
+    gap: 14px;
   }
   .kappa-metrics-summary {
     grid-template-columns: repeat(2, 1fr);
+  }
+  .kappa-metric-box:nth-child(3) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 640px) {
+  .stat-modal-overlay {
+    padding: 8px !important;
+  }
+  .kappa-modal-container {
+    max-height: 94vh !important;
+    border-radius: 14px !important;
+  }
+  .kappa-score-dashboard {
+    padding: 12px 14px;
+    gap: 12px;
+  }
+  .kappa-big-number {
+    font-size: 28px;
+  }
+  .kappa-interactive-panel,
+  .kappa-matrix-panel {
+    padding: 12px 14px;
+  }
+
+  /* Switch tabs on mobile */
+  .tab-text-desktop {
+    display: none !important;
+  }
+  .tab-text-mobile {
+    display: inline !important;
+  }
+  .kappa-tab-bar .citation-tab {
+    flex: 1 !important;
+    justify-content: center !important;
+    font-size: 11.5px !important;
+    padding: 8px 6px !important;
+  }
+
+  /* Sample Toolbar Stack on mobile */
+  .kappa-sample-toolbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  .sample-size-selector {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  .sample-size-selector .selector-text {
+    font-size: 11px !important;
+    white-space: nowrap !important;
+  }
+  .sample-size-selector .btn-sample-chip {
+    flex: 1 !important;
+    text-align: center !important;
+    padding: 5px 0 !important;
+    font-size: 11px !important;
+  }
+  .coder-names-row {
+    width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+  .coder-names-row input {
+    flex: 1 !important;
+    width: 0 !important;
+    min-width: 0 !important;
+    font-size: 11px !important;
+    padding: 5px 8px !important;
+  }
+  .coder-vs-divider {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  /* Hide Desktop table, show thumb-friendly card list on mobile */
+  .kappa-desktop-table {
+    display: none !important;
+  }
+  .kappa-mobile-sample-list {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    max-height: 280px !important;
+    overflow-y: auto !important;
+    padding-right: 2px;
+  }
+
+  /* Action bar stack on mobile */
+  .kappa-action-bar {
+    padding: 12px 14px !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .kappa-action-bar button {
+    width: 100% !important;
+    justify-content: center !important;
+    height: 40px !important;
+  }
+
+  .stat-modal-footer {
+    padding: 10px 14px !important;
+  }
+  .stat-footer-left {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
   }
 }
 
