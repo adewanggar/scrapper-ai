@@ -190,7 +190,7 @@ function PinLockScreen({ onUnlock }) {
         </h2>
         <p className="pin-subtitle">
           {isSuccess
-            ? 'Membuka dashboard Scraper Hub...'
+            ? 'Membuka dashboard Tesisori...'
             : 'Sistem dilindungi keamanan. Masukkan PIN 6-digit untuk membuka aplikasi.'}
         </p>
 
@@ -1060,14 +1060,16 @@ export default function App() {
       <aside className={`app-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         {/* Brand */}
         <div className="sidebar-brand">
-          <div className="brand-icon-square">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M19.589 6.686a4.793 4.793 0 0 1-3.77-4.245V2h-3.445v13.672a2.896 2.896 0 0 1-5.201 1.743l-.068-.102a2.895 2.895 0 0 1 2.374-4.536c.313 0 .618.05.904.144V9.324a6.34 6.34 0 0 0-.904-.065c-3.528 0-6.387 2.86-6.387 6.388 0 3.528 2.859 6.388 6.387 6.388 3.528 0 6.388-2.86 6.388-6.388V8.653c1.53.945 3.328 1.488 5.253 1.488V6.686z" />
+          <div className="brand-icon-square brand-icon-tesisori">
+            <svg width="28" height="28" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M10 22L18 13H52L46 22H10Z" fill="#F97316" />
+              <path d="M22 24H35V53L22 46V24Z" fill="#F97316" />
+              <path d="M35 24L46 19V47L35 53V24Z" fill="#EA580C" />
             </svg>
           </div>
           <div className="brand-title-wrap">
-            <h1>Social Scraper Hub</h1>
-            <p>Multi-Platform & Research</p>
+            <h1 className="brand-tesisori-title">Tesisori</h1>
+            <p className="brand-tesisori-sub">AI Research Workspace</p>
           </div>
         </div>
 
@@ -3546,7 +3548,7 @@ export default function App() {
                 <div className="settings-group">
                   <div className="settings-group-title">Versi & Lisensi</div>
                   <div className="settings-group-desc">
-                    Social Scraper Hub v2.1 (AI Enhanced) • Berlisensi MIT.
+                    Tesisori — AI Research Workspace v2.1 • Berlisensi MIT.
                   </div>
                 </div>
               </div>

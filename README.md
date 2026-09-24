@@ -81,9 +81,9 @@ python main.py --aweme_id=7170139292767882522 --size=10 --output=data
     // more comments
   ]
 }
-## 🌐 Web Dashboard & AI Analysis (Skripsi & Tesis S2 Edition)
+## 🌐 Tesisori — AI Research Workspace (Skripsi & Tesis S2 Edition)
 
-Aplikasi ini dilengkapi antarmuka web modern berbasis **React (Vite)** dan backend server **Python** dengan integrasi **AI Analysis (Clario LLM - DeepSeek V4 & Gemini 3.7 Flash)** untuk riset skripsi dan tesis:
+**Tesisori** adalah platform *all-in-one research workspace* berbasis antarmuka web modern **React (Vite)** dan backend server **Python** dengan integrasi **AI Analysis (Clario LLM - DeepSeek V4 & Gemini 3.7 Flash)** untuk riset skripsi dan tesis:
 
 ### 🎓 Fitur Akademik Unggulan:
 - **Analisis Framing Robert Entman (1993)**: Membedah 4 kuadran framing media (*Define Problems, Diagnose Causes, Make Moral Judgments, Suggest Remedies*) untuk ketajaman Bab 4 Pembahasan.

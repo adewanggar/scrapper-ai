@@ -1,56 +1,60 @@
 :root {
   /* Base surfaces */
-  --color-bg: #FAFAFA;              /* page background */
+  --color-bg: #FAFAF9;              /* warm light page background */
   --color-surface: #FFFFFF;         /* cards, inputs, header, sidebar */
   --color-border: #E5E7EB;          /* default hairline border */
   --color-border-strong: #D1D5DB;   /* input borders */
 
   /* Text */
-  --color-text-primary: #111827;    /* headings, usernames, body */
-  --color-text-secondary: #6B7280;  /* subtitles, meta, labels */
-  --color-text-muted: #9CA3AF;      /* placeholders, timestamps, "no replies" */
+  --color-text-primary: #0F172A;    /* headings, usernames, body */
+  --color-text-secondary: #64748B;  /* subtitles, meta, labels */
+  --color-text-muted: #94A3B8;      /* placeholders, timestamps, "no replies" */
 
-  /* Brand / primary action */
-  --color-primary: #2563EB;         /* active tab, checked checkbox, links */
-  --color-primary-bg: #EFF6FF;
+  /* Tesisori Brand Palette (Warm Orange Identity) */
+  --color-primary: #F97316;         /* Tesisori core orange */
+  --color-primary-dark: #EA580C;    /* deep orange for hover and contrast */
+  --color-primary-light: #FB923C;   /* vibrant accent */
+  --color-primary-bg: #FFF7ED;      /* warm cream orange background tint */
+  --color-primary-border: #FED7AA;  /* subtle orange border */
 
-  /* CTA gradient — "Scrape Video Baru" */
-  --gradient-cta: linear-gradient(135deg, #FB923C 0%, #F97316 100%);
+  /* CTA gradient — Tesisori Signature */
+  --gradient-cta: linear-gradient(135deg, #FB923C 0%, #EA580C 100%);
+  --gradient-primary: linear-gradient(135deg, #F97316 0%, #C2410C 100%);
 
   /* Status */
   --color-success: #16A34A;
   --color-success-bg: #DCFCE7;      /* "API Online" badge */
 
   /* Caption card (warm highlight) */
-  --color-caption-bg: #FFF9EB;
-  --color-caption-accent: #2563EB;  /* "CAPTION VIDEO TIKTOK" label */
+  --color-caption-bg: #FFFBF5;
+  --color-caption-accent: #EA580C;  /* "CAPTION VIDEO TIKTOK" label */
 
   /* "Buka di TikTok" pill */
   --color-tiktok-pill-bg: #FEF2F2;
   --color-tiktok-pill-text: #DC2626;
 
-  /* Stat-card accent backgrounds (each stat gets its own pastel) */
-  --stat-blue-bg: #DBEAFE;   --stat-blue-icon: #2563EB;   /* Komentar Utama */
+  /* Stat-card accent backgrounds (Tesisori Signature Warm Palette) */
+  --stat-blue-bg: #FFEDD5;   --stat-blue-icon: #EA580C;   /* Komentar Utama (Tesisori Orange) */
   --stat-rose-bg: #FEE2E2;   --stat-rose-icon: #DC2626;   /* Total Balasan */
   --stat-violet-bg: #EDE9FE; --stat-violet-icon: #7C3AED; /* Partisipan Unik */
   --stat-amber-bg: #FEF3C7;  --stat-amber-icon: #D97706;  /* Hasil Terfilter */
 
   /* Tag / keyword pills */
-  --color-pill-bg: #F3F4F6;
-  --color-pill-bg-hover: #E5E7EB;
-  --color-pill-text: #374151;
+  --color-pill-bg: #F8FAFC;
+  --color-pill-bg-hover: #FFF7ED;
+  --color-pill-text: #334155;
 
   /* Keyword highlight */
-  --color-highlight-bg: #FEF08A;
-  --color-highlight-text: #713F12;
+  --color-highlight-bg: #FED7AA;
+  --color-highlight-text: #9A3412;
 
   /* Shadows */
-  --shadow-card: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
-  --shadow-header: 0 1px 0 rgba(16, 24, 40, 0.04);
-  --shadow-cta: 0 2px 5px rgba(249, 115, 22, 0.25);
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-header: 0 1px 0 rgba(15, 23, 42, 0.05);
+  --shadow-cta: 0 3px 10px rgba(234, 88, 12, 0.28);
 
   /* Typography & Radius */
-  --font-family: 'Inter', -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -132,28 +136,33 @@ a:focus-visible {
 }
 
 .brand-icon-square {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: var(--radius-md);
-  background: #000000;
+  background: transparent;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #FFFFFF;
   flex-shrink: 0;
 }
 
 .brand-title-wrap h1 {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  line-height: 1.2;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 19px;
+  font-weight: 800;
+  color: #F97316;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .brand-title-wrap p {
-  font-size: 11.5px;
-  color: var(--color-text-secondary);
-  font-weight: 500;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 9.5px;
+  color: #EA580C;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-top: 1px;
 }
 
 .sidebar-nav {
@@ -192,14 +201,15 @@ a:focus-visible {
 }
 
 .nav-item:hover {
-  background: #F3F4F6;
-  color: var(--color-text-primary);
+  background: #FFF7ED;
+  color: #EA580C;
 }
 
 .nav-item.active {
-  background: var(--color-primary-bg);
-  color: var(--color-primary);
-  font-weight: 600;
+  background: #FFF7ED;
+  color: #EA580C;
+  font-weight: 700;
+  border-left: 3px solid #F97316;
 }
 
 .nav-item .nav-badge {
@@ -213,8 +223,8 @@ a:focus-visible {
 }
 
 .nav-item.active .nav-badge {
-  background: #DBEAFE;
-  color: var(--color-primary);
+  background: #FFEDD5;
+  color: #C2410C;
 }
 
 .sidebar-footer {
