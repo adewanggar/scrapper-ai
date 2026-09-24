@@ -1751,7 +1751,8 @@ export default function App() {
                         title="Ekspor dataset terstandarisasi untuk SPSS, Excel, SmartPLS, dan JASP"
                       >
                         <FileSpreadsheet size={15} />
-                        <span>Ekspor Statistik (SPSS, Excel, PLS, JASP)</span>
+                        <span className="btn-stat-text-desktop">Ekspor Statistik (SPSS, Excel, PLS, JASP)</span>
+                        <span className="btn-stat-text-mobile">Ekspor Statistik (SPSS/PLS)</span>
                       </button>
                       <button
                         className="btn btn-white-bordered"
@@ -1759,7 +1760,7 @@ export default function App() {
                         title="Ekspor ke format Excel / CSV standar"
                       >
                         <Download size={14} />
-                        Ekspor CSV
+                        <span>Ekspor CSV</span>
                       </button>
                       <button
                         className="btn btn-white-bordered"
@@ -1767,7 +1768,7 @@ export default function App() {
                         title="Ekspor ke format JSON"
                       >
                         <FileJson size={14} />
-                        Ekspor JSON
+                        <span>Ekspor JSON</span>
                       </button>
                     </div>
                   </div>
