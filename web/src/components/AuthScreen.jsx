@@ -242,7 +242,7 @@ export default function AuthScreen({ onAuthSuccess }) {
         {/* Security & Privacy Footer Note */}
         <div className="auth-privacy-note">
           <ShieldCheck size={14} color="#16A34A" />
-          <span>Setiap file dan analisis scraping bersifat <strong>100% privat</strong> dan terisolasi untuk akun Anda di Firestore.</span>
+          <span>Seluruh dataset dan analisis riset bersifat <strong>100% privat</strong> dan hanya dapat diakses oleh akun Anda.</span>
         </div>
       </div>
     </div>

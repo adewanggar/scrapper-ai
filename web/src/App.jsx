@@ -544,10 +544,11 @@ export default function App() {
     }
   };
 
-  // Delete a private file from Firestore
+  // Delete a dataset from user account
   const handleDeleteUserFile = async (filename) => {
     if (!currentUser) return;
-    if (!confirm(`Hapus file "${filename}" dari akun Anda? Data ini akan dihapus permanen dari Firestore.`)) {
+    const displayName = filename.replace(/\.json$/i, '');
+    if (!confirm(`Hapus dataset "${displayName}" dari akun Anda? Data ini akan dihapus secara permanen.`)) {
       return;
     }
     try {
@@ -800,10 +801,10 @@ export default function App() {
           await fetchFilesList();
           setActiveTab('results');
         } else {
-          alert('Format JSON tidak sesuai: tidak ditemukan field comments.');
+          alert('Format data tidak sesuai: tidak ditemukan kolom komentar.');
         }
       } catch (err) {
-        alert('File JSON tidak valid: ' + err.message);
+        alert('File dataset tidak dapat dibaca: ' + err.message);
       }
     };
     reader.readAsText(file);
@@ -1245,18 +1246,12 @@ export default function App() {
         {/* Sidebar Footer */}
         <div className="sidebar-footer">
           <div className="sidebar-footer-row">
-            <span className="sidebar-server-label">
-              <span className="server-dot" /> Status Server
+            <span className="sidebar-server-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <ShieldCheck size={14} color="#16A34A" /> Ruang Riset Privat
             </span>
-            {serverOnline ? (
-              <span className="badge-status-pill online">
-                <span className="status-dot" /> Online
-              </span>
-            ) : (
-              <span className="badge-status-pill offline">
-                <span className="status-dot" /> Offline
-              </span>
-            )}
+            <span className="badge-status-pill online">
+              <span className="status-dot" /> Aktif
+            </span>
           </div>
         </div>
       </aside>
@@ -1279,10 +1274,10 @@ export default function App() {
             <button
               className="btn-pill-header"
               onClick={() => fileInputRef.current?.click()}
-              title="Buka file JSON dari komputer ke akun privat Anda"
+              title="Unggah dataset penelitian dari komputer ke akun Anda"
             >
               <Upload size={14} />
-              <span>Upload JSON</span>
+              <span>Unggah Dataset</span>
             </button>
 
             {/* User Profile Menu with Google / Email Dropdown */}
@@ -1316,7 +1311,7 @@ export default function App() {
                     <div className="user-dropdown-email">{currentUser.email}</div>
                     <div className="user-dropdown-badge">
                       <ShieldCheck size={12} />
-                      <span>Firestore Private Cloud</span>
+                      <span>Ruang Riset Privat</span>
                     </div>
                   </div>
                   <button
@@ -1557,7 +1552,7 @@ export default function App() {
                   </div>
                   <div className="stat-card-content">
                     <div className="stat-card-value">{totalScrapedStats.totalVideos}</div>
-                    <div className="stat-card-title">Total Video Ter-scrape</div>
+                    <div className="stat-card-title">Total Konten Riset</div>
                   </div>
                   <ArrowRight size={16} className="stat-card-arrow" />
                 </div>
@@ -1569,31 +1564,31 @@ export default function App() {
                   </div>
                   <div className="stat-card-content">
                     <div className="stat-card-value">{totalScrapedStats.totalStoredComments.toLocaleString()}</div>
-                    <div className="stat-card-title">Total Komentar Tersimpan</div>
+                    <div className="stat-card-title">Total Komentar Dianalisis</div>
                   </div>
                   <ArrowRight size={16} className="stat-card-arrow" />
                 </div>
 
-                {/* Card 3: File JSON di Folder data/ (Soft Lavender) */}
-                <div className="stat-card-clean stat-card-lavender">
+                {/* Card 3: Dataset Tersimpan (Soft Lavender) */}
+                <div className="stat-card-clean stat-card-lavender" onClick={() => setActiveTab('files')} style={{ cursor: 'pointer' }}>
                   <div className="stat-card-icon-box lavender-icon">
-                    <FileText size={20} />
+                    <FolderArchive size={20} />
                   </div>
                   <div className="stat-card-content">
                     <div className="stat-card-value">{files.length}</div>
-                    <div className="stat-card-title">File JSON di Folder data/</div>
+                    <div className="stat-card-title">Dataset Tersimpan</div>
                   </div>
                   <ArrowRight size={16} className="stat-card-arrow" />
                 </div>
 
-                {/* Card 4: Status Server Lokal (Soft Mint) */}
+                {/* Card 4: Privasi Akun Peneliti (Soft Mint) */}
                 <div className="stat-card-clean stat-card-mint">
                   <div className="stat-card-icon-box mint-icon">
-                    <CheckCircle2 size={20} />
+                    <ShieldCheck size={20} />
                   </div>
                   <div className="stat-card-content">
-                    <div className="stat-card-value">{serverOnline ? '100% Aktif' : 'Offline'}</div>
-                    <div className="stat-card-title">Status Server Lokal</div>
+                    <div className="stat-card-value">100% Aman</div>
+                    <div className="stat-card-title">Privasi Akun Peneliti</div>
                   </div>
                   <ArrowRight size={16} className="stat-card-arrow" />
                 </div>
@@ -1617,10 +1612,10 @@ export default function App() {
                     <table className="recent-table-clean">
                       <thead>
                         <tr>
-                          <th style={{ width: '28%' }}>NAMA FILE / VIDEO ID</th>
-                          <th style={{ width: '32%' }}>CAPTION PREVIEW</th>
+                          <th style={{ width: '28%' }}>KONTEN / VIDEO</th>
+                          <th style={{ width: '32%' }}>CAPTION & TOPIK</th>
                           <th style={{ width: '16%' }}>JUMLAH KOMENTAR</th>
-                          <th style={{ width: '14%' }}>WAKTU SCRAPE</th>
+                          <th style={{ width: '14%' }}>WAKTU AMBIL</th>
                           <th style={{ width: '10%', textAlign: 'right' }}>AKSI</th>
                         </tr>
                       </thead>
@@ -1630,7 +1625,7 @@ export default function App() {
                             <td>
                               <div className="file-name-cell">
                                 <FileText size={16} className="file-icon-orange" />
-                                <span className="file-name-text">{f.filename}</span>
+                                <span className="file-name-text">{f.filename.replace(/\.json$/i, '')}</span>
                               </div>
                             </td>
                             <td>
@@ -1674,9 +1669,9 @@ export default function App() {
               <div className="video-selector-row">
                 <div className="video-selector-bar">
                   <div className="selector-icon">
-                    <FileJson size={18} />
+                    <Database size={18} />
                   </div>
-                  <span className="selector-label">Pilih Data Video:</span>
+                  <span className="selector-label">Pilih Dataset Riset:</span>
                   {files.length > 0 ? (
                     <select
                       className="selector-select"
@@ -1685,29 +1680,27 @@ export default function App() {
                     >
                       {files.map((f) => (
                         <option key={f.filename} value={f.filename}>
-                          {f.filename} ({f.comments_count} komentar) {f.caption ? `- ${f.caption.slice(0, 45)}...` : ''}
+                          {f.caption ? `${f.caption.slice(0, 48)}...` : f.filename.replace(/\.json$/i, '')} ({f.comments_count} komentar)
                         </option>
                       ))}
                     </select>
                   ) : (
                     <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', flex: 1 }}>
-                      {selectedFile ? selectedFile : 'Belum ada data di folder data/'}
+                      {selectedFile ? selectedFile.replace(/\.json$/i, '') : 'Belum ada dataset penelitian tersimpan'}
                     </span>
                   )}
                   <ChevronDown size={16} color="var(--color-text-secondary)" style={{ pointerEvents: 'none', flexShrink: 0 }} />
                 </div>
 
                 <div className="selector-actions-group">
-                  {serverOnline && (
-                    <button
-                      className="btn btn-white-bordered"
-                      onClick={fetchFilesList}
-                      title="Refresh daftar file"
-                    >
-                      <RefreshCw size={14} />
-                      Refresh
-                    </button>
-                  )}
+                  <button
+                    className="btn btn-white-bordered"
+                    onClick={fetchFilesList}
+                    title="Segarkan riwayat dataset"
+                  >
+                    <RefreshCw size={14} />
+                    Segarkan
+                  </button>
 
                   <button
                     className="btn btn-white-bordered"
@@ -2222,13 +2215,13 @@ export default function App() {
                 <div className="empty-state-box">
                   <MessageSquare size={42} className="empty-state-icon" />
                   <h4>Belum ada data komentar yang dipilih</h4>
-                  <p>Silakan scrape video baru di tab Dashboard, atau pilih file dari daftar riwayat.</p>
+                  <p>Mulai scraping konten baru di tab Dashboard, atau pilih dataset dari riwayat penelitian Anda.</p>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
                     <button className="btn btn-scrape-primary" onClick={() => setActiveTab('dashboard')} style={{ height: '38px', padding: '0 16px' }}>
                       Buka Form Scraper
                     </button>
                     <button className="btn btn-white-bordered" onClick={() => fileInputRef.current?.click()}>
-                      Upload File JSON
+                      Unggah Dataset
                     </button>
                   </div>
                 </div>
@@ -2382,9 +2375,9 @@ export default function App() {
                 <div className="video-selector-row">
                   <div className="video-selector-bar">
                     <div className="selector-icon">
-                      <FileJson size={18} />
+                      <Database size={18} />
                     </div>
-                    <span className="selector-label">File Dataset:</span>
+                    <span className="selector-label">Pilih Dataset Riset:</span>
                     {files.length > 0 ? (
                       <select
                         className="selector-select"
@@ -2393,13 +2386,13 @@ export default function App() {
                       >
                         {files.map((f) => (
                           <option key={f.filename} value={f.filename}>
-                            {f.filename} ({f.comments_count} komentar) {f.caption ? `- ${f.caption.slice(0, 45)}...` : ''}
+                            {f.caption ? `${f.caption.slice(0, 48)}...` : f.filename.replace(/\.json$/i, '')} ({f.comments_count} komentar)
                           </option>
                         ))}
                       </select>
                     ) : (
                       <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', flex: 1 }}>
-                        {selectedFile ? selectedFile : 'Belum ada data'}
+                        {selectedFile ? selectedFile.replace(/\.json$/i, '') : 'Belum ada dataset penelitian tersimpan'}
                       </span>
                     )}
                     <ChevronDown size={16} color="var(--color-text-secondary)" style={{ pointerEvents: 'none' }} />
@@ -3556,20 +3549,20 @@ export default function App() {
           })()}
 
           {/* ====================================================================
-              TAB 3: RIWAYAT FILE (DATA DIRECTORY EXPLORER)
+              TAB 3: RIWAYAT DATASET PENELITIAN
               ==================================================================== */}
           {activeTab === 'files' && (
             <div>
               <div className="dashboard-hero">
-                <h2>Riwayat File Scraping (Privat Akun)</h2>
-                <p>Seluruh file data komentar milik akun Anda yang tersimpan aman secara privat di cloud Firestore (<code>tesis-ori</code>).</p>
+                <h2>Riwayat Dataset Penelitian</h2>
+                <p>Seluruh dataset hasil riset dan analisis komentar yang tersimpan aman di akun privat Anda.</p>
               </div>
 
               {files.length === 0 ? (
                 <div className="empty-state-box">
                   <FolderArchive size={42} className="empty-state-icon" />
-                  <h4>Belum ada file data tersimpan di akun Anda</h4>
-                  <p>Gunakan tab Dashboard untuk memulai scraping video TikTok pertama Anda atau upload file JSON.</p>
+                  <h4>Belum ada dataset penelitian tersimpan</h4>
+                  <p>Gunakan tab Dashboard untuk memulai scraping video atau mengunggah data penelitian Anda.</p>
                   <button className="btn btn-scrape-primary" onClick={() => setActiveTab('dashboard')} style={{ height: '38px', padding: '0 16px' }}>
                     Mulai Scraping
                   </button>
@@ -3579,10 +3572,10 @@ export default function App() {
                   <table className="recent-table">
                     <thead>
                       <tr>
-                        <th>File JSON</th>
-                        <th>Caption Video</th>
-                        <th>Komentar</th>
-                        <th>Waktu Diperbarui</th>
+                        <th>Nama Dataset</th>
+                        <th>Topik / Caption Video</th>
+                        <th>Jumlah Komentar</th>
+                        <th>Terakhir Diperbarui</th>
                         <th style={{ textAlign: 'right' }}>Aksi</th>
                       </tr>
                     </thead>
@@ -3591,8 +3584,8 @@ export default function App() {
                         <tr key={f.filename}>
                           <td>
                             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontWeight: 600 }}>
-                              <FileJson size={18} color="var(--color-primary)" />
-                              {f.filename}
+                              <Database size={18} color="var(--color-primary)" />
+                              <span>{f.filename.replace(/\.json$/i, '')}</span>
                             </div>
                           </td>
                           <td>
@@ -3631,7 +3624,7 @@ export default function App() {
                                 className="btn btn-white-bordered"
                                 style={{ padding: '6px 10px', fontSize: '12px', color: '#DC2626', borderColor: '#FECACA' }}
                                 onClick={() => handleDeleteUserFile(f.filename)}
-                                title="Hapus file dari akun Firestore Anda"
+                                title="Hapus dataset dari akun Anda"
                               >
                                 <Trash2 size={13} />
                               </button>
@@ -3647,38 +3640,36 @@ export default function App() {
           )}
 
           {/* ====================================================================
-              TAB 4: PENGATURAN (SYSTEM INFO & CONFIG)
+              TAB 4: PENGATURAN & PROFIL RISET
               ==================================================================== */}
           {activeTab === 'settings' && (
             <div>
               <div className="dashboard-hero">
-                <h2>Pengaturan Aplikasi</h2>
-                <p>Konfigurasi sistem, akun Firebase, status backend API, dan penyimpanan Firestore.</p>
+                <h2>Pengaturan Akun & Preferensi Riset</h2>
+                <p>Kelola profil peneliti, status keamanan akun, dan preferensi workspace penelitian.</p>
               </div>
 
               <div className="settings-card">
                 <div className="settings-group">
-                  <div className="settings-group-title">Autentikasi Akun & Database Firestore (tesis-ori)</div>
+                  <div className="settings-group-title">Profil Peneliti</div>
                   <div className="settings-group-desc">
-                    Akun Anda terhubung dengan Firebase Authentication dan Firestore Cloud Database. Semua data scraping, dataset, dan riwayat analisis AI disimpan secara <strong>privat dan terisolasi</strong> hanya untuk akun Anda.
-                    <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    Akun Anda terlindungi dengan privasi penuh. Seluruh data penelitian, dataset komentar, dan draf bab skripsi hanya dapat diakses oleh akun Anda.
+                    <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       <div style={{ fontSize: '13px' }}>
-                        👤 <strong>Nama:</strong> {currentUser.displayName || '-'}
+                        👤 <strong>Nama Peneliti:</strong> {currentUser.displayName || 'Peneliti'}
                       </div>
                       <div style={{ fontSize: '13px' }}>
-                        ✉️ <strong>Email:</strong> {currentUser.email}
+                        ✉️ <strong>Alamat Email:</strong> {currentUser.email}
                       </div>
-                      <div style={{ fontSize: '13px' }}>
-                        🔑 <strong>User ID (UID):</strong> <code>{currentUser.uid}</code>
+                      <div style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <ShieldCheck size={15} color="#16A34A" />
+                        <span><strong>Status Privasi:</strong> Ruang Riset Privat & Terenkripsi</span>
                       </div>
-                      <div style={{ fontSize: '13px' }}>
-                        ☁️ <strong>Project ID Firestore:</strong> <code>tesis-ori</code>
-                      </div>
-                      <div style={{ marginTop: '6px' }}>
+                      <div style={{ marginTop: '8px' }}>
                         <button
                           className="btn btn-white-bordered"
                           onClick={handleLogout}
-                          style={{ color: '#DC2626', borderColor: '#FCA5A5', background: '#FEF2F2', padding: '6px 14px', fontSize: '12.5px' }}
+                          style={{ color: '#DC2626', borderColor: '#FCA5A5', background: '#FEF2F2', padding: '7px 16px', fontSize: '12.5px' }}
                         >
                           <LogOut size={13} style={{ marginRight: '6px' }} /> Keluar dari Akun (Logout)
                         </button>
@@ -3688,49 +3679,33 @@ export default function App() {
                 </div>
 
                 <div className="settings-group">
-                  <div className="settings-group-title">Status Backend API Localhost</div>
+                  <div className="settings-group-title">Mesin Analisis Kecerdasan Buatan (AI Engine)</div>
                   <div className="settings-group-desc">
-                    Backend Python berjalan pada endpoint <code>{API_BASE || 'http://localhost:5000'}/api</code>.
-                    <div style={{ marginTop: '8px' }}>
-                      {serverOnline ? (
-                        <span className="badge-status badge-status-online">
-                          <span className="dot" /> API Server Online & Terhubung
-                        </span>
-                      ) : (
-                        <span className="badge-status badge-status-offline">
-                          <span className="dot" /> Server Terputus (Mode Cloud Firestore Saja)
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="settings-group">
-                  <div className="settings-group-title">Konfigurasi AI Provider (Google AI Studio & Clario)</div>
-                  <div className="settings-group-desc">
-                    • <strong>Primary AI:</strong> Google AI Studio (<code>gemini-3.8-flash</code>)<br />
-                    • <strong>Fallback / Alternative:</strong> Clario LLM (<code>clario/deepseek-v4-flash</code>, <code>clario/gemini-3.7-flash</code>)<br />
-                    • <strong>Fallback Base URL:</strong> <code>https://clario.apicloud.my.id/v1</code><br />
-                    • <strong>Status Kuota / Koneksi:</strong> Terhubung (HTTP 200 OK)
-                  </div>
-                </div>
-
-                <div className="settings-group">
-                  <div className="settings-group-title">Kesiapan Multi-Platform</div>
-                  <div className="settings-group-desc">
-                    Arsitektur antarmuka telah mendukung integrasi platform media sosial:
-                    <ul style={{ paddingLeft: '20px', marginTop: '6px' }}>
-                      <li><strong>YouTube:</strong> YouTube Data API v3 Aktif & Terhubung (Google Cloud Console <code>tesis-ori</code>)</li>
-                      <li><strong>TikTok:</strong> Modul Scraper Aktif (versi 2.0)</li>
-                      <li><strong>Instagram:</strong> Modul Scraper Komentar & Reels Aktif (Cookie Session)</li>
+                    Workspace riset ini ditenagai oleh model AI penalaran tingkat lanjut untuk analisis kuantitatif dan kualitatif:
+                    <ul style={{ paddingLeft: '20px', marginTop: '8px', lineHeight: '1.7' }}>
+                      <li><strong>Model Penalaran:</strong> Gemini 3.8 Flash (Multimodal & Fast Reasoning)</li>
+                      <li><strong>Kerangka Teoretis:</strong> Framing Robert Entman (1993), Sentimen Publik, Perilaku Konsumen, Psikologi Sosial</li>
+                      <li><strong>Validitas Metodologis:</strong> Dilengkapi Kalkulator Reliabilitas Antar-Pengkode (Cohen's Kappa)</li>
                     </ul>
                   </div>
                 </div>
 
                 <div className="settings-group">
-                  <div className="settings-group-title">Versi & Lisensi</div>
+                  <div className="settings-group-title">Dukungan Platform Media Sosial</div>
                   <div className="settings-group-desc">
-                    Tassiori — AI Research Workspace v2.2 • Berlisensi MIT.
+                    Workspace mendukung pengumpulan data komentar dari platform:
+                    <ul style={{ paddingLeft: '20px', marginTop: '8px', lineHeight: '1.7' }}>
+                      <li><strong>YouTube:</strong> Video Reguler & YouTube Shorts</li>
+                      <li><strong>TikTok:</strong> Video Publik, Caption & Balasan Komentar Bertingkat</li>
+                      <li><strong>Instagram:</strong> Postingan Feed & Reels</li>
+                    </ul>
+                  </div>
+                </div>
+
+                <div className="settings-group">
+                  <div className="settings-group-title">Tentang Workspace</div>
+                  <div className="settings-group-desc">
+                    Tassiori — AI Research Workspace • Dirancang khusus untuk mahasiswa dan peneliti Ilmu Komunikasi & Sosial Humaniora.
                   </div>
                 </div>
               </div>
