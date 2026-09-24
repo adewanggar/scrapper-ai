@@ -3527,7 +3527,7 @@ export default function App() {
             <div>
               <div className="dashboard-hero">
                 <h2>Riwayat File Scraping (Privat Akun)</h2>
-                <p>Seluruh file data komentar milik akun Anda yang tersimpan aman secara privat di cloud Firestore (<code>data-ori</code>).</p>
+                <p>Seluruh file data komentar milik akun Anda yang tersimpan aman secara privat di cloud Firestore (<code>tesis-ori</code>).</p>
               </div>
 
               {files.length === 0 ? (
@@ -3623,7 +3623,7 @@ export default function App() {
 
               <div className="settings-card">
                 <div className="settings-group">
-                  <div className="settings-group-title">Autentikasi Akun & Database Firestore (data-ori)</div>
+                  <div className="settings-group-title">Autentikasi Akun & Database Firestore (tesis-ori)</div>
                   <div className="settings-group-desc">
                     Akun Anda terhubung dengan Firebase Authentication dan Firestore Cloud Database. Semua data scraping, dataset, dan riwayat analisis AI disimpan secara <strong>privat dan terisolasi</strong> hanya untuk akun Anda.
                     <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -3637,7 +3637,7 @@ export default function App() {
                         🔑 <strong>User ID (UID):</strong> <code>{currentUser.uid}</code>
                       </div>
                       <div style={{ fontSize: '13px' }}>
-                        ☁️ <strong>Project ID Firestore:</strong> <code>data-ori</code>
+                        ☁️ <strong>Project ID Firestore:</strong> <code>tesis-ori</code>
                       </div>
                       <div style={{ marginTop: '6px' }}>
                         <button

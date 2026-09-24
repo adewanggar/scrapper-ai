@@ -23,13 +23,13 @@ import {
 } from 'firebase/firestore';
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB2Ba-sftKNkFYT6hHq-AXCvHM65detOpU",
-  authDomain: "data-ori.firebaseapp.com",
-  projectId: "data-ori",
-  storageBucket: "data-ori.firebasestorage.app",
-  messagingSenderId: "734542474899",
-  appId: "1:734542474899:web:6fbaa99d9b587fba37a766",
-  measurementId: "G-K2S5BG42H5"
+  apiKey: "AIzaSyC-mCSjAgmxEWd8SWY_3PRiDmh_lKGItz0",
+  authDomain: "tesis-ori.firebaseapp.com",
+  projectId: "tesis-ori",
+  storageBucket: "tesis-ori.firebasestorage.app",
+  messagingSenderId: "82797472070",
+  appId: "1:82797472070:web:8760b99a937c04bfcb5d47",
+  measurementId: "G-HXKDRN8FW6"
 };
 
 // Initialize Firebase
