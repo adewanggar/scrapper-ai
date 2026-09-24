@@ -41,9 +41,12 @@ import {
   ShieldAlert,
   Award,
   MessageCircle,
-  BarChart3
+  BarChart3,
+  Quote
 } from 'lucide-react';
 import ExportStatsModal from './components/ExportStatsModal';
+import CitationModal from './components/CitationModal';
+import VerbatimQuoteModal from './components/VerbatimQuoteModal';
 
 const STOPWORDS = new Set([
   'di', 'ke', 'dari', 'yang', 'dan', 'ini', 'itu', 'ada', 'aku', 'kau', 'dia', 'mereka',
@@ -316,6 +319,9 @@ export default function App() {
   const [expandedReplies, setExpandedReplies] = useState(new Set());
   const [copiedId, setCopiedId] = useState(null);
   const [showExportStatsModal, setShowExportStatsModal] = useState(false);
+  const [showCitationModal, setShowCitationModal] = useState(false);
+  const [verbatimModalComment, setVerbatimModalComment] = useState(null);
+  const [verbatimModalIndex, setVerbatimModalIndex] = useState(1);
 
   const fileInputRef = useRef(null);
 
@@ -1477,17 +1483,27 @@ export default function App() {
                   <div className="caption-content">
                     <div className="caption-header">
                       <span className="caption-eyebrow">CAPTION VIDEO TIKTOK</span>
-                      {data.video_url && (
-                        <a
-                          href={data.video_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="btn-tiktok-pill"
+                      <div className="caption-actions">
+                        <button
+                          className="btn-cite-pill"
+                          onClick={() => setShowCitationModal(true)}
+                          title="Buat sitasi otomatis untuk Daftar Pustaka (APA 7th, Harvard, Mendeley, BibTeX)"
                         >
-                          <ExternalLink size={13} />
-                          Buka di TikTok
-                        </a>
-                      )}
+                          <Quote size={13} />
+                          Sitasi Video (APA / Mendeley)
+                        </button>
+                        {data.video_url && (
+                          <a
+                            href={data.video_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="btn-tiktok-pill"
+                          >
+                            <ExternalLink size={13} />
+                            Buka di TikTok
+                          </a>
+                        )}
+                      </div>
                     </div>
                     <p className="caption-body">
                       {data.caption || 'Tidak ada caption dalam video ini.'}
@@ -1745,6 +1761,17 @@ export default function App() {
                                   </div>
 
                                   <button
+                                    className="comment-icon-subtle quote-btn"
+                                    title="Kutip verbatim untuk Bab 4 Skripsi (Format APA / Narasi Ilmiah)"
+                                    onClick={() => {
+                                      setVerbatimModalComment(comment);
+                                      setVerbatimModalIndex(index + 1);
+                                    }}
+                                  >
+                                    <Quote size={14} />
+                                  </button>
+
+                                  <button
                                     className="comment-icon-subtle"
                                     title="Salin isi komentar"
                                     onClick={() => copyToClipboard(comment.comment, comment.comment_id || index)}
@@ -1816,6 +1843,16 @@ export default function App() {
                                           <div className="comment-timestamp">
                                             {formatDate(reply.create_time)}
                                           </div>
+                                          <button
+                                            className="comment-icon-subtle quote-btn"
+                                            title="Kutip balasan untuk Bab 4 Skripsi"
+                                            onClick={() => {
+                                              setVerbatimModalComment(reply);
+                                              setVerbatimModalIndex(rIdx + 1);
+                                            }}
+                                          >
+                                            <Quote size={12} />
+                                          </button>
                                           <button
                                             className="comment-icon-subtle"
                                             title="Salin balasan"
@@ -2050,14 +2087,24 @@ export default function App() {
                     )}
 
                     {data && (
-                      <button
-                        className="btn btn-stat-export"
-                        onClick={() => setShowExportStatsModal(true)}
-                        title="Ekspor data komentar & metrik statistik untuk SPSS, Excel, SmartPLS, JASP"
-                      >
-                        <FileSpreadsheet size={14} />
-                        <span>Ekspor Statistik</span>
-                      </button>
+                      <>
+                        <button
+                          className="btn btn-white-bordered"
+                          onClick={() => setShowCitationModal(true)}
+                          title="Salin sitasi video untuk Daftar Pustaka (APA 7th, Harvard, Mendeley)"
+                        >
+                          <Quote size={14} color="#db2777" />
+                          <span>Sitasi Video (APA)</span>
+                        </button>
+                        <button
+                          className="btn btn-stat-export"
+                          onClick={() => setShowExportStatsModal(true)}
+                          title="Ekspor data komentar & metrik statistik untuk SPSS, Excel, SmartPLS, JASP"
+                        >
+                          <FileSpreadsheet size={14} />
+                          <span>Ekspor Statistik</span>
+                        </button>
+                      </>
                     )}
                   </div>
                 </div>
@@ -3302,6 +3349,24 @@ export default function App() {
         filteredComments={filteredComments || []}
         selectedFileName={selectedFile || 'dataset'}
         searchKeyword={searchKeyword}
+      />
+
+      {/* Modal Sitasi Otomatis (APA 7th, Harvard, Mendeley, BibTeX) */}
+      <CitationModal
+        isOpen={showCitationModal}
+        onClose={() => setShowCitationModal(false)}
+        data={data}
+        selectedFileName={selectedFile || 'video'}
+      />
+
+      {/* Modal Kutipan Verbatim Bab 4 Skripsi */}
+      <VerbatimQuoteModal
+        isOpen={!!verbatimModalComment}
+        onClose={() => setVerbatimModalComment(null)}
+        comment={verbatimModalComment}
+        commentIndex={verbatimModalIndex}
+        videoTitle={data?.caption || ''}
+        videoUrl={data?.video_url || ''}
       />
     </div>
   );

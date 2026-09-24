@@ -3167,3 +3167,558 @@ a:focus-visible {
   }
 }
 
+/* ====================================================================
+   SITASI OTOMATIS (APA 7th, HARVARD, MENDELEY) & KUTIPAN VERBATIM
+   ==================================================================== */
+
+/* Tombol Sitasi di Caption Card */
+.btn-cite-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fdf2f8;
+  color: #db2777;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid #fbcfe8;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.btn-cite-pill:hover {
+  background: #fce7f3;
+  border-color: #f472b6;
+  transform: translateY(-1px);
+}
+
+.caption-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Tombol Kutip Verbatim pada Baris Komentar */
+.comment-icon-subtle.quote-btn {
+  color: #059669;
+}
+
+.comment-icon-subtle.quote-btn:hover {
+  background: #ecfdf5;
+  color: #047857;
+}
+
+/* Citation Meta Box */
+.citation-meta-box {
+  padding: 16px 24px;
+  background: #fbfcfe;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.citation-meta-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin-bottom: 10px;
+}
+
+.citation-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.meta-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meta-field label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.meta-field input,
+.meta-field select {
+  font-size: 12px;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--color-text-primary);
+}
+
+.meta-field input:focus,
+.meta-field select:focus {
+  border-color: var(--color-primary);
+  outline: none;
+}
+
+.handle-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.handle-prefix {
+  padding: 6px 8px;
+  background: #f8fafc;
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  border-right: 1px solid var(--color-border);
+}
+
+.handle-input-wrap input {
+  border: none;
+  flex: 1;
+  padding: 6px 8px;
+  outline: none;
+}
+
+/* Citation Tabs */
+.citation-tab-bar {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--color-border);
+  background: #f8fafc;
+  padding: 0 24px;
+  gap: 6px;
+  overflow-x: auto;
+}
+
+.citation-tab {
+  padding: 12px 14px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.citation-tab:hover {
+  color: var(--color-text-primary);
+}
+
+.citation-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background: #ffffff;
+}
+
+.cite-badge {
+  font-size: 9.5px;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: #dbeafe;
+  color: #1e40af;
+  font-weight: 700;
+}
+
+/* Citation Content */
+.citation-body-content {
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.citation-card-block {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.cite-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.cite-block-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-sm-copy {
+  font-size: 12px !important;
+  padding: 5px 12px !important;
+  gap: 5px !important;
+}
+
+.cite-preview-text {
+  font-size: 13.5px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border-left: 3px solid var(--color-primary);
+  word-break: break-word;
+}
+
+.cite-preview-text.apa-font {
+  font-family: 'Times New Roman', Times, serif, system-ui;
+  font-size: 14.5px;
+}
+
+.citation-in-text-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.in-text-item {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.in-text-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+
+.copy-mini-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.copy-mini-btn:hover {
+  background: #e2e8f0;
+}
+
+.in-text-item code {
+  font-family: monospace;
+  font-size: 12px;
+  color: #1e3a8a;
+  background: #eff6ff;
+  padding: 4px 6px;
+  border-radius: 4px;
+  word-break: break-word;
+}
+
+/* Mendeley & BibTeX Cards */
+.citation-export-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+}
+
+.cite-export-card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cite-export-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cite-export-head strong {
+  font-size: 13px;
+  display: block;
+}
+
+.cite-export-head p {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.code-snippet-preview {
+  background: #0f172a;
+  color: #e2e8f0;
+  padding: 10px 12px;
+  border-radius: 6px;
+  font-family: monospace;
+  font-size: 11px;
+  max-height: 120px;
+  overflow-y: auto;
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+/* ====================================================================
+   VERBATIM QUOTE MODAL (KUTIPAN SKRIPSI)
+   ==================================================================== */
+
+.quote-comment-highlight {
+  padding: 16px 24px;
+  background: #fbfcfe;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.quote-author-line {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.quote-author-name {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quote-badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.quote-time-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.quote-text-original {
+  font-size: 14px;
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--color-text-primary);
+  background: #ffffff;
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border);
+}
+
+/* Ethics Bar */
+.quote-ethics-bar {
+  padding: 12px 24px;
+  background: #f0fdf4;
+  border-bottom: 1px solid #bbf7d0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.quote-ethics-info {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  max-width: 620px;
+}
+
+.quote-ethics-info strong {
+  font-size: 12.5px;
+  color: #166534;
+  display: block;
+}
+
+.quote-ethics-info p {
+  font-size: 11px;
+  color: #15803d;
+  line-height: 1.4;
+  margin-top: 1px;
+}
+
+.quote-ethics-info code {
+  background: #dcfce7;
+  padding: 1px 4px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.quote-toggle-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.quote-toggle-switch input {
+  display: none;
+}
+
+.toggle-slider {
+  width: 36px;
+  height: 20px;
+  background: #cbd5e1;
+  border-radius: 20px;
+  position: relative;
+  transition: 0.2s;
+}
+
+.toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  top: 2px;
+  left: 2px;
+  transition: 0.2s;
+}
+
+.quote-toggle-switch input:checked + .toggle-slider {
+  background: #059669;
+}
+
+.quote-toggle-switch input:checked + .toggle-slider::before {
+  transform: translateX(16px);
+}
+
+.toggle-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Quote Variants */
+.quote-variants-list {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.quote-variant-card {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+.variant-header {
+  padding: 10px 14px;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.variant-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12.5px;
+}
+
+.variant-badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.variant-body {
+  padding: 12px 14px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-primary);
+}
+
+.quote-academic-font {
+  font-family: 'Times New Roman', Times, serif, system-ui;
+  font-size: 14px;
+}
+
+.blockquote-display {
+  background: #fbfcfe;
+}
+
+.blockquote-display pre {
+  font-family: inherit;
+  font-size: 13.5px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  margin: 0;
+  border-left: 3px solid #d97706;
+  padding-left: 12px;
+  color: #334155;
+}
+
+.table-row-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  overflow-x: auto;
+  font-size: 12px;
+}
+
+.table-row-chip {
+  padding: 4px 8px;
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.table-row-chip.quote-chip {
+  font-style: italic;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 768px) {
+  .citation-meta-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .citation-in-text-grid,
+  .citation-export-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+
