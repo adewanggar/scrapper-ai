@@ -24,7 +24,8 @@ import {
   ShoppingBag,
   Sparkles,
   Target,
-  Users
+  Users,
+  X
 } from 'lucide-react';
 import {
   FRAMEWORK_CATEGORIES,

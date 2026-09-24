@@ -20,8 +20,6 @@ export default function DashboardPage({
   isScraping,
   scrapeError,
   scrapeSuccess,
-  igCookie,
-  setIgCookie,
   handleScrapeSubmit,
   switchTab,
   totalScrapedStats,

@@ -702,8 +702,6 @@ export default function App() {
               isScraping={isScraping}
               scrapeError={scrapeError}
               scrapeSuccess={scrapeSuccess}
-              igCookie={igCookie}
-              setIgCookie={setIgCookie}
               handleScrapeSubmit={handleScrapeSubmit}
               switchTab={switchTab}
               totalScrapedStats={totalScrapedStats}
