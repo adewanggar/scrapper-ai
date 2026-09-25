@@ -293,3 +293,10 @@ export async function getUserAiAnalysis(userId, filename, analysisType) {
   const data = snap.data();
   return data?.analyses?.[analysisType]?.result || null;
 }
+
+export async function saveResearchContext(userId, filename, context) {
+  if (!userId || !filename) return;
+  const ref = doc(db, 'users', userId, 'scrapes', getDocIdFromFilename(filename));
+  // Replace this field so clearing a selected title/theory does not retain nested values.
+  await setDoc(ref, { researchContext: JSON.parse(JSON.stringify(context)) }, { mergeFields: ['researchContext'] });
+}

@@ -12,6 +12,8 @@ const navigation = [
   ["dashboard", "Ikhtisar", LayoutDashboard],
   ["results", "Komentar", MessageSquare],
   ["ai-analysis", "Analisis riset", ScanText],
+  ["research-titles", "Generator ide judul", ScanText],
+  ["research-theories", "Rekomendasi teori", ScanText],
   ["files", "Koleksi dataset", FolderArchive],
 ];
 export default function Sidebar({

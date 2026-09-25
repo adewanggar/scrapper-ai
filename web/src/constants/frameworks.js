@@ -536,6 +536,8 @@ export const API_BASE = (import.meta.env.VITE_API_URL || '').replace(/\/$/, '');
 export const CORRECT_PIN = '112233';
 
 export const TAB_ROUTES = {
+  'research-titles': '/ide-judul',
+  'research-theories': '/rekomendasi-teori',
   dashboard: '/dashboard',
   results: '/komentar',
   'ai-analysis': '/analisis',
@@ -544,6 +546,8 @@ export const TAB_ROUTES = {
 };
 
 export const ROUTE_TABS = {
+  '/ide-judul': 'research-titles',
+  '/rekomendasi-teori': 'research-theories',
   '/dashboard': 'dashboard',
   '/': 'dashboard',
   '/komentar': 'results',

@@ -1,0 +1,24 @@
+.research-page { max-width: 1200px; margin: 0 auto; color: var(--text-primary, #23362f); padding-bottom: 30px; }
+.research-page h1 { font-size: clamp(1.6rem, 3vw, 2.3rem); margin: 12px 0; }
+.research-page h2 { font-size: 1.2rem; line-height: 1.5; }
+.research-page h3 { font-size: .95rem; margin: 18px 0 6px; }
+.research-page p { line-height: 1.65; margin: 10px 0; }
+.research-page button { border: 1px solid #cbd7d0; background: #fff; color: #24483b; padding: 10px 14px; border-radius: 9px; cursor: pointer; font: inherit; }
+.research-page button:disabled { opacity: .5; cursor: not-allowed; }
+.research-page button[aria-current], .research-page .research-primary { background: #245544; color: white; }
+.research-page :focus-visible { outline: 3px solid #1c9070; outline-offset: 3px; }
+.research-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 16px 0; }
+.research-form, .research-card { background: #fff; border: 1px solid #dce5df; border-radius: 16px; padding: 24px; margin-top: 20px; overflow-wrap: anywhere; }
+.research-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.research-grid, .research-results { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.research-results { align-items: start; }
+.research-grid label { display: flex; flex-direction: column; gap: 8px; font-size: .9rem; font-weight: 600; }
+.research-grid input, .research-grid textarea, .research-grid select { width: 100%; box-sizing: border-box; padding: 12px; border: 1px solid #cbd7d0; border-radius: 8px; background: white; color: #263d33; font: inherit; }
+.research-wide { grid-column: 1 / -1; }
+.research-context, .research-empty { background: #eff5f1; border-radius: 12px; padding: 18px; margin: 20px 0; }
+.research-error { background: #fff0ee; color: #9a2924; padding: 16px; border-radius: 10px; }
+.research-page details { padding: 14px 0; border-block: 1px solid #e5ece8; }
+.research-page summary { cursor: pointer; font-weight: 600; }
+.research-page blockquote { margin: 14px 0; padding: 12px 16px; border-left: 3px solid #699d86; background: #f4f8f5; white-space: pre-wrap; }
+.research-page a { color: #176b56; }
+@media (max-width: 720px) { .research-grid, .research-results { grid-template-columns: 1fr; } .research-form, .research-card { padding: 17px; } }

@@ -231,8 +231,26 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
             self.handle_scrape()
         elif path == '/api/ai/analyze':
             self.handle_ai_analyze()
+        elif path == '/api/ai/research':
+            self.handle_research_plan()
         else:
             self._send_json(404, {"error": "Not Found"})
+
+    def handle_research_plan(self):
+        try:
+            length = int(self.headers.get('Content-Length', 0))
+            if length <= 0 or length > 20 * 1024 * 1024:
+                self._send_json(413, {"error": "Dataset melebihi batas 20 MB atau permintaan kosong."})
+                return
+            body = json.loads(self.rfile.read(length).decode('utf-8'))
+            from research_planner import generate_research
+            result = generate_research(body)
+            self._send_json(200, result)
+        except (ValueError, UnicodeError) as exc:
+            self._send_json(400, {"error": str(exc)})
+        except Exception:
+            logger.exception("Research planning failed")
+            self._send_json(502, {"error": "Layanan AI belum dapat memproses permintaan. Silakan coba kembali."})
 
     def handle_get_ai_analysis(self, filename: str):
         from ai_analyzer import load_cached_analysis
@@ -270,6 +288,7 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
                 sample_size=sample_size,
                 preferred_model=preferred_model,
                 analysis_type=analysis_type,
+                research_context=body.get('research_context'),
                 request_id=body.get('request_id')
             )
             self._send_json(200, {"success": True, "analysis": result})

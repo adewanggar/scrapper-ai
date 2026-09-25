@@ -36,6 +36,8 @@ import DatasetSwitcher from "../components/DatasetSwitcher";
 
 export default function AnalysisPage({
   analysisType,
+  fwCategoryFilter,
+  setFwCategoryFilter,
   handleFrameworkChange,
   aiSampleSize,
   setAiSampleSize,
@@ -55,7 +57,6 @@ export default function AnalysisPage({
   setVerbatimModalIndex,
 }) {
   const [copiedThesisText, setCopiedThesisText] = useState(false);
-  const [fwCategoryFilter, setFwCategoryFilter] = useState("all");
   const [fwSearchQuery, setFwSearchQuery] = useState("");
   const [fwStep, setFwStep] = useState("jurusan"); // 'jurusan' -> 'kerangka'
   const activeCat =

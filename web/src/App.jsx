@@ -11,6 +11,8 @@ import MobileNav from './components/layout/MobileNav';
 import DashboardPage from './pages/DashboardPage';
 import CommentsPage from './pages/CommentsPage';
 import AnalysisPage from './pages/AnalysisPage';
+import ResearchPage from './pages/ResearchPage';
+import { emptyResearch, restoreResearch } from './utils/researchContext';
 import DatasetsPage from './pages/DatasetsPage';
 import SettingsPage from './pages/SettingsPage';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -20,6 +22,7 @@ import { readCommentPreference, saveCommentPreferences } from './utils/commentPr
 
 import {
   STOPWORDS,
+  FRAMEWORKS_LIST,
   API_BASE,
   TAB_ROUTES,
   ROUTE_TABS,
@@ -33,7 +36,8 @@ import {
   getUserScrapes,
   getUserScrapeContent,
   saveUserAiAnalysis,
-  getUserAiAnalysis
+  getUserAiAnalysis,
+  saveResearchContext
 } from './firebase';
 
 export default function App() {
@@ -101,6 +105,28 @@ export default function App() {
 
   // AI Analysis (Skripsi Focus) State
   const [analysisType, setAnalysisType] = useState('entman_framing');
+  const [fwCategoryFilter, setFwCategoryFilter] = useState('komunikasi');
+  const [researchByFile, setResearchByFile] = useState({});
+  const loadSequence = useRef(0);
+  const researchSaves = useRef(new Map());
+  const researchState = researchByFile[selectedFile] || emptyResearch(
+    fwCategoryFilter === 'all' ? (FRAMEWORKS_LIST.find(f => f.id === analysisType)?.category || 'komunikasi') : fwCategoryFilter,
+    analysisType,
+  );
+  const updateResearch = (value) => setResearchByFile(prev => ({ ...prev, [selectedFile]:
+    typeof value === 'function' ? value(prev[selectedFile] || researchState) : value }));
+  const persistResearch = (value) => {
+    const uid = currentUser.uid;
+    const filename = selectedFile;
+    const key = `${uid}:${filename}`;
+    const pending = (researchSaves.current.get(key) || Promise.resolve()).catch(() => {}).then(() =>
+      saveResearchContext(uid, filename, { draft: value.draft, selectedTitle: value.selectedTitle, selectedTheory: value.selectedTheory }));
+    researchSaves.current.set(key, pending);
+    return pending;
+  };
+  useEffect(() => {
+    if (researchState.draft.department) setFwCategoryFilter(researchState.draft.department);
+  }, [researchState.draft.department]);
   const [aiSampleSize, setAiSampleSize] = useState(50); // 30, 50, 100, 150, 200, or 0 (all)
   const [aiLoading, setAiLoading] = useState(false);
   const [aiAnalysis, setAiAnalysis] = useState(null);
@@ -117,6 +143,7 @@ export default function App() {
 
   // User Dropdown State & Click-outside listener
   const [currentUser, setCurrentUser] = useState(null);
+  const researchUser = useRef(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [showUserDropdown, setShowUserDropdown] = useState(false);
   const userMenuRef = useRef(null);
@@ -134,6 +161,15 @@ export default function App() {
   // Subscribe to Firebase Auth
   useEffect(() => {
     const unsubscribe = subscribeToAuth((user) => {
+      if (researchUser.current !== (user?.uid || null)) {
+        researchUser.current = user?.uid || null;
+        setResearchByFile({});
+        setSelectedFile('');
+        setData(null);
+        setFiles([]);
+        setAiAnalysis(null);
+        loadSequence.current += 1;
+      }
       setCurrentUser(user);
       setAuthLoading(false);
     });
@@ -150,6 +186,8 @@ export default function App() {
       setData(null);
       setSelectedFile('');
       setAiAnalysis(null);
+      setResearchByFile({});
+      loadSequence.current += 1;
     } catch (err) {
       console.error('Logout error:', err);
     }
@@ -235,15 +273,22 @@ export default function App() {
   // Load comment data for a specific file
   const loadFileContent = async (filename, shouldSwitchTab = false) => {
     if (!filename || !currentUser) return;
+    const sequence = ++loadSequence.current;
     setLoading(true);
     setSelectedFile(filename);
+    setData(null);
     try {
       const docData = await getUserScrapeContent(currentUser.uid, filename);
+      if (sequence !== loadSequence.current) return;
       if (docData) {
         setData(docData);
+        const restored = researchByFile[filename] || restoreResearch(docData.researchContext, fwCategoryFilter === 'all' ? 'komunikasi' : fwCategoryFilter, analysisType);
+        setResearchByFile(prev => ({ ...prev, [filename]: prev[filename] || restored }));
+        const restoredFramework = FRAMEWORKS_LIST.some(f => f.id === restored.draft.framework_id) ? restored.draft.framework_id : analysisType;
+        setAnalysisType(restoredFramework);
         setExpandedReplies(new Set());
         setCurrentPage(1);
-        loadAiAnalysis(filename, analysisType);
+        loadAiAnalysis(filename, restoredFramework);
         if (shouldSwitchTab) {
           switchTab('results');
         }
@@ -255,6 +300,7 @@ export default function App() {
       });
       if (res.ok) {
         const json = await res.json();
+        if (sequence !== loadSequence.current) return;
         setData(json);
         setExpandedReplies(new Set());
         setCurrentPage(1);
@@ -266,7 +312,7 @@ export default function App() {
     } catch (err) {
       console.error('Failed to load file content:', err);
     } finally {
-      setLoading(false);
+      if (sequence === loadSequence.current) setLoading(false);
     }
   };
 
@@ -299,6 +345,7 @@ export default function App() {
   // Change research framework
   const handleFrameworkChange = (newType) => {
     setAnalysisType(newType);
+    if (selectedFile) updateResearch(prev => ({ ...prev, draft: { ...prev.draft, framework_id: newType } }));
     setAiAnalysis(null); // Clear immediately to prevent rendering wrong/stale framework
     setAiError('');
     if (selectedFile) {
@@ -313,6 +360,12 @@ export default function App() {
     setAiError('');
     try {
       const json = await requestAnalysis(API_BASE, {
+        research_context: {
+          title: researchState.selectedTitle,
+          theory: researchState.selectedTheory?.name || researchState.draft.theory,
+          method: researchState.draft.method,
+          focus: researchState.draft.focus,
+        },
         filename: selectedFile,
         analysis_type: analysisType,
         sample_size: aiSampleSize,
@@ -848,9 +901,28 @@ export default function App() {
           )}
 
           {/* TAB 3: ANALISIS AI SKRIPSI */}
+          {['research-titles', 'research-theories'].includes(activeTab) && (
+            <ResearchPage key={`${currentUser.uid}:${selectedFile}:${activeTab}`}
+              kind={activeTab === 'research-titles' ? 'titles' : 'theories'}
+              files={files} selectedFile={selectedFile} data={data} loading={loading}
+              loadFileContent={loadFileContent} state={researchState} onChange={updateResearch}
+              onSave={persistResearch} switchTab={switchTab} onUseFramework={handleFrameworkChange} />
+          )}
           {activeTab === 'ai-analysis' && (
             <ErrorBoundary onReset={() => setAiAnalysis(null)}>
+              {(researchState.selectedTitle || researchState.selectedTheory) && <aside className="research-context">
+                <strong>Konteks penelitian aktif</strong>
+                <p>{researchState.selectedTitle || 'Judul belum dipilih'}</p>
+                <p>Teori: {researchState.selectedTheory?.name || 'Belum dipilih'} · Metode: {researchState.draft.method}</p>
+                <p>Kerangka analisis: {FRAMEWORKS_LIST.find(f => f.id === analysisType)?.title}. Teori yang dipilih menjadi konteks; hasil mengikuti implementasi kerangka ini.</p>
+                <button onClick={() => switchTab('research-titles')}>Buka rancangan penelitian</button>
+              </aside>}
               <AnalysisPage
+                fwCategoryFilter={fwCategoryFilter}
+                setFwCategoryFilter={value => {
+                  setFwCategoryFilter(value);
+                  if (value !== 'all' && selectedFile) updateResearch(prev => ({ ...prev, draft: { ...prev.draft, department: value } }));
+                }}
                 analysisType={analysisType}
                 handleFrameworkChange={handleFrameworkChange}
                 aiSampleSize={aiSampleSize}

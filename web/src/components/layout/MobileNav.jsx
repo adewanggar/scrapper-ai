@@ -5,11 +5,16 @@ import {
   Brain,
   FolderArchive,
   Settings,
+  Lightbulb,
 } from "lucide-react";
 
 export default function MobileNav({ activeTab, handleNavClick, data, files }) {
   return (
     <nav className="mobile-bottom-nav">
+      <button className={`mobile-nav-tab ${activeTab.startsWith('research-') ? 'active' : ''}`} onClick={() => handleNavClick('research-titles')} aria-label="Rancangan penelitian: ide judul dan teori">
+        <div className="mobile-nav-icon-wrap"><Lightbulb size={20} /></div>
+        <span className="mobile-nav-label">Rancangan</span>
+      </button>
       <button
         className={`mobile-nav-tab ${activeTab === "dashboard" ? "active" : ""}`}
         onClick={() => handleNavClick("dashboard")}
