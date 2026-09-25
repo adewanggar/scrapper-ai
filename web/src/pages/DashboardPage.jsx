@@ -41,7 +41,7 @@ export default function DashboardPage({
           <p>Kumpulkan komentar. Temukan pola. Bangun riset Anda.</p>
         </div>
         <div className="intro-index" aria-hidden="true">
-          <span>TASSIORI</span>
+          <span>TESISORI</span>
           <strong>01</strong>
           <span>RESEARCH NOTES</span>
         </div>
@@ -278,7 +278,7 @@ export default function DashboardPage({
         )}
       </section>
       <footer className="workspace-footnote">
-        <span>Tassiori — ruang untuk rasa ingin tahu.</span>
+        <span>TesisOri — ruang untuk rasa ingin tahu.</span>
         <span>KUMPULKAN / PAHAMI / TEMUKAN</span>
       </footer>
     </div>

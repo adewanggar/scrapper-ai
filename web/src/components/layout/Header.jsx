@@ -21,7 +21,7 @@ export default function Header({
   return (
     <header className="top-navbar-clean">
       <div className="navbar-left">
-        <span className="workspace-breadcrumb">Tassiori <span>/ Ruang riset</span></span>
+        <span className="workspace-breadcrumb">TesisOri <span>/ Ruang riset</span></span>
         <button
           className="btn-mobile-menu"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

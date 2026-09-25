@@ -1,5 +1,5 @@
 # Product Requirement Document (PRD) & Deskripsi Produk
-# Tesisori: AI Research Workspace
+# TesisOri: AI Research Workspace
 ### *Edisi Khusus Riset Skripsi & Tesis S2 (Ilmu Komunikasi, Manajemen, & Sains Sosial)*
 
 ---
@@ -7,7 +7,7 @@
 ## 📌 1. Executive Summary & Deskripsi Produk
 
 ### 1.1 Visi Produk
-**Tesisori** adalah platform riset terpadu (*all-in-one research workspace*) yang menggabungkan kemampuan **ekstraksi data komentar media sosial TikTok** berkecepatan tinggi dengan modul **analisis kecerdasan buatan (AI LLM - DeepSeek V4 & Gemini 3.7 Flash)** serta utilitas **metodologi penelitian ilmiah** (uji reliabilitas inter-coder, ekspor perangkat lunak statistik SPSS/SmartPLS/JASP, sitasi APA 7th, dan kutipan verbatim).
+**TesisOri** adalah platform riset terpadu (*all-in-one research workspace*) yang menggabungkan kemampuan **ekstraksi data komentar media sosial TikTok** berkecepatan tinggi dengan modul **analisis kecerdasan buatan (AI LLM - DeepSeek V4 & Gemini 3.7 Flash)** serta utilitas **metodologi penelitian ilmiah** (uji reliabilitas inter-coder, ekspor perangkat lunak statistik SPSS/SmartPLS/JASP, sitasi APA 7th, dan kutipan verbatim).
 
 ### 1.2 Tagline
 > *"Dari Jutaan Komentar TikTok Menjadi Naskah Bab 3 & Bab 4 Skripsi/Tesis yang Lolos Uji Sidang."*

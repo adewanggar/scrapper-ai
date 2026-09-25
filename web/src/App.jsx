@@ -740,7 +740,7 @@ export default function App() {
   if (authLoading) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100vh', background: '#F8FAFC' }}>
-        <img src="/logo.png" alt="Tassiori Logo" style={{ width: '48px', height: '48px', objectFit: 'contain', marginBottom: '12px' }} />
+        <img src="/logo.png" alt="TesisOri Logo" style={{ width: '48px', height: '48px', objectFit: 'contain', marginBottom: '12px' }} />
         <span style={{ fontSize: '13px', fontWeight: 600, color: '#64748B' }}>Menghubungkan ke Ruang Riset...</span>
       </div>
     );

@@ -29,7 +29,7 @@ export default function Sidebar({
         </div>
         <div className="brand-title-wrap">
           <h1>
-            Tassiori<span className="brand-period">.</span>
+            TesisOri<span className="brand-period">.</span>
           </h1>
           <p>Ruang riset digital</p>
         </div>

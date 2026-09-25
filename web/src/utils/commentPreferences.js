@@ -1,7 +1,9 @@
 export function readCommentPreference(key, fallback, allowed) {
   try {
     const value = JSON.parse(
-      localStorage.getItem("tassiori.commentPreferences") || "{}",
+      localStorage.getItem("tesisori.commentPreferences") ||
+        localStorage.getItem("tassiori.commentPreferences") ||
+        "{}",
     )[key];
     return allowed.includes(value) ? value : fallback;
   } catch {
@@ -11,7 +13,7 @@ export function readCommentPreference(key, fallback, allowed) {
 export function saveCommentPreferences(pageSize, sortBy) {
   try {
     localStorage.setItem(
-      "tassiori.commentPreferences",
+      "tesisori.commentPreferences",
       JSON.stringify({ pageSize, sortBy }),
     );
   } catch {

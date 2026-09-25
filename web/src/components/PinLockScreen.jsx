@@ -65,8 +65,8 @@ export default function PinLockScreen({ onUnlock }) {
     <div className="pin-screen-wrapper">
       <div className={`pin-card ${isError ? 'shake' : ''}`}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '16px' }}>
-          <img src="/logo.png" alt="Tesisori" style={{ width: '52px', height: '52px', objectFit: 'contain', marginBottom: '6px' }} />
-          <span style={{ fontSize: '20px', fontWeight: 800, color: '#F97316', letterSpacing: '-0.02em', lineHeight: 1.1 }}>Tassiori</span>
+          <img src="/logo.png" alt="TesisOri" style={{ width: '52px', height: '52px', objectFit: 'contain', marginBottom: '6px' }} />
+          <span style={{ fontSize: '20px', fontWeight: 800, color: '#F97316', letterSpacing: '-0.02em', lineHeight: 1.1 }}>TesisOri</span>
           <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#EA580C' }}>AI Research Workspace</span>
         </div>
 
@@ -75,7 +75,7 @@ export default function PinLockScreen({ onUnlock }) {
         </h2>
         <p className="pin-subtitle">
           {isSuccess
-            ? 'Membuka dashboard Tassiori...'
+            ? 'Membuka dashboard TesisOri...'
             : 'Sistem dilindungi keamanan. Masukkan PIN 6-digit untuk membuka aplikasi.'}
         </p>
 

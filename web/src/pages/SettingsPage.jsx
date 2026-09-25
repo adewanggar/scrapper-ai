@@ -136,7 +136,7 @@ export default function SettingsPage({
           </section>
           <section id="settings-about" className="settings-panel">
             <div className="settings-panel-heading">
-              <h2>Tentang Tassiori</h2>
+              <h2>Tentang TesisOri</h2>
               <p>Ruang kerja untuk pengumpulan dan analisis komentar.</p>
             </div>
             <dl className="settings-details">
