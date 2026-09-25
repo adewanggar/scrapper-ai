@@ -6,7 +6,6 @@ import {
   Lock,
   User,
   AlertCircle,
-  CheckCircle2,
   Eye,
   EyeOff,
   ShieldCheck
@@ -70,6 +69,13 @@ export default function AuthScreen({ onAuthSuccess }) {
 
   return (
     <div className="auth-screen-wrapper">
+      <aside className="auth-editorial">
+        <span className="section-kicker">TASSIORI / RUANG RISET DIGITAL</span>
+        <h2>Di balik komentar,<br />ada <em>cerita.</em></h2>
+        <p>Ruang untuk mengumpulkan percakapan, memahami sudut pandang, dan menemukan makna dalam data.</p>
+        <div className="auth-specimen" aria-hidden="true"><span>CATATAN LAPANGAN — 001</span><div>“</div><p>Percakapan menjadi data.<br />Data menjadi pemahaman.</p><span>TIKTOK & YOUTUBE / RISET KUALITATIF</span></div>
+        <footer>Kumpulkan. Pahami. Temukan.</footer>
+      </aside>
       <div className="auth-card">
         {/* Brand Header */}
         <div className="auth-brand-header">

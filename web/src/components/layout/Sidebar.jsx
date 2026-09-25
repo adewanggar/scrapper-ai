@@ -1,101 +1,84 @@
-import React from 'react';
+import React from "react";
 import {
   LayoutDashboard,
   MessageSquare,
-  Brain,
+  ScanText,
   FolderArchive,
   Settings,
-  ShieldCheck
-} from 'lucide-react';
-
+  ShieldCheck,
+  ArrowUpRight,
+} from "lucide-react";
+const navigation = [
+  ["dashboard", "Ikhtisar", LayoutDashboard],
+  ["results", "Komentar", MessageSquare],
+  ["ai-analysis", "Analisis riset", ScanText],
+  ["files", "Koleksi dataset", FolderArchive],
+];
 export default function Sidebar({
   activeTab,
   handleNavClick,
   isMobileMenuOpen,
   data,
-  files
+  files,
 }) {
   return (
-    <aside className={`app-sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
-      {/* Brand */}
+    <aside className={`app-sidebar ${isMobileMenuOpen ? "open" : ""}`}>
       <div className="sidebar-brand">
-        <div className="brand-icon-square brand-icon-tesisori">
-          <img
-            src="/logo.png"
-            alt="Tassiori Logo"
-            style={{ width: '34px', height: '34px', objectFit: 'contain' }}
-          />
+        <div className="brand-icon-square">
+          <img src="/logo.png" alt="" width="34" height="34" />
         </div>
         <div className="brand-title-wrap">
-          <h1 className="brand-tesisori-title">Tassiori</h1>
-          <p className="brand-tesisori-sub">AI RESEARCH WORKSPACE</p>
+          <h1>
+            Tassiori<span className="brand-period">.</span>
+          </h1>
+          <p>Ruang riset digital</p>
         </div>
       </div>
-
-      {/* Navigation Items */}
-      <nav className="sidebar-nav">
+      <nav className="sidebar-nav" aria-label="Navigasi utama">
+        <div className="nav-section-title">WORKSPACE</div>
+        {navigation.map(([id, label, Icon]) => (
+          <button
+            key={id}
+            className={`nav-item ${activeTab === id ? "active" : ""}`}
+            aria-current={activeTab === id ? "page" : undefined}
+            onClick={() => handleNavClick(id)}
+          >
+            <Icon size={18} strokeWidth={1.6} />
+            <span>{label}</span>
+            {id === "results" && (
+              <span className="nav-badge-pill">
+                {data?.comments?.length || 0}
+              </span>
+            )}
+            {id === "files" && (
+              <span className="nav-badge-pill">{files.length}</span>
+            )}
+          </button>
+        ))}
+        <div className="sidebar-nav-divider" />
         <button
-          className={`nav-item ${activeTab === 'dashboard' ? 'active' : ''}`}
-          onClick={() => handleNavClick('dashboard')}
+          className={`nav-item ${activeTab === "settings" ? "active" : ""}`}
+          aria-current={activeTab === "settings" ? "page" : undefined}
+          onClick={() => handleNavClick("settings")}
         >
-          <LayoutDashboard size={18} />
-          <span>Dashboard</span>
-        </button>
-
-        <button
-          className={`nav-item ${activeTab === 'results' ? 'active' : ''}`}
-          onClick={() => handleNavClick('results')}
-        >
-          <MessageSquare size={18} />
-          <span>Hasil Komentar</span>
-          {data?.comments?.length ? (
-            <span className="nav-badge-pill">{data.comments.length}</span>
-          ) : files.length > 0 && files[0]?.comments_count ? (
-            <span className="nav-badge-pill">{files[0].comments_count}</span>
-          ) : (
-            <span className="nav-badge-pill">0</span>
-          )}
-        </button>
-
-        <button
-          className={`nav-item ${activeTab === 'ai-analysis' ? 'active' : ''}`}
-          onClick={() => handleNavClick('ai-analysis')}
-        >
-          <Brain size={18} />
-          <span>Analisis AI (Skripsi)</span>
-          <span className="nav-badge-pill badge-ai">AI</span>
-        </button>
-
-        <button
-          className={`nav-item ${activeTab === 'files' ? 'active' : ''}`}
-          onClick={() => handleNavClick('files')}
-        >
-          <FolderArchive size={18} />
-          <span>Riwayat File</span>
-          <span className="nav-badge-pill">{files.length}</span>
-        </button>
-
-        <div className="nav-section-title">SISTEM</div>
-
-        <button
-          className={`nav-item ${activeTab === 'settings' ? 'active' : ''}`}
-          onClick={() => handleNavClick('settings')}
-        >
-          <Settings size={18} />
+          <Settings size={18} strokeWidth={1.6} />
           <span>Pengaturan</span>
         </button>
       </nav>
-
-      {/* Sidebar Footer */}
+      <div className="sidebar-note">
+        <span className="section-kicker">DARI DATA KE MAKNA</span>
+        <p>
+          Setiap percakapan
+          <br />
+          punya cerita.
+        </p>
+        <button onClick={() => handleNavClick("ai-analysis")}>
+          Jelajahi analisis <ArrowUpRight size={14} />
+        </button>
+      </div>
       <div className="sidebar-footer">
-        <div className="sidebar-footer-row">
-          <span className="sidebar-server-label" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-            <ShieldCheck size={14} color="#16A34A" /> Ruang Riset Privat
-          </span>
-          <span className="badge-status-pill online">
-            <span className="status-dot" /> Aktif
-          </span>
-        </div>
+        <ShieldCheck size={15} />
+        <span>Ruang riset privat</span>
       </div>
     </aside>
   );
