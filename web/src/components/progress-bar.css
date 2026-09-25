@@ -1,266 +1,66 @@
-/* Progress Bar Styles for Scraping and AI Analysis */
-.research-progress-card {
-  background: #ffffff;
+.operation-progress {
+  margin: 16px 0 20px;
+  padding: 18px 20px;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  padding: 20px 22px;
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.02);
-  margin-top: 16px;
-  margin-bottom: 20px;
-  animation: fadeInProgress 0.3s ease-out;
-  position: relative;
-  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
 }
 
-.research-progress-card.ai-theme {
-  border-color: #e0e7ff;
-  background: linear-gradient(180deg, #faf5ff 0%, #ffffff 40%);
-}
-
-.research-progress-card.scrape-theme {
-  border-color: #fed7aa;
-  background: linear-gradient(180deg, #fff7ed 0%, #ffffff 40%);
-}
-
-@keyframes fadeInProgress {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.progress-header {
+.operation-progress__header {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  margin-bottom: 14px;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 16px;
 }
 
-.progress-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.progress-icon-badge {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.progress-icon-badge.scrape {
-  background: #ffedd5;
-  color: #ea580c;
-}
-
-.progress-icon-badge.ai {
-  background: #f3e8ff;
-  color: #7c3aed;
-}
-
-.progress-title-text h4 {
-  font-size: 15px;
-  font-weight: 700;
-  color: #0f172a;
-  margin: 0 0 2px 0;
-  line-height: 1.2;
-}
-
-.progress-title-text p {
-  font-size: 12px;
-  color: #64748b;
+.operation-progress .operation-progress__title {
   margin: 0;
-}
-
-.progress-meta-stats {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.progress-timer-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  background: #f1f5f9;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
+  color: #1e293b;
+  font-size: 14px;
   font-weight: 600;
-  color: #475569;
+  line-height: 1.5;
 }
 
-.progress-percentage {
-  font-size: 20px;
-  font-weight: 800;
-  color: #f97316;
-  min-width: 52px;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-}
-
-.progress-percentage.ai-pct {
-  color: #7c3aed;
-}
-
-/* Track & Bar */
-.progress-track {
-  width: 100%;
-  height: 10px;
-  background: #e2e8f0;
-  border-radius: 999px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
-  margin-bottom: 12px;
-}
-
-.progress-fill {
-  height: 100%;
-  border-radius: 999px;
-  transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.progress-fill.scrape-fill {
-  background: linear-gradient(90deg, #f97316 0%, #fb923c 60%, #ea580c 100%);
-}
-
-.progress-fill.ai-fill {
-  background: linear-gradient(90deg, #8b5cf6 0%, #ec4899 50%, #f97316 100%);
-}
-
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.45) 50%,
-    rgba(255, 255, 255, 0) 100%
-  );
-  animation: progressShimmer 1.8s infinite linear;
-}
-
-@keyframes progressShimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
-
-/* Active Step Banner */
-.progress-active-stage {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #334155;
-  margin-bottom: 14px;
-}
-
-.progress-stage-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #f97316;
-  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
-  animation: stagePulse 1.2s infinite alternate;
+.operation-progress__time {
   flex-shrink: 0;
-}
-
-.progress-stage-dot.ai-dot {
-  background: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
-}
-
-@keyframes stagePulse {
-  from { transform: scale(0.9); opacity: 0.7; }
-  to { transform: scale(1.2); opacity: 1; }
-}
-
-/* Micro-Steps List */
-.progress-steps-list {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.progress-step-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11.5px;
-  padding: 6px 8px;
-  border-radius: 8px;
-  background: #f8fafc;
-  color: #94a3b8;
-  border: 1px solid #f1f5f9;
-  transition: all 0.2s ease;
-  min-width: 0;
-}
-
-.progress-step-item.completed {
-  background: #f0fdf4;
-  color: #166534;
-  border-color: #bbf7d0;
-  font-weight: 600;
-}
-
-.progress-step-item.active {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border-color: #bfdbfe;
-  font-weight: 700;
-  box-shadow: 0 1px 3px rgba(29, 78, 216, 0.08);
-}
-
-.progress-step-label {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Research Hint Box */
-.progress-tip-box {
-  background: rgba(248, 250, 252, 0.85);
-  border: 1px dashed #cbd5e1;
-  border-radius: 8px;
-  padding: 9px 12px;
-  font-size: 12px;
   color: #64748b;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.progress-tip-box span {
-  flex: 1;
-  line-height: 1.45;
+.operation-progress .operation-progress__description {
+  margin: 6px 0 16px;
+  color: #475569;
+  font-size: 13px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
-@media (max-width: 640px) {
-  .progress-steps-list {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-  }
-  .progress-percentage {
-    font-size: 17px;
-  }
+.operation-progress__track {
+  height: 4px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: #f1f5f9;
+}
+
+.operation-progress__indicator {
+  display: block;
+  width: 35%;
+  height: 100%;
+  border-radius: inherit;
+  background: #f97316;
+  animation: operation-progress-slide 2s ease-in-out infinite alternate;
+}
+
+@keyframes operation-progress-slide {
+  from { transform: translateX(0); }
+  to { transform: translateX(185.7%); }
+}
+
+@media (max-width: 480px) {
+  .operation-progress { padding: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .operation-progress__indicator { animation: none; }
 }
