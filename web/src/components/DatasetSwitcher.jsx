@@ -7,9 +7,10 @@ import {
   CheckCircle2,
   X,
   Users,
-  FileText,
   Calendar,
-  ArrowLeftRight
+  ArrowLeftRight,
+  User,
+  RefreshCw
 } from 'lucide-react';
 import useModalDialog from './useModalDialog';
 import './dataset-switcher.css';
@@ -41,12 +42,39 @@ function detectPlatform(file) {
   return isYt ? 'youtube' : 'tiktok';
 }
 
+/**
+ * Produce a clean, academic, human-friendly dataset title without .json or backend technical prefixes
+ */
+function getCleanDatasetTitle(file, fallback = '') {
+  if (file?.caption && file.caption.trim()) {
+    return file.caption.trim();
+  }
+  if (file?.author_name || file?.author) {
+    const platform = detectPlatform(file);
+    const platformName = platform === 'youtube' ? 'YouTube' : 'TikTok';
+    return `Kumpulan Komentar ${platformName} (@${file.author_name || file.author})`;
+  }
+  const raw = file?.filename || fallback || '';
+  if (!raw) return 'Dataset Penelitian';
+  
+  // Clean raw filename from technical extensions and prefixes
+  const clean = raw
+    .replace(/\.json$/i, '')
+    .replace(/^(yt_|youtube_|tiktok_)/i, '');
+  const platform = detectPlatform(file);
+  const platformName = platform === 'youtube' ? 'YouTube' : 'TikTok';
+  
+  if (!clean) return `Dataset Riset ${platformName}`;
+  return `Dataset Riset ${platformName} (${clean.slice(0, 10)})`;
+}
+
 export default function DatasetSwitcher({
   files = [],
   selectedFile = '',
   onSelectDataset,
   label = 'Dataset Riset Aktif',
-  data = null
+  data = null,
+  onRefresh = null
 }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [tempSelected, setTempSelected] = useState(selectedFile);
@@ -64,18 +92,20 @@ export default function DatasetSwitcher({
     return files.find((f) => f.filename === selectedFile) || null;
   }, [files, selectedFile]);
 
-  // Extract display information for the active card
+  // Extract display information for the active card (WITHOUT any .json backend filenames)
   const activeDisplay = useMemo(() => {
     const platform = detectPlatform(activeFile) || (data?.platform === 'youtube' ? 'youtube' : 'tiktok');
-    const caption = activeFile?.caption || data?.caption || activeFile?.filename?.replace(/\.json$/i, '') || selectedFile?.replace(/\.json$/i, '') || 'Belum ada dataset penelitian terpilih';
+    const title = getCleanDatasetTitle(activeFile, data?.caption || selectedFile);
     const commentsCount = activeFile?.comments_count ?? (data?.comments?.length ?? 0);
-    const filename = activeFile?.filename || selectedFile || '';
+    const author = activeFile?.author_name || activeFile?.author || data?.author_name || data?.author || '';
+    const date = formatDateShort(activeFile?.modified || data?.published_at || data?.date_now);
 
     return {
       platform,
-      caption,
+      title,
       commentsCount,
-      filename
+      author,
+      date
     };
   }, [activeFile, selectedFile, data]);
 
@@ -87,11 +117,11 @@ export default function DatasetSwitcher({
       if (platformFilter === 'youtube' && platform !== 'youtube') return false;
       if (platformFilter === 'tiktok' && platform !== 'tiktok') return false;
 
-      // Real-time search filter
+      // Real-time search filter (matches clean title, caption, author, topic)
       if (!searchQuery.trim()) return true;
       const q = searchQuery.toLowerCase().trim();
       const cap = (f.caption || '').toLowerCase();
-      const fname = (f.filename || '').toLowerCase();
+      const fname = (f.filename || '').replace(/\.json$/i, '').toLowerCase();
       const author = (f.author_name || f.author || '').toLowerCase();
 
       return cap.includes(q) || fname.includes(q) || author.includes(q);
@@ -106,13 +136,13 @@ export default function DatasetSwitcher({
         return (a.comments_count || 0) - (b.comments_count || 0);
       }
       if (sortBy === 'name_asc') {
-        const titleA = a.caption || a.filename || '';
-        const titleB = b.caption || b.filename || '';
+        const titleA = getCleanDatasetTitle(a);
+        const titleB = getCleanDatasetTitle(b);
         return titleA.localeCompare(titleB, 'id', { sensitivity: 'base' });
       }
       if (sortBy === 'name_desc') {
-        const titleA = a.caption || a.filename || '';
-        const titleB = b.caption || b.filename || '';
+        const titleA = getCleanDatasetTitle(a);
+        const titleB = getCleanDatasetTitle(b);
         return titleB.localeCompare(titleA, 'id', { sensitivity: 'base' });
       }
       // Default: 'newest' (based on modified timestamp if available)
@@ -183,20 +213,39 @@ export default function DatasetSwitcher({
               </span>
             </div>
 
-            <div className="dataset-switcher-title" title={activeDisplay.caption}>
-              {activeDisplay.caption}
+            <div className="dataset-switcher-title" title={activeDisplay.title}>
+              {activeDisplay.title}
             </div>
 
-            {activeDisplay.filename && (
-              <div className="dataset-switcher-sub" title={activeDisplay.filename}>
-                <FileText size={11} />
-                <span>{activeDisplay.filename}</span>
-              </div>
-            )}
+            <div className="dataset-switcher-sub">
+              {activeDisplay.author ? (
+                <span className="dataset-sub-item">
+                  <User size={12} />
+                  <span>Kreator: @{activeDisplay.author.replace(/^@/, '')}</span>
+                </span>
+              ) : null}
+              {activeDisplay.date ? (
+                <span className="dataset-sub-item">
+                  <Calendar size={12} />
+                  <span>Waktu Riset: {activeDisplay.date}</span>
+                </span>
+              ) : null}
+            </div>
           </div>
         </div>
 
-        <div className="dataset-switcher-action">
+        <div className="dataset-switcher-actions-wrap">
+          {typeof onRefresh === 'function' && (
+            <button
+              type="button"
+              className="btn-refresh-dataset"
+              onClick={onRefresh}
+              title="Segarkan riwayat dataset penelitian"
+            >
+              <RefreshCw size={14} />
+              <span>Segarkan</span>
+            </button>
+          )}
           <button
             type="button"
             className="btn-change-dataset"
@@ -232,7 +281,7 @@ export default function DatasetSwitcher({
                     Pilih Dataset
                   </h3>
                   <p className="dataset-modal-subtitle">
-                    Pilih dataset penelitian yang ingin digunakan untuk analisis riset akademik
+                    Pilih dataset penelitian yang ingin digunakan untuk riset akademik Anda
                   </p>
                 </div>
               </div>
@@ -253,7 +302,7 @@ export default function DatasetSwitcher({
                 <input
                   type="text"
                   className="dataset-search-input"
-                  placeholder="Cari judul video, nama file, atau topik riset..."
+                  placeholder="Cari judul video, topik riset, atau kreator..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   autoFocus
@@ -281,8 +330,8 @@ export default function DatasetSwitcher({
                   <option value="newest">Terbaru Ditambahkan</option>
                   <option value="most_comments">Komentar Terbanyak</option>
                   <option value="least_comments">Komentar Tersedikit</option>
-                  <option value="name_asc">Judul / Nama (A - Z)</option>
-                  <option value="name_desc">Judul / Nama (Z - A)</option>
+                  <option value="name_asc">Judul / Topik (A - Z)</option>
+                  <option value="name_desc">Judul / Topik (Z - A)</option>
                 </select>
               </div>
             </div>
@@ -355,8 +404,9 @@ export default function DatasetSwitcher({
                     const isActive = file.filename === selectedFile;
                     const isSelected = file.filename === tempSelected;
                     const platform = detectPlatform(file);
-                    const title = file.caption || file.filename?.replace(/\.json$/i, '');
+                    const title = getCleanDatasetTitle(file);
                     const comments = file.comments_count ?? 0;
+                    const author = file.author_name || file.author || '';
 
                     return (
                       <div
@@ -389,7 +439,7 @@ export default function DatasetSwitcher({
                           )}
                         </div>
 
-                        {/* Item Details */}
+                        {/* Item Details (Clean academic, no .json backend filenames) */}
                         <div className="dataset-item-content">
                           <div className="dataset-item-title-row">
                             <span className="dataset-item-title" title={title}>
@@ -405,10 +455,12 @@ export default function DatasetSwitcher({
                               <Users size={12} />
                               {comments} komentar
                             </span>
-                            <span className="dataset-meta-item filename" title={file.filename}>
-                              <FileText size={11} />
-                              {file.filename}
-                            </span>
+                            {author ? (
+                              <span className="dataset-meta-item">
+                                <User size={11} />
+                                @{author.replace(/^@/, '')}
+                              </span>
+                            ) : null}
                             {file.modified && (
                               <span className="dataset-meta-item">
                                 <Calendar size={11} />
@@ -448,7 +500,7 @@ export default function DatasetSwitcher({
                 </span>
                 {tempSelected && tempSelected !== selectedFile && (
                   <span className="dataset-selection-hint">
-                    Klik &quot;Gunakan Dataset&quot; untuk mengalihkan ke dataset pilihan ini
+                    Klik &quot;Gunakan Dataset&quot; untuk beralih ke dataset ini
                   </span>
                 )}
               </div>

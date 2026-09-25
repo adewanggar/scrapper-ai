@@ -1,5 +1,6 @@
 import React from "react";
 import "./comments.css";
+import DatasetSwitcher from "../components/DatasetSwitcher";
 import { API_BASE } from "../constants/frameworks";
 import {
   Database,
@@ -105,62 +106,15 @@ export default function CommentsPage({
           Analisis riset
         </button>
       </header>
-      {/* Video Selector Bar */}
-      <div className="video-selector-row">
-        <div className="video-selector-bar">
-          <div className="selector-icon">
-            <Database size={18} />
-          </div>
-          <label htmlFor="comments-dataset" className="selector-label">
-            Dataset
-          </label>
-          {files.length > 0 ? (
-            <select
-              id="comments-dataset"
-              className="selector-select"
-              value={selectedFile}
-              onChange={(e) => loadFileContent(e.target.value)}
-            >
-              {files.map((f) => (
-                <option key={f.filename} value={f.filename}>
-                  {f.caption
-                    ? `${f.caption.slice(0, 48)}...`
-                    : f.filename.replace(/\.json$/i, "")}{" "}
-                  ({f.comments_count} komentar)
-                </option>
-              ))}
-            </select>
-          ) : (
-            <span
-              style={{
-                fontSize: "13px",
-                color: "var(--color-text-secondary)",
-                flex: 1,
-              }}
-            >
-              {selectedFile
-                ? selectedFile.replace(/\.json$/i, "")
-                : "Belum ada dataset penelitian tersimpan"}
-            </span>
-          )}
-          <ChevronDown
-            size={16}
-            color="var(--color-text-secondary)"
-            style={{ pointerEvents: "none", flexShrink: 0 }}
-          />
-        </div>
-
-        <div className="selector-actions-group">
-          <button
-            className="btn btn-white-bordered"
-            onClick={fetchFilesList}
-            title="Segarkan riwayat dataset"
-          >
-            <RefreshCw size={14} />
-            Segarkan
-          </button>
-        </div>
-      </div>
+      {/* Dataset Switcher Card & Search Modal */}
+      <DatasetSwitcher
+        files={files}
+        selectedFile={selectedFile}
+        onSelectDataset={(filename) => loadFileContent(filename)}
+        label="Dataset Riset Aktif"
+        data={data}
+        onRefresh={fetchFilesList}
+      />
 
       {/* Caption Card */}
       {data && (
