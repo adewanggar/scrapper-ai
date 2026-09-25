@@ -31,6 +31,7 @@ import {
   FRAMEWORK_CATEGORIES,
   FRAMEWORKS_LIST
 } from '../constants/frameworks';
+import { normalizeAiAnalysis } from '../utils/aiNormalize';
 
 export default function AnalysisPage({
   analysisType,
@@ -39,7 +40,7 @@ export default function AnalysisPage({
   setAiSampleSize,
   aiLoading,
   aiError,
-  aiAnalysis,
+  aiAnalysis: rawAiAnalysis,
   runAiAnalysis,
   selectedFile,
   files,
@@ -54,6 +55,15 @@ export default function AnalysisPage({
   const [copiedThesisText, setCopiedThesisText] = useState(false);
   const [fwCategoryFilter, setFwCategoryFilter] = useState('all');
   const [fwSearchQuery, setFwSearchQuery] = useState('');
+
+  const aiAnalysis = useMemo(() => {
+    const norm = normalizeAiAnalysis(rawAiAnalysis);
+    if (!norm) return null;
+    return {
+      ...norm,
+      result: (norm.result && typeof norm.result === 'object') ? norm.result : {}
+    };
+  }, [rawAiAnalysis]);
 
   const copyThesisParagraph = (text) => {
     if (!text) return;
@@ -79,14 +89,14 @@ export default function AnalysisPage({
 
   const exportAiReportMarkdown = () => {
     if (!aiAnalysis) return;
-    const r = aiAnalysis.result;
-    const type = aiAnalysis.analysis_type || 'emotion_marketing';
+    const r = aiAnalysis.result || {};
+    const type = aiAnalysis.analysis_type || analysisType || 'emotion_marketing';
     const fwMeta = FRAMEWORKS_LIST.find((f) => f.id === type) || FRAMEWORKS_LIST[0];
 
     let md = `# Laporan Analisis AI Skripsi: ${fwMeta.title}\n\n`;
     md += `**Fokus Bidang:** ${fwMeta.badge}\n`;
-    md += `**File:** \`${aiAnalysis.filename}\`\n`;
-    md += `**Sampel Dianalisis:** ${aiAnalysis.sample_analyzed} dari ${aiAnalysis.total_comments} komentar\n`;
+    md += `**File:** \`${aiAnalysis.filename || selectedFile || 'dataset'}\`\n`;
+    md += `**Sampel Dianalisis:** ${aiAnalysis.sample_analyzed || 0} dari ${aiAnalysis.total_comments || 0} komentar\n`;
     md += `**Landasan Teori:** ${fwMeta.theory}\n\n`;
     md += `---\n\n`;
 
@@ -337,8 +347,9 @@ export default function AnalysisPage({
   };
 
   const currentFw = FRAMEWORKS_LIST.find((f) => f.id === analysisType) || FRAMEWORKS_LIST[0];
-  const resultType = aiAnalysis?.analysis_type || analysisType;
-  const activeResultFw = FRAMEWORKS_LIST.find((f) => f.id === resultType) || FRAMEWORKS_LIST[0];
+  const hasMatchingAnalysis = Boolean(aiAnalysis && aiAnalysis.analysis_type === analysisType);
+  const resultType = hasMatchingAnalysis ? (aiAnalysis.analysis_type || analysisType) : analysisType;
+  const activeResultFw = FRAMEWORKS_LIST.find((f) => f.id === resultType) || currentFw;
 
   return (
     <div>
@@ -353,8 +364,8 @@ export default function AnalysisPage({
                     </div>
                     <p style={{ fontSize: '13px', color: 'var(--color-text-secondary)' }}>
                       Fokus Kajian: <strong>{currentFw.badge}</strong>
-                      {aiAnalysis && (
-                        <span> • <strong>{aiAnalysis.sample_analyzed}</strong> dari <strong>{aiAnalysis.total_comments}</strong> komentar dianalisis</span>
+                      {hasMatchingAnalysis && (
+                        <span> • <strong>{aiAnalysis.sample_analyzed || 0}</strong> dari <strong>{aiAnalysis.total_comments || 0}</strong> komentar dianalisis</span>
                       )}
                     </p>
                   </div>
@@ -419,17 +430,17 @@ export default function AnalysisPage({
                       {aiLoading ? (
                         <>
                           <div className="spinner-icon" />
-                          <span>Menganalisis ({currentFw.badge.split('/')[0].trim()})...</span>
+                          <span>Menganalisis ({(currentFw.badge || '').split('/')[0]?.trim() || 'Riset'})...</span>
                         </>
                       ) : (
                         <>
                           <Sparkles size={15} />
-                          <span>{aiAnalysis ? 'Analisis Ulang AI' : 'Mulai Analisis AI'}</span>
+                          <span>{hasMatchingAnalysis ? 'Analisis Ulang AI' : 'Mulai Analisis AI'}</span>
                         </>
                       )}
                     </button>
 
-                    {aiAnalysis && (
+                    {hasMatchingAnalysis && (
                       <button
                         className="btn btn-white-bordered"
                         onClick={exportAiReportMarkdown}
@@ -638,7 +649,7 @@ export default function AnalysisPage({
                 )}
 
                 {/* Empty state when no analysis done yet for this framework */}
-                {!aiAnalysis && !aiLoading && (
+                {!hasMatchingAnalysis && !aiLoading && (
                   <div className="empty-state-box">
                     <div
                       style={{
@@ -670,13 +681,13 @@ export default function AnalysisPage({
                       style={{ height: '40px', padding: '0 20px', margin: '0 auto' }}
                     >
                       <Sparkles size={16} />
-                      Jalankan Analisis ({currentFw.badge.split('/')[0].trim()})
+                      Jalankan Analisis ({(currentFw.badge || '').split('/')[0]?.trim() || 'Riset'})
                     </button>
                   </div>
                 )}
 
                 {/* AI Analysis Content View */}
-                {aiAnalysis && (
+                {hasMatchingAnalysis && (
                   <div>
                     {/* 1. Context Banner (Perspective-Specific) */}
                     <div className="ai-context-banner">
@@ -1125,7 +1136,7 @@ export default function AnalysisPage({
                             <div className="stat-icon-wrapper" style={{ background: '#059669', color: '#FFF' }}><CheckCircle2 size={18} /></div>
                             <div>
                               <div className="stat-number" style={{ color: '#065F46' }}>
-                                {aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct}%
+                                {aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct ?? 0}%
                               </div>
                               <div className="stat-label">Dominan-Hegemonik (Menerima)</div>
                             </div>
@@ -1134,7 +1145,7 @@ export default function AnalysisPage({
                             <div className="stat-icon-wrapper"><MessageCircle size={18} /></div>
                             <div>
                               <div className="stat-number">
-                                {aiAnalysis.result.hall_reception_positions?.negotiated_pct}%
+                                {aiAnalysis.result.hall_reception_positions?.negotiated_pct ?? 0}%
                               </div>
                               <div className="stat-label">Posisi Negosiasi (Kompromi)</div>
                             </div>
@@ -1143,7 +1154,7 @@ export default function AnalysisPage({
                             <div className="stat-icon-wrapper"><AlertCircle size={18} /></div>
                             <div>
                               <div className="stat-number">
-                                {aiAnalysis.result.hall_reception_positions?.oppositional_pct}%
+                                {aiAnalysis.result.hall_reception_positions?.oppositional_pct ?? 0}%
                               </div>
                               <div className="stat-label">Posisi Oposisional (Menolak)</div>
                             </div>
@@ -1569,30 +1580,30 @@ export default function AnalysisPage({
                             <div className="progress-stat-row">
                               <div className="progress-stat-header">
                                 <span className="progress-stat-name">✅ Dominan-Hegemonik (Menerima Pesan)</span>
-                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct}%</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct ?? 0}%</span>
                               </div>
                               <div className="progress-track">
-                                <div className="progress-fill fill-green" style={{ width: `${aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct}%` }} />
+                                <div className="progress-fill fill-green" style={{ width: `${aiAnalysis.result.hall_reception_positions?.dominant_hegemonic_pct ?? 0}%` }} />
                               </div>
                             </div>
 
                             <div className="progress-stat-row">
                               <div className="progress-stat-header">
                                 <span className="progress-stat-name">🤝 Posisi Negosiasi (Kompromi / Syarat)</span>
-                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.negotiated_pct}%</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.negotiated_pct ?? 0}%</span>
                               </div>
                               <div className="progress-track">
-                                <div className="progress-fill fill-amber" style={{ width: `${aiAnalysis.result.hall_reception_positions?.negotiated_pct}%` }} />
+                                <div className="progress-fill fill-amber" style={{ width: `${aiAnalysis.result.hall_reception_positions?.negotiated_pct ?? 0}%` }} />
                               </div>
                             </div>
 
                             <div className="progress-stat-row">
                               <div className="progress-stat-header">
                                 <span className="progress-stat-name">❌ Posisi Oposisional (Mendekonstruksi/Menolak)</span>
-                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.oppositional_pct}%</span>
+                                <span className="progress-stat-pct">{aiAnalysis.result.hall_reception_positions?.oppositional_pct ?? 0}%</span>
                               </div>
                               <div className="progress-track">
-                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.hall_reception_positions?.oppositional_pct}%` }} />
+                                <div className="progress-fill fill-rose" style={{ width: `${aiAnalysis.result.hall_reception_positions?.oppositional_pct ?? 0}%` }} />
                               </div>
                             </div>
 

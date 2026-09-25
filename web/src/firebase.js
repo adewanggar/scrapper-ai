@@ -263,15 +263,16 @@ export async function deleteUserScrape(userId, filename) {
  * Save cached AI analysis for a specific scrape
  */
 export async function saveUserAiAnalysis(userId, filename, analysisType, analysis) {
-  if (!userId || !filename) return;
+  if (!userId || !filename || !analysis) return;
   const docId = getDocIdFromFilename(filename);
   const docRef = doc(db, 'users', userId, 'scrapes', docId);
+  const cleanAnalysis = JSON.parse(JSON.stringify(analysis));
   await setDoc(
     docRef,
     {
       analyses: {
         [analysisType]: {
-          result: analysis,
+          result: cleanAnalysis,
           updatedAt: new Date().toISOString()
         }
       }

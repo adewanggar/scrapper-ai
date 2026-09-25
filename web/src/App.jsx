@@ -13,6 +13,8 @@ import CommentsPage from './pages/CommentsPage';
 import AnalysisPage from './pages/AnalysisPage';
 import DatasetsPage from './pages/DatasetsPage';
 import SettingsPage from './pages/SettingsPage';
+import ErrorBoundary from './components/ErrorBoundary';
+import { normalizeAiAnalysis } from './utils/aiNormalize';
 import { readCommentPreference, saveCommentPreferences } from './utils/commentPreferences';
 
 import {
@@ -269,23 +271,29 @@ export default function App() {
 
   // Load cached AI analysis from Firestore
   const loadAiAnalysis = async (filename, type = analysisType) => {
-    if (!filename || !currentUser) return;
+    if (!filename || !currentUser) {
+      setAiAnalysis(null);
+      return;
+    }
     try {
       const cached = await getUserAiAnalysis(currentUser.uid, filename, type);
       if (cached) {
-        setAiAnalysis(cached);
+        setAiAnalysis(normalizeAiAnalysis(cached));
         setAiError('');
         return;
       }
       setAiAnalysis(null);
     } catch (err) {
       console.error('Failed to check AI cache:', err);
+      setAiAnalysis(null);
     }
   };
 
   // Change research framework
   const handleFrameworkChange = (newType) => {
     setAnalysisType(newType);
+    setAiAnalysis(null); // Clear immediately to prevent rendering wrong/stale framework
+    setAiError('');
     if (selectedFile) {
       loadAiAnalysis(selectedFile, newType);
     }
@@ -313,10 +321,11 @@ export default function App() {
         throw new Error(json.error || 'Gagal melakukan analisis AI');
       }
 
-      setAiAnalysis(json);
+      const normalized = normalizeAiAnalysis(json);
+      setAiAnalysis(normalized);
 
       if (currentUser) {
-        await saveUserAiAnalysis(currentUser.uid, selectedFile, analysisType, json);
+        await saveUserAiAnalysis(currentUser.uid, selectedFile, analysisType, normalized);
       }
     } catch (err) {
       console.error('AI Analysis failed:', err);
@@ -838,25 +847,27 @@ export default function App() {
 
           {/* TAB 3: ANALISIS AI SKRIPSI */}
           {activeTab === 'ai-analysis' && (
-            <AnalysisPage
-              analysisType={analysisType}
-              handleFrameworkChange={handleFrameworkChange}
-              aiSampleSize={aiSampleSize}
-              setAiSampleSize={setAiSampleSize}
-              aiLoading={aiLoading}
-              aiError={aiError}
-              aiAnalysis={aiAnalysis}
-              runAiAnalysis={runAiAnalysis}
-              selectedFile={selectedFile}
-              files={files}
-              loadFileContent={loadFileContent}
-              data={data}
-              setShowCitationModal={setShowCitationModal}
-              setShowInterCoderModal={setShowInterCoderModal}
-              setShowExportStatsModal={setShowExportStatsModal}
-              setVerbatimModalComment={setVerbatimModalComment}
-              setVerbatimModalIndex={setVerbatimModalIndex}
-            />
+            <ErrorBoundary onReset={() => setAiAnalysis(null)}>
+              <AnalysisPage
+                analysisType={analysisType}
+                handleFrameworkChange={handleFrameworkChange}
+                aiSampleSize={aiSampleSize}
+                setAiSampleSize={setAiSampleSize}
+                aiLoading={aiLoading}
+                aiError={aiError}
+                aiAnalysis={aiAnalysis}
+                runAiAnalysis={runAiAnalysis}
+                selectedFile={selectedFile}
+                files={files}
+                loadFileContent={loadFileContent}
+                data={data}
+                setShowCitationModal={setShowCitationModal}
+                setShowInterCoderModal={setShowInterCoderModal}
+                setShowExportStatsModal={setShowExportStatsModal}
+                setVerbatimModalComment={setVerbatimModalComment}
+                setVerbatimModalIndex={setVerbatimModalIndex}
+              />
+            </ErrorBoundary>
           )}
 
           {/* TAB 4: RIWAYAT FILE */}
