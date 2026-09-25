@@ -5464,6 +5464,182 @@ a:focus-visible {
   margin-bottom: 12px;
 }
 
+/* Indicator dimension chips on framework cards */
+.fw-indicator-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 9px;
+}
+
+.fw-indicator-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 10.5px;
+  font-weight: 500;
+  line-height: 1.35;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: var(--card-accent-alpha, rgba(0, 0, 0, 0.05));
+  color: var(--card-accent, var(--color-text-secondary));
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fw-indicator-chip.more {
+  background: transparent;
+  border: 1px dashed currentColor;
+  color: var(--color-text-muted);
+}
+
+/* Cross-field search results (kerangka lintas jurusan) */
+.cross-field-section {
+  margin-top: 20px;
+}
+
+.cross-field-header {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 10px;
+  background: #FFF7ED;
+  border: 1px dashed #FDBA74;
+}
+
+.cross-field-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #9A3412;
+}
+
+.cross-field-subtitle {
+  font-size: 11.5px;
+  color: #C2410C;
+}
+
+/* ==========================================================================
+   Two-step Framework Selector: Step 1 Jurusan Cards
+   ========================================================================== */
+
+.jurusan-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 14px;
+}
+
+.jurusan-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 18px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-card);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.16s ease;
+}
+
+.jurusan-card:hover {
+  border-color: var(--card-accent, var(--color-primary));
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+}
+
+.jurusan-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.jurusan-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  line-height: 1.35;
+  margin: 0;
+}
+
+.jurusan-desc {
+  font-size: 11.5px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.jurusan-count {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-top: 4px;
+}
+
+/* Step 2 toolbar: back button + active major label */
+.fw-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 13px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.16s ease;
+  white-space: nowrap;
+}
+
+.fw-back-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  background: #FFF7ED;
+}
+
+.fw-active-cat-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  background: var(--color-bg);
+  border: 1px solid var(--color-primary-border, var(--color-border));
+  padding: 6px 13px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .jurusan-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
+  }
+
+  .jurusan-card {
+    padding: 14px 12px;
+  }
+
+  .fw-active-cat-label {
+    display: none;
+  }
+}
+
 
 /* ==========================================================================
    Dataset Management (Riwayat File) UI Enhancements

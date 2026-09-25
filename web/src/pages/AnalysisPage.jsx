@@ -8,6 +8,7 @@ import {
   Check,
   CheckCircle2,
   ChevronDown,
+  ChevronLeft,
   Copy,
   Database,
   Download,
@@ -58,6 +59,8 @@ export default function AnalysisPage({
   const [copiedThesisText, setCopiedThesisText] = useState(false);
   const [fwCategoryFilter, setFwCategoryFilter] = useState('all');
   const [fwSearchQuery, setFwSearchQuery] = useState('');
+  const [fwStep, setFwStep] = useState('jurusan'); // 'jurusan' -> 'kerangka'
+  const activeCat = FRAMEWORK_CATEGORIES.find((c) => c.id === fwCategoryFilter) || null;
 
   const aiAnalysis = useMemo(() => {
     const norm = normalizeAiAnalysis(rawAiAnalysis);
@@ -75,19 +78,29 @@ export default function AnalysisPage({
     setTimeout(() => setCopiedThesisText(false), 2000);
   };
 
+  const fwMatchQuery = (fw, q) => {
+    const catLabel = FRAMEWORK_CATEGORIES.find((c) => c.id === fw.category)?.label || '';
+    return [
+      fw.title, fw.desc, fw.badge, fw.theory, catLabel,
+      ...(fw.keywords || []),
+      ...(fw.indicators || [])
+    ].join(' ').toLowerCase().includes(q);
+  };
+
   const filteredFrameworks = useMemo(() => {
+    const q = fwSearchQuery.trim().toLowerCase();
     return FRAMEWORKS_LIST.filter((fw) => {
       const matchCat = fwCategoryFilter === 'all' || fw.category === fwCategoryFilter;
       if (!matchCat) return false;
-      if (!fwSearchQuery.trim()) return true;
-      const q = fwSearchQuery.toLowerCase();
-      return (
-        fw.title.toLowerCase().includes(q) ||
-        fw.desc.toLowerCase().includes(q) ||
-        fw.badge.toLowerCase().includes(q) ||
-        fw.theory.toLowerCase().includes(q)
-      );
+      return !q || fwMatchQuery(fw, q);
     });
+  }, [fwCategoryFilter, fwSearchQuery]);
+
+  // Pencarian lintas jurusan: kerangka yang cocok di luar bidang yang sedang dipilih
+  const crossFieldFrameworks = useMemo(() => {
+    const q = fwSearchQuery.trim().toLowerCase();
+    if (!q || fwCategoryFilter === 'all') return [];
+    return FRAMEWORKS_LIST.filter((fw) => fw.category !== fwCategoryFilter && fwMatchQuery(fw, q));
   }, [fwCategoryFilter, fwSearchQuery]);
 
   const exportAiReportMarkdown = () => {
@@ -289,6 +302,27 @@ export default function AnalysisPage({
       md += `- Sinisme / Krisis Kepercayaan: **${r.policy_sentiment?.cynical_distrust_pct}%**\n`;
       md += `- Mendukung Regulasi: **${r.policy_sentiment?.supportive_pct}%**\n`;
       md += `*Sikap Dominan:* **${r.policy_sentiment?.dominant_stance}**\n\n`;
+    } else if (r.indicator_analysis?.indicators) {
+      // Generic: kerangka bidang penelitian tambahan (indikator teori-spesifik)
+      md += `## 1. Konteks Analisis\n`;
+      md += `- **Objek / Fenomena:** ${r.context_summary?.research_object || '-'}\n`;
+      md += `- **Topik Diskusi Dominan:** ${r.context_summary?.main_topic || '-'}\n`;
+      md += `- **Catatan Kontekstual:** ${r.context_summary?.analysis_note || '-'}\n\n`;
+
+      md += `## 2. Distribusi Sentimen Komentar\n`;
+      md += `- Positif: **${r.sentiment_distribution?.positive_pct}%**\n`;
+      md += `- Netral: **${r.sentiment_distribution?.neutral_pct}%**\n`;
+      md += `- Negatif: **${r.sentiment_distribution?.negative_pct}%**\n`;
+      md += `*Sentimen Dominan:* **${r.sentiment_distribution?.dominant_sentiment}**\n`;
+      md += `*Rangkuman:* ${r.sentiment_distribution?.sentiment_summary}\n\n`;
+
+      md += `## 3. Distribusi Dimensi / Indikator Analisis\n`;
+      (r.indicator_analysis.indicators || []).forEach((ind) => {
+        md += `- **${ind.name}: ${ind.pct}%**\n`;
+        md += `  - ${ind.description}\n`;
+        if (ind.sample_quote) md += `  - Kutipan: "${ind.sample_quote}"\n`;
+      });
+      md += `\n*Insight Dimensi Dominan:* ${r.indicator_analysis?.dominant_explanation}\n\n`;
     } else {
       // Default: Emotion-driven marketing
       md += `## 1. Konteks Narasi & Strategi Pemasaran\n`;
@@ -353,6 +387,56 @@ export default function AnalysisPage({
   const hasMatchingAnalysis = Boolean(aiAnalysis && aiAnalysis.analysis_type === analysisType);
   const resultType = hasMatchingAnalysis ? (aiAnalysis.analysis_type || analysisType) : analysisType;
   const activeResultFw = FRAMEWORKS_LIST.find((f) => f.id === resultType) || currentFw;
+
+  const renderFrameworkCard = (fw) => {
+    const IconComp = fw.icon;
+    const isActive = analysisType === fw.id;
+    return (
+      <button
+        key={fw.id}
+        type="button"
+        className={`framework-card ${isActive ? 'active' : ''}`}
+        style={{
+          '--card-accent': fw.color,
+          '--card-accent-alpha': `${fw.color}25`
+        }}
+        onClick={() => handleFrameworkChange(fw.id)}
+      >
+        <div className="framework-card-top">
+          <div className="framework-icon-wrap" style={{ background: `${fw.color}15`, color: fw.color }}>
+            <IconComp size={18} />
+          </div>
+          <span className="framework-badge" style={{ background: `${fw.color}15`, color: fw.color }}>
+            {fw.badge.split('/')[0].trim()}
+          </span>
+        </div>
+
+        <div className="framework-card-body">
+          <h4>{fw.title}</h4>
+          <p>{fw.desc}</p>
+          {fw.indicators?.length > 0 && (
+            <div className="fw-indicator-chips">
+              {fw.indicators.slice(0, 3).map((ind) => (
+                <span key={ind} className="fw-indicator-chip">{ind}</span>
+              ))}
+              {fw.indicators.length > 3 && (
+                <span className="fw-indicator-chip more" title={fw.indicators.join(', ')}>
+                  +{fw.indicators.length - 3}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="framework-card-footer">
+          <span className="framework-theory-tag" title={fw.theory}>
+            {fw.theory.split(',')[0]}
+          </span>
+          {isActive && <div className="framework-active-indicator" />}
+        </div>
+      </button>
+    );
+  };
 
   return (
     <div>
@@ -494,7 +578,7 @@ export default function AnalysisPage({
                   data={data}
                 />
 
-                {/* Academic Frameworks Selector */}
+                {/* Academic Frameworks Selector: Step 1 (Jurusan) -> Step 2 (Kerangka) */}
                 <div className="ai-frameworks-section">
                   <div className="ai-frameworks-header">
                     <div className="ai-frameworks-title">
@@ -502,109 +586,133 @@ export default function AnalysisPage({
                       <span>Pilih Sudut Pandang / Kerangka Analisis Skripsi:</span>
                     </div>
                     <span className="ai-frameworks-subtitle">
-                      Pilih teori dan fokus kajian yang relevan dengan topik penelitian tugas akhir Anda ({filteredFrameworks.length} dari {FRAMEWORKS_LIST.length} kerangka teori)
+                      {fwStep === 'jurusan' && !fwSearchQuery.trim()
+                        ? 'Langkah 1 dari 2: pilih jurusan / bidang penelitian Anda terlebih dahulu'
+                        : `Langkah 2 dari 2: pilih kerangka analisis${activeCat ? ` bidang ${activeCat.label}` : ''} yang relevan dengan topik skripsi (${filteredFrameworks.length} kerangka)`}
                     </span>
                   </div>
 
-                  {/* Filter Toolbar: Category Pills & Instant Search */}
-                  <div className="frameworks-filter-toolbar">
-                    <div className="frameworks-cat-pills">
+                  {fwStep === 'jurusan' && !fwSearchQuery.trim() ? (
+                    /* STEP 1: Kartu Pilihan Jurusan / Bidang Penelitian */
+                    <div className="jurusan-grid">
                       {FRAMEWORK_CATEGORIES.map((cat) => {
                         const count = cat.id === 'all'
                           ? FRAMEWORKS_LIST.length
                           : FRAMEWORKS_LIST.filter((f) => f.category === cat.id).length;
-                        const isCatActive = fwCategoryFilter === cat.id;
+                        const CatIcon = cat.icon;
                         return (
                           <button
                             key={cat.id}
                             type="button"
-                            className={`cat-pill-btn ${isCatActive ? 'active' : ''}`}
-                            onClick={() => setFwCategoryFilter(cat.id)}
+                            className="jurusan-card"
+                            style={{ '--card-accent': cat.color, '--card-accent-alpha': `${cat.color}15` }}
+                            onClick={() => {
+                              setFwCategoryFilter(cat.id);
+                              setFwStep('kerangka');
+                            }}
+                            title={`Lihat ${count} kerangka analisis bidang ${cat.label}`}
                           >
-                            <span>{cat.label}</span>
-                            <span className="cat-pill-count">{count}</span>
+                            <div className="jurusan-icon-wrap" style={{ background: `${cat.color}15`, color: cat.color }}>
+                              <CatIcon size={22} />
+                            </div>
+                            <h4>{cat.label}</h4>
+                            {cat.desc && <p className="jurusan-desc">{cat.desc}</p>}
+                            <span className="jurusan-count" style={{ background: `${cat.color}15`, color: cat.color }}>
+                              {count} kerangka
+                            </span>
                           </button>
                         );
                       })}
-                    </div>
-
-                    <div className="frameworks-search-box">
-                      <Search size={14} className="fw-search-icon" />
-                      <input
-                        type="text"
-                        className="fw-search-input"
-                        placeholder="Cari teori, topik, kata kunci..."
-                        value={fwSearchQuery}
-                        onChange={(e) => setFwSearchQuery(e.target.value)}
-                      />
-                      {fwSearchQuery && (
-                        <button
-                          type="button"
-                          className="fw-search-clear"
-                          onClick={() => setFwSearchQuery('')}
-                          title="Hapus pencarian"
-                        >
-                          <X size={13} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {filteredFrameworks.length === 0 ? (
-                    <div className="empty-frameworks-notice">
-                      <p>Tidak ada kerangka analisis yang cocok dengan filter "<strong>{fwSearchQuery}</strong>".</p>
-                      <button
-                        type="button"
-                        className="btn btn-secondary btn-sm"
-                        style={{ marginTop: '8px' }}
-                        onClick={() => {
-                          setFwCategoryFilter('all');
-                          setFwSearchQuery('');
-                        }}
-                      >
-                        Reset Filter & Tampilkan Semua
-                      </button>
                     </div>
                   ) : (
-                    <div className="ai-frameworks-grid">
-                      {filteredFrameworks.map((fw) => {
-                        const IconComp = fw.icon;
-                        const isActive = analysisType === fw.id;
-                        return (
+                    /* STEP 2: Daftar Kerangka Analisis Bidang Terpilih */
+                    <>
+                      <div className="frameworks-filter-toolbar">
+                        <button
+                          type="button"
+                          className="fw-back-btn"
+                          onClick={() => {
+                            setFwStep('jurusan');
+                            setFwCategoryFilter('all');
+                            setFwSearchQuery('');
+                          }}
+                          title="Kembali memilih jurusan / bidang penelitian"
+                        >
+                          <ChevronLeft size={14} />
+                          <span>Ganti Jurusan</span>
+                        </button>
+
+                        {activeCat && !fwSearchQuery.trim() && (
+                          <span className="fw-active-cat-label">
+                            <activeCat.icon size={14} />
+                            <span>{activeCat.label}</span>
+                          </span>
+                        )}
+
+                        <div className="frameworks-search-box">
+                          <Search size={14} className="fw-search-icon" />
+                          <input
+                            type="text"
+                            className="fw-search-input"
+                            placeholder="Cari teori, topik, kata kunci..."
+                            value={fwSearchQuery}
+                            onChange={(e) => setFwSearchQuery(e.target.value)}
+                          />
+                          {fwSearchQuery && (
+                            <button
+                              type="button"
+                              className="fw-search-clear"
+                              onClick={() => setFwSearchQuery('')}
+                              title="Hapus pencarian"
+                            >
+                              <X size={13} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {filteredFrameworks.length === 0 && crossFieldFrameworks.length === 0 ? (
+                        <div className="empty-frameworks-notice">
+                          <p>Tidak ada kerangka analisis yang cocok dengan filter "<strong>{fwSearchQuery}</strong>".</p>
                           <button
-                            key={fw.id}
                             type="button"
-                            className={`framework-card ${isActive ? 'active' : ''}`}
-                            style={{
-                              '--card-accent': fw.color,
-                              '--card-accent-alpha': `${fw.color}25`
+                            className="btn btn-secondary btn-sm"
+                            style={{ marginTop: '8px' }}
+                            onClick={() => {
+                              setFwStep('jurusan');
+                              setFwCategoryFilter('all');
+                              setFwSearchQuery('');
                             }}
-                            onClick={() => handleFrameworkChange(fw.id)}
                           >
-                            <div className="framework-card-top">
-                              <div className="framework-icon-wrap" style={{ background: `${fw.color}15`, color: fw.color }}>
-                                <IconComp size={18} />
-                              </div>
-                              <span className="framework-badge" style={{ background: `${fw.color}15`, color: fw.color }}>
-                                {fw.badge.split('/')[0].trim()}
-                              </span>
-                            </div>
-
-                            <div className="framework-card-body">
-                              <h4>{fw.title}</h4>
-                              <p>{fw.desc}</p>
-                            </div>
-
-                            <div className="framework-card-footer">
-                              <span className="framework-theory-tag" title={fw.theory}>
-                                {fw.theory.split(',')[0]}
-                              </span>
-                              {isActive && <div className="framework-active-indicator" />}
-                            </div>
+                            Kembali & Pilih Jurusan
                           </button>
-                        );
-                      })}
-                    </div>
+                        </div>
+                      ) : (
+                        <>
+                          {filteredFrameworks.length > 0 && (
+                            <div className="ai-frameworks-grid">
+                              {filteredFrameworks.map((fw) => renderFrameworkCard(fw))}
+                            </div>
+                          )}
+
+                          {crossFieldFrameworks.length > 0 && (
+                            <div className="cross-field-section">
+                              <div className="cross-field-header">
+                                <span className="cross-field-title">
+                                  Ditemukan di bidang lain ({crossFieldFrameworks.length})
+                                </span>
+                                <span className="cross-field-subtitle">
+                                  Kerangka berikut relevan dengan pencarian Anda meski berasal dari jurusan lain
+                                </span>
+                              </div>
+                              <div className="ai-frameworks-grid">
+                                {crossFieldFrameworks.map((fw) => renderFrameworkCard(fw))}
+                              </div>
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </>
                   )}
                 </div>
 
@@ -878,6 +986,28 @@ export default function AnalysisPage({
                               <div className="ai-context-item-label">Kepercayaan Tata Kelola (Governance)</div>
                               <div className="ai-context-item-value">
                                 {aiAnalysis.result.context_summary?.trust_in_governance || '-'}
+                              </div>
+                            </div>
+                          </>
+                        ) : aiAnalysis.result.context_summary?.research_object ? (
+                          <>
+                            {/* Generic: kerangka bidang penelitian tambahan */}
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Objek / Fenomena yang Dianalisis</div>
+                              <div className="ai-context-item-value" style={{ fontWeight: 700, color: '#1E40AF' }}>
+                                {aiAnalysis.result.context_summary?.research_object || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Topik Diskusi Dominan</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.main_topic || '-'}
+                              </div>
+                            </div>
+                            <div className="ai-context-item">
+                              <div className="ai-context-item-label">Catatan Kontekstual ({activeResultFw.badge.split('/')[0]?.trim()})</div>
+                              <div className="ai-context-item-value">
+                                {aiAnalysis.result.context_summary?.analysis_note || '-'}
                               </div>
                             </div>
                           </>
@@ -1227,6 +1357,44 @@ export default function AnalysisPage({
                                 {aiAnalysis.result.policy_sentiment?.dominant_stance || '-'}
                               </div>
                               <div className="stat-label">Sikap Publik Dominan</div>
+                            </div>
+                          </div>
+                        </>
+                      ) : aiAnalysis.result.indicator_analysis?.indicators ? (
+                        <>
+                          {/* Generic: kerangka bidang penelitian tambahan (indikator teori-spesifik) */}
+                          <div className="stat-card stat-card-violet">
+                            <div className="stat-icon-wrapper"><Layers size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.indicator_analysis?.dominant_indicator || '-'}
+                              </div>
+                              <div className="stat-label">Dimensi Dominan Menurut Teori</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-emerald" style={{ background: '#ECFDF5', borderColor: '#A7F3D0' }}>
+                            <div className="stat-icon-wrapper" style={{ background: '#059669', color: '#FFF' }}><Target size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ color: '#065F46' }}>
+                                {aiAnalysis.result.sentiment_distribution?.positive_pct}%
+                              </div>
+                              <div className="stat-label">Komentar Bernada Positif</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-rose">
+                            <div className="stat-icon-wrapper"><AlertCircle size={18} /></div>
+                            <div>
+                              <div className="stat-number">{aiAnalysis.result.sentiment_distribution?.negative_pct}%</div>
+                              <div className="stat-label">Komentar Bernada Negatif</div>
+                            </div>
+                          </div>
+                          <div className="stat-card stat-card-amber">
+                            <div className="stat-icon-wrapper"><BarChart3 size={18} /></div>
+                            <div>
+                              <div className="stat-number" style={{ fontSize: '16px' }}>
+                                {aiAnalysis.result.sentiment_distribution?.dominant_sentiment || '-'}
+                              </div>
+                              <div className="stat-label">Sentimen Dominan</div>
                             </div>
                           </div>
                         </>
@@ -1693,6 +1861,43 @@ export default function AnalysisPage({
                               <strong style={{ color: '#0369A1' }}>Sikap Kolektif Warga:</strong>
                               <p style={{ margin: '4px 0 0', color: '#075985' }}>
                                 {aiAnalysis.result.policy_sentiment?.dominant_stance}
+                              </p>
+                            </div>
+                          </>
+                        ) : aiAnalysis.result.indicator_analysis?.indicators ? (
+                          <>
+                            {/* Generic: distribusi indikator teori-spesifik kerangka bidang penelitian */}
+                            <div className="ai-card-title">
+                              <span>Distribusi Dimensi / Indikator Analisis</span>
+                              <span className="ai-card-badge" style={{ background: '#EDE9FE', color: '#6D28D9' }}>
+                                {activeResultFw.badge.split('/')[0]?.trim() || 'Klasifikasi Teori'}
+                              </span>
+                            </div>
+
+                            {(aiAnalysis.result.indicator_analysis.indicators || []).map((ind, idx) => (
+                              <div className="progress-stat-row" key={ind.name || idx}>
+                                <div className="progress-stat-header">
+                                  <span className="progress-stat-name">📊 {ind.name}</span>
+                                  <span className="progress-stat-pct">{ind.pct}%</span>
+                                </div>
+                                <div className="progress-track">
+                                  <div
+                                    className={`progress-fill ${idx % 4 === 0 ? 'fill-blue' : idx % 4 === 1 ? 'fill-rose' : idx % 4 === 2 ? 'fill-purple' : 'fill-amber'}`}
+                                    style={{ width: `${ind.pct || 0}%` }}
+                                  />
+                                </div>
+                                {ind.sample_quote && (
+                                  <p style={{ margin: '4px 0 0', fontSize: '11.5px', color: 'var(--color-text-muted)', fontStyle: 'italic' }}>
+                                    "{ind.sample_quote}"
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+
+                            <div style={{ marginTop: '14px', fontSize: '12px', background: '#F5F3FF', padding: '10px 12px', borderRadius: '8px', border: '1px solid #DDD6FE' }}>
+                              <strong style={{ color: '#6D28D9' }}>Insight Dimensi Dominan:</strong>
+                              <p style={{ margin: '4px 0 0', color: '#5B21B6' }}>
+                                {aiAnalysis.result.indicator_analysis?.dominant_explanation}
                               </p>
                             </div>
                           </>

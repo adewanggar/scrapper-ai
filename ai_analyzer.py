@@ -104,6 +104,524 @@ ANALYSIS_FRAMEWORKS = {
         "description": "Evaluasi penerimaan publik terhadap kebijakan pemerintah, regulasi hukum, kritik layanan umum, dan tuntutan transparansi masyarakat.",
         "theory": "Deliberative Democracy, Citizen Engagement, Good Governance & Accountability",
         "target_major": "Administrasi Publik, Kebijakan Publik, Ilmu Komunikasi"
+    },
+
+    # ============ PSIKOLOGI ============
+    "persepsi_emosi_digital": {
+        "id": "persepsi_emosi_digital",
+        "title": "Persepsi, Emosi & Perilaku Digital (Cognitive Appraisal & Uses & Gratifications)",
+        "short_title": "Persepsi & Emosi Digital",
+        "icon": "Eye",
+        "description": "Menganalisis cara netizen menilai (persepsi kognitif) dan merespons secara emosional sebuah konten atau fenomena, serta motivasi keterlibatan mereka di media digital.",
+        "theory": "Cognitive Appraisal Theory (Lazarus, 1991), Uses and Gratifications Theory (Katz, Blumler & Gurevitch, 1973), Basic Emotions (Ekman, 1992)",
+        "target_major": "Psikologi, Psikologi Media, Ilmu Komunikasi",
+        "research_persona": "psikologi media dan persepsi kognitif digital",
+        "focus": "menilai persepsi kognitif netizen terhadap konten, respons emosional yang muncul, motivasi penggunaan media, dan kecenderungan perilaku keterlibatan digital",
+        "indicators": [
+            {"name": "Persepsi Positif", "desc": "komentar yang menilai konten/fenomena secara positif, setuju, atau apresiatif"},
+            {"name": "Persepsi Negatif", "desc": "komentar yang menilai negatif, keberatan, atau tidak setuju dengan konten/fenomena"},
+            {"name": "Respons Emosional", "desc": "emosi yang diekspresikan (gembira, marah, khawatir, sedih, terhibur, terkejut)"},
+            {"name": "Motivasi Penggunaan Media", "desc": "gratifikasi yang dicari: hiburan, informasi, interaksi sosial, pelarian (escapism)"},
+            {"name": "Kecenderungan Perilaku Keterlibatan", "desc": "niat bereaksi, membagikan ulang, mengikuti perkembangan, atau mengambil sikap"}
+        ]
+    },
+    "identitas_sosial_kelompok": {
+        "id": "identitas_sosial_kelompok",
+        "title": "Identitas Sosial & Dinamika Kelompok (Social Identity & Group Dynamics)",
+        "short_title": "Identitas & Kelompok",
+        "icon": "Users",
+        "description": "Mengkaji bagaimana netizen mendefinisikan identitas kelompoknya (in-group vs out-group), konformitas terhadap mayoritas, dan solidaritas di dalam kolom komentar.",
+        "theory": "Social Identity Theory (Tajfel & Turner, 1979), Group Polarization (Moscovici & Zavalloni, 1969), Conformity Studies (Asch, 1955)",
+        "target_major": "Psikologi Sosial, Psikologi, Sosiologi",
+        "research_persona": "psikologi sosial dengan spesialisasi identitas sosial dan dinamika kelompok",
+        "focus": "mengidentifikasi pengelompokan identitas in-group dan out-group, konformitas terhadap opini mayoritas, solidaritas kelompok, dan favoritisme in-group",
+        "indicators": [
+            {"name": "Identifikasi In-Group", "desc": "komentar yang menunjukkan identitas/bangga dengan kelompoknya sendiri (kami, kita)"},
+            {"name": "Persepsi terhadap Out-Group", "desc": "komentar yang menandai, mengelompokkan, atau menyerang kelompok lawan (mereka)"},
+            {"name": "Konformitas / Bandwagon", "desc": "mengikuti opini mayoritas atau ikut-ikutan tanpa argumen mandiri"},
+            {"name": "Solidaritas & Dukungan Kelompok", "desc": "dukungan emosional dan verbal kepada anggota kelompoknya"},
+            {"name": "Favoritisme In-Group & Bias", "desc": "penilaian timpang yang lebih baik untuk kelompok sendiri dibanding kelompok lain"}
+        ]
+    },
+    "atribusi_sosial": {
+        "id": "atribusi_sosial",
+        "title": "Persepsi dan Atribusi Sosial (Social Perception & Attribution)",
+        "short_title": "Atribusi Sosial",
+        "icon": "Fingerprint",
+        "description": "Menganalisis sebab yang ditudingkan netizen terhadap perilaku orang lain: atribusi internal (karakter) atau eksternal (situasi), beserta bias-bias penilaiannya.",
+        "theory": "Attribution Theory (Heider, 1958; Weiner, 1985), Fundamental Attribution Error (Ross, 1977)",
+        "target_major": "Psikologi Sosial, Psikologi, Humaniora",
+        "research_persona": "psikologi sosial dengan spesialisasi persepsi dan atribusi kausal",
+        "focus": "mengklasifikasikan atribusi sebab yang diberikan netizen (internal vs eksternal), penilaian tanggung jawab, dan bias atribusi yang muncul",
+        "indicators": [
+            {"name": "Atribusi Internal", "desc": "menyalahkan atau memuji karakter, niat, dan kemampuan pribadi pelaku"},
+            {"name": "Atribusi Eksternal", "desc": "menyalahkan atau mengkreditkan situasi, tekanan lingkungan, atau kebetulan"},
+            {"name": "Penilaian Tanggung Jawab", "desc": "pemberian blame (kecaman) atau credit (pengakuan) kepada aktor tertentu"},
+            {"name": "Bias Atribusi & Stereotip", "desc": "fundamental attribution error, stereotip kelompok, atau penilaian tergesa"},
+            {"name": "Empati vs Kecaman", "desc": "kecenderungan menempatkan diri pada situasi pelaku vs langsung menghakimi"}
+        ]
+    },
+    "ekspresi_emosi_digital": {
+        "id": "ekspresi_emosi_digital",
+        "title": "Ekspresi Emosi dalam Interaksi Digital (Emotional Expression in CMC)",
+        "short_title": "Ekspresi Emosi",
+        "icon": "Smile",
+        "description": "Memetakan ekspresi emosi dasar yang ditampilkan warganet, penularan emosi (emotional contagion), dan bentuk dukungan emosional dalam interaksi daring.",
+        "theory": "Basic Emotion Theory (Ekman & Friesen, 1971), Emotional Contagion (Hatfield, Cacioppo & Rapson, 1994), Emotion Regulation (Gross, 1998)",
+        "target_major": "Psikologi, Psikologi Komunikasi, Humaniora Digital",
+        "research_persona": "psikologi emosi dan interaksi berbantuan komputer",
+        "focus": "memetakan ekspresi emosi dasar netizen, penularan emosi kolektif, sarkasme, dan bentuk regulasi atau dukungan emosional di ruang digital",
+        "indicators": [
+            {"name": "Ekspresi Emosi Dasar", "desc": "emosi dasar Ekman: senang, marah, sedih, takut, terkejut, jijik/tidak suka"},
+            {"name": "Empati & Dukungan Emosional", "desc": "ucapan belasungkawa, doa, semangat, atau ikut merasakan"},
+            {"name": "Kontagion / Emosi Kolektif", "desc": "emosi yang menular dan membesar secara kolektif di kolom komentar"},
+            {"name": "Sarkasme & Emosi Terselubung", "desc": "ejekan, sindiran, humor hitam, atau emosi yang disamarkan"},
+            {"name": "Regulasi & Penenangan Emosi", "desc": "upaya menenangkan pihak lain, meredam ketegangan, atau menyerahkan pada waktu"}
+        ]
+    },
+
+    # ============ SOSIOLOGI ============
+    "ketimpangan_sosial": {
+        "id": "ketimpangan_sosial",
+        "title": "Ketimpangan Sosial & Dinamika Masyarakat (Social Inequality & Stratification)",
+        "short_title": "Ketimpangan Sosial",
+        "icon": "TrendingDown",
+        "description": "Mengkaji kesadaran warganet terhadap kesenjangan ekonomi-sosial, kritik distribusi dan akses, serta suara kelompok terpinggirkan di media digital.",
+        "theory": "Forms of Capital & Stratification (Bourdieu, 1986), Digital Divide (van Dijk, 2005; DiMaggio & Hargittai, 2001)",
+        "target_major": "Sosiologi, Kajian Pembangunan, Ilmu Sosial",
+        "research_persona": "sosiolog dengan spesialisasi stratifikasi sosial dan ketimpangan",
+        "focus": "mengidentifikasi kesadaran ketimpangan, kritik terhadap distribusi dan akses, posisi kelompok terpinggirkan, dan tuntutan keadilan sosial dalam komentar",
+        "indicators": [
+            {"name": "Kesadaran Ketimpangan", "desc": "komentar yang menyadari atau menyoroti kesenjangan sosial-ekonomi"},
+            {"name": "Kritik Distribusi & Akses", "desc": "kritik terhadap pemerataan pendapatan, layanan, atau akses digital"},
+            {"name": "Suara Kelompok Terpinggirkan", "desc": "pengalaman atau pembelaan bagi kelompok rentan/marginal"},
+            {"name": "Simbol Kapital & Status", "desc": "penanda kapital ekonomi/sosial/budaya: gaya hidup, harga, prestise"},
+            {"name": "Tuntutan Keadilan Sosial", "desc": "seruan pemerataan, subsidi, atau perbaikan struktur"}
+        ]
+    },
+    "konstruksi_sosial_digital": {
+        "id": "konstruksi_sosial_digital",
+        "title": "Konstruksi Sosial di Media Digital (Social Construction of Reality)",
+        "short_title": "Konstruksi Sosial",
+        "icon": "Network",
+        "description": "Menganalisis bagaimana makna dan realitas sosial dibangun bersama oleh warganet: narasi dominan, pelabelan, simbol, dan negosiasi makna.",
+        "theory": "Social Construction of Reality (Berger & Luckmann, 1966), Symbolic Interactionism (Blumer, 1969)",
+        "target_major": "Sosiologi, Kajian Media, Antropologi Digital",
+        "research_persona": "sosiolog dengan spesialisasi konstruksi sosial realitas dan interaksionisme simbolik",
+        "focus": "menganalisis definisi situasi, narasi dominan, pelabelan dan stigma, simbol bahasa khas, serta negosiasi makna antar kubu warganet",
+        "indicators": [
+            {"name": "Definisi Situasi & Narasi Dominan", "desc": "cara warganet mendefinisikan 'apa yang sebenarnya terjadi'"},
+            {"name": "Pelabelan & Stigma Sosial", "desc": "pemberian label, julukan, atau stigma kepada aktor/kelompok"},
+            {"name": "Simbol, Meme & Bahasa Khas", "desc": "simbol verbal/visual khas yang dipakai untuk memaknai situasi"},
+            {"name": "Negosiasi Makna Antar Kubu", "desc": "tarik-menarik interpretasi antara kubu yang berbeda"},
+            {"name": "Realitas yang Dikonstruksi Bersama", "desc": "kesepakatan makna yang terbentuk dan diperkuat secara kolektif"}
+        ]
+    },
+    "konflik_sosial_polarisasi": {
+        "id": "konflik_sosial_polarisasi",
+        "title": "Konflik Sosial & Polarisasi Kelompok (Social Conflict & Polarization)",
+        "short_title": "Konflik & Polarisasi",
+        "icon": "Zap",
+        "description": "Mengkaji sumber konflik, pengelompokan kubu, eskalasi retorika, serta upaya mediasi atau de-eskalasi yang muncul dalam diskursus digital.",
+        "theory": "Realistic Conflict Theory (Sherif, 1966), The Functions of Social Conflict (Coser, 1956), Group Polarization (Moscovici & Zavalloni, 1969)",
+        "target_major": "Sosiologi, Ilmu Sosial, Studi Perdamaian",
+        "research_persona": "sosiolog dengan spesialisasi konflik sosial dan polarisasi kelompok",
+        "focus": "mengidentifikasi sumber konflik, garis pengelompokan kubu, eskalasi dan de-eskalasi, retorika permusuhan, serta jembatan mediasi dalam komentar",
+        "indicators": [
+            {"name": "Sumber Konflik", "desc": "akar pertikaian: sumber daya, nilai, identitas, atau informasi"},
+            {"name": "Pengelompokan Kubu", "desc": "garis pembatas kubu yang terbentuk dalam perdebatan"},
+            {"name": "Eskalasi & De-eskalasi", "desc": "meningkatnya ketegangan atau upaya meredam konflik"},
+            {"name": "Retorika Permusuhan", "desc": "serangan personal, hinaan, atau ujaran kebencian antar kubu"},
+            {"name": "Mediasi & Jembatan Perdamaian", "desc": "komentar yang menengahi, berpindah kubu, atau mengajak berdamai"}
+        ]
+    },
+    "norma_sosial_interaksi": {
+        "id": "norma_sosial_interaksi",
+        "title": "Norma Sosial & Interaksi Masyarakat (Social Norms & Interaction Order)",
+        "short_title": "Norma & Interaksi",
+        "icon": "BookOpen",
+        "description": "Menganalisis norma yang dijaga warganet: norma deskriptif dan injunktif, pelanggaran beserta sanksi sosial, dan tata krama interaksi daring.",
+        "theory": "Focus Theory of Normative Conduct (Cialdini, Reno & Kallgren, 1990), Interaction Ritual (Goffman, 1967), Social Control Theory",
+        "target_major": "Sosiologi, Antropologi, Ilmu Komunikasi",
+        "research_persona": "sosiolog dengan spesialisasi norma sosial dan kontrol sosial",
+        "focus": "mengklasifikasikan norma yang berlaku dan dijaga warganet, bentuk pelanggaran norma, sanksi sosial, serta pola tata krama interaksi",
+        "indicators": [
+            {"name": "Norma Deskriptif", "desc": "referensi pada 'kebiasaan kebanyakan orang' sebagai pedoman perilaku"},
+            {"name": "Norma Injunktif", "desc": "referensi pada aturan, larangan, dan penilaian benar-salah"},
+            {"name": "Pelanggaran Norma", "desc": "perilaku yang dinilai melanggar norma agama, sosial, atau hukum"},
+            {"name": "Sanksi Sosial & Penghakiman", "desc": "camplakan, pengucilan, viral-bashing, atau 'pengadilan publik'"},
+            {"name": "Kesantunan & Tata Krama Interaksi", "desc": "ritual sopan santun, sapaan, dan etika percakapan daring"}
+        ]
+    },
+
+    # ============ MANAJEMEN & BISNIS ============
+    "brand_perception_purchase": {
+        "id": "brand_perception_purchase",
+        "title": "Persepsi Merek & Keputusan Pembelian (Brand Equity & Purchase Decision)",
+        "short_title": "Persepsi Merek",
+        "icon": "ShieldCheck",
+        "description": "Menganalisis persepsi warganet terhadap sebuah merek (kesadaran, asosiasi, kualitas, kepercayaan) dan kaitannya dengan niat membeli.",
+        "theory": "Brand Equity Model (Aaker, 1991), Theory of Planned Behavior (Ajzen, 1991)",
+        "target_major": "Manajemen, Pemasaran, Bisnis Digital",
+        "research_persona": "ahli manajemen pemasaran dengan spesialisasi ekuitas merek dan keputusan pembelian",
+        "focus": "menganalisis kesadaran merek, asosiasi dan citra merek, persepsi kualitas, kepercayaan, serta niat beli yang terekspresikan dalam komentar",
+        "indicators": [
+            {"name": "Kesadaran & Pengenalan Merek", "desc": "komentar yang menyebut, mengenali, atau mengingat merek/produk"},
+            {"name": "Asosiasi & Citra Merek", "desc": "atribut dan kesan yang dilekatkan pada merek (murah, premium, kampungan, dsb)"},
+            {"name": "Persepsi Kualitas", "desc": "penilaian atas kualitas produk/layanan yang dibicarakan"},
+            {"name": "Kepercayaan terhadap Merek", "desc": "kredibilitas, jujur, amanah, atau sebaliknya diragukan"},
+            {"name": "Niat Beli (Purchase Intention)", "desc": "ekspresi ingin membeli, memesan, atau menunggu promo"}
+        ]
+    },
+    "konsumen_digital": {
+        "id": "konsumen_digital",
+        "title": "Perilaku Konsumen Digital (Digital Consumer Behaviour & Customer Journey)",
+        "short_title": "Konsumen Digital",
+        "icon": "Smartphone",
+        "description": "Memetakan perjalanan konsumen digital: dari mengenal produk, mencari dan membandingkan informasi, hingga hambatan yang menahan keputusan pembelian.",
+        "theory": "Customer Journey & Experience (Lemon & Verhoef, 2016), Impulse Buying (Rook, 1987)",
+        "target_major": "Manajemen, Pemasaran Digital, E-Commerce",
+        "research_persona": "ahli perilaku konsumen dengan spesialisasi customer journey digital",
+        "focus": "memetakan tahapan perjalanan konsumen, pembelian impulsif, pencarian informasi, validasi sosial, dan hambatan keputusan pembelian",
+        "indicators": [
+            {"name": "Tahap Perjalanan Konsumen", "desc": "awareness, pertimbangan, pembelian, atau pengalaman pascabeli"},
+            {"name": "Pembelian Impulsif", "desc": "godaan beli mendadak akibat konten, harga, atau FOMO"},
+            {"name": "Pencarian & Perbandingan Informasi", "desc": "menanyakan harga, spesifikasi, membandingkan dengan kompetitor"},
+            {"name": "Validasi Sosial", "desc": "bergantung pada ulasan, testimoni, bukti sosial, atau rekomendasi orang lain"},
+            {"name": "Hambatan Keputusan Pembelian", "desc": "keraguan: harga, kualitas, kepercayaan, logistik, atau budget"}
+        ]
+    },
+    "ewom": {
+        "id": "ewom",
+        "title": "Electronic Word of Mouth (e-WOM) (eWOM & Information Adoption)",
+        "short_title": "e-WOM",
+        "icon": "ThumbsUp",
+        "description": "Menganalisis komunikasi dari mulut ke mulut secara elektronik: rekomendasi, kualitas argumen, kredibilitas sumber, dan motivasi warganet berbagi informasi.",
+        "theory": "eWOM Intention (Hennig-Thurau et al., 2004), Information Adoption Model (Sussman & Siegal, 2003)",
+        "target_major": "Manajemen Pemasaran, Ilmu Komunikasi, Bisnis Digital",
+        "research_persona": "ahli pemasaran dengan spesialisasi electronic word of mouth",
+        "focus": "mengklasifikasikan eWOM positif dan negatif, kualitas argumen, kredibilitas sumber, dan motivasi warganet menyebarkan informasi",
+        "indicators": [
+            {"name": "eWOM Positif", "desc": "rekomendasi, pujian, dan ajakan memakai produk/jasa"},
+            {"name": "eWOM Negatif", "desc": "peringatan, keluhan yang disebarkan, dan ajakan menghindari"},
+            {"name": "Kualitas Argumen Informasi", "desc": "kelengkapan, relevansi, dan kesaktian argumen yang disampaikan"},
+            {"name": "Kredibilitas Sumber", "desc": "penilaian sumber: pengalaman langsung, influencer, atau cuma tukang iklan"},
+            {"name": "Motivasi Berbagi Informasi", "desc": "altruisme, ekspresi diri, membantu orang lain, atau sekadar ikut trending"}
+        ]
+    },
+    "loyalitas_pengalaman": {
+        "id": "loyalitas_pengalaman",
+        "title": "Loyalitas Pelanggan & Pengalaman Konsumen (Customer Loyalty & Experience)",
+        "short_title": "Loyalitas & Pengalaman",
+        "icon": "Award",
+        "description": "Mengukur kepuasan, pengalaman layanan, advokasi, dan niat penggunaan berkelanjutan pelanggan yang terekspresikan dalam komentar.",
+        "theory": "Customer Experience (Lemon & Verhoef, 2016), Customer Loyalty (Oliver, 1999), Expectation-Confirmation Theory (Bhattacherjee, 2001)",
+        "target_major": "Manajemen, Kewirausahaan, Manajemen Layanan",
+        "research_persona": "ahli manajemen dengan spesialisasi pengalaman pelanggan dan loyalitas",
+        "focus": "menganalisis kepuasan pelanggan, kualitas pengalaman layanan, advokasi, keluhan, dan niat menggunakan kembali",
+        "indicators": [
+            {"name": "Kepuasan Pelanggan", "desc": "ekspresi puas atau kecewa terhadap produk/layanan"},
+            {"name": "Pengalaman Layanan & Penggunaan", "desc": "cerita pengalaman memakai produk, pelayanan, atau fitur"},
+            {"name": "Advokasi (Merekomendasikan)", "desc": "menganjurkan orang lain ikut memakai"},
+            {"name": "Keluhan & Komplain", "desc": "gugatan spesifik atas masalah produk, layanan, atau penanganan"},
+            {"name": "Niat Penggunaan Berkelanjutan", "desc": "niat repurchase, langganan, atau setia pada merek"}
+        ]
+    },
+
+    # ============ PENDIDIKAN ============
+    "persepsi_kebijakan_pendidikan": {
+        "id": "persepsi_kebijakan_pendidikan",
+        "title": "Persepsi Mahasiswa terhadap Kebijakan Pendidikan (Student Perception of Education Policy)",
+        "short_title": "Persepsi Kebijakan Dikti",
+        "icon": "GraduationCap",
+        "description": "Menganalisis sikap mahasiswa dan warganet terhadap kebijakan pendidikan: dukungan, persepsi dampak, kritik implementasi, dan tuntutan perubahan.",
+        "theory": "Theory of Reasoned Action (Fishbein & Ajzen, 1975), Understanding Public Policy (Dye, 1972)",
+        "target_major": "Pendidikan, Administrasi Pendidikan, Kebijakan Publik",
+        "research_persona": "peneliti pendidikan dengan spesialisasi persepsi terhadap kebijakan pendidikan",
+        "focus": "menganalisis dukungan dan penolakan terhadap kebijakan pendidikan, persepsi dampak dan keadilan, kritik implementasi, serta usulan perubahan",
+        "indicators": [
+            {"name": "Dukungan terhadap Kebijakan", "desc": "apresiasi dan persetujuan atas kebijakan pendidikan yang dibahas"},
+            {"name": "Penolakan & Keberatan", "desc": "penolakan, protes, atau keberatan terhadap kebijakan"},
+            {"name": "Persepsi Dampak bagi Mahasiswa/Lembaga", "desc": "perkiraan manfaat atau kerugian yang dirasakan"},
+            {"name": "Persepsi Keadilan & Pemerataan", "desc": "penilaian apakah kebijakan adil dan merata bagi semua pihak"},
+            {"name": "Kritik Implementasi & Usulan Perubahan", "desc": "kritik pelaksanaan di lapangan serta saran perbaikan konkret"}
+        ]
+    },
+    "teknologi_pendidikan": {
+        "id": "teknologi_pendidikan",
+        "title": "Penerimaan Teknologi dalam Pendidikan (Technology Acceptance in Education)",
+        "short_title": "Teknologi Pendidikan",
+        "icon": "Cpu",
+        "description": "Menganalisis penerimaan mahasiswa dan guru terhadap teknologi pembelajaran: persepsi kemudahan, kegunaan, kesiapan, hambatan, dan dampak belajar.",
+        "theory": "Technology Acceptance Model (Davis, 1989), UTAUT (Venkatesh et al., 2003)",
+        "target_major": "Pendidikan, Teknologi Pendidikan, Manajemen Pendidikan",
+        "research_persona": "peneliti teknologi pendidikan dengan spesialisasi adopsi teknologi pembelajaran",
+        "focus": "menganalisis persepsi kemudahan dan kegunaan teknologi pembelajaran, niat penggunaan, hambatan infrastruktur dan literasi, serta dampaknya pada efektivitas belajar",
+        "indicators": [
+            {"name": "Persepsi Kemudahan Penggunaan", "desc": "penilaian apakah teknologi mudah dipakai untuk belajar"},
+            {"name": "Persepsi Kegunaan Pembelajaran", "desc": "penilaian manfaat teknologi bagi hasil belajar"},
+            {"name": "Niat & Kesiapan Penggunaan", "desc": "kesediaan memakai platform/aplikasi pembelajaran"},
+            {"name": "Hambatan Infrastruktur & Literasi", "desc": "kendala jaringan, perangkat, biaya, atau kemampuan digital"},
+            {"name": "Dampak pada Efektivitas Belajar", "desc": "perubahan prestasi, fokus, atau kualitas belajar yang dirasakan"}
+        ]
+    },
+    "motivasi_belajar_digital": {
+        "id": "motivasi_belajar_digital",
+        "title": "Motivasi Belajar & Pembelajaran Digital (Learning Motivation & Self-Regulated Learning)",
+        "short_title": "Motivasi Belajar",
+        "icon": "Lightbulb",
+        "description": "Menganalisis motivasi intrinsik dan ekstrinsik, kemandirian belajar, keterlibatan, serta hambatan yang dialami pelajar dalam pembelajaran digital.",
+        "theory": "Self-Determination Theory (Deci & Ryan, 1985), ARCS Motivation Model (Keller, 1987), Self-Regulated Learning (Zimmerman, 1990)",
+        "target_major": "Pendidikan, Psikologi Pendidikan, Bimbingan Konseling",
+        "research_persona": "peneliti pendidikan dengan spesialisasi motivasi belajar dan regulasi diri",
+        "focus": "menganalisis motivasi intrinsik dan ekstrinsik belajar, kemandirian, engagement, serta hambatan dan kelelahan belajar digital",
+        "indicators": [
+            {"name": "Motivasi Intrinsik", "desc": "minat, rasa ingin tahu, dan kesenangan belajar itu sendiri"},
+            {"name": "Motivasi Ekstrinsik", "desc": "dorongan nilai, beasiswa, pekerjaan, atau tekanan orang tua"},
+            {"name": "Kemandirian & Disiplin Belajar", "desc": "self-regulated learning: aturan belajar sendiri, manajemen waktu"},
+            {"name": "Keterlibatan (Engagement) Belajar", "desc": "partisipasi aktif, antusias, atau sebaliknya pasif"},
+            {"name": "Hambatan & Kelelahan Belajar Digital", "desc": "jenuh, lelah layar, distraksi, atau kehilangan semangat"}
+        ]
+    },
+    "ai_pendidikan": {
+        "id": "ai_pendidikan",
+        "title": "Persepsi terhadap Penggunaan AI dalam Pendidikan (AI Acceptance in Education)",
+        "short_title": "AI dalam Pendidikan",
+        "icon": "Bot",
+        "description": "Menganalisis sikap mahasiswa dan pendidik terhadap penggunaan AI: antusiasme, persepsi manfaat dan akurasi, kekhawatiran, serta kepercayaan pada AI.",
+        "theory": "Technology Acceptance Model (Davis, 1989), Expectation-Confirmation Theory (Bhattacherjee, 2001), Algorithm Aversion & Appreciation (Logg, Minson & Moore, 2019)",
+        "target_major": "Pendidikan, Teknologi Pendidikan, Informatika",
+        "research_persona": "peneliti pendidikan dengan spesialisasi penerimaan kecerdasan buatan dalam pembelajaran",
+        "focus": "menganalisis penerimaan dan antusiasme terhadap AI, persepsi manfaat dan akurasi, kekhawatiran integritas akademik, kepercayaan pada rekomendasi AI, serta harapan peran dosen",
+        "indicators": [
+            {"name": "Penerimaan & Antusiasme terhadap AI", "desc": "sikap positif dan antusias pada penggunaan AI dalam belajar"},
+            {"name": "Persepsi Manfaat & Akurasi AI", "desc": "penilaian kebergunaan dan ketepatan jawaban/fitur AI"},
+            {"name": "Kekhawatiran (Dependensi & Kejujuran Akademik)", "desc": "cemas terhadap plagiat, kemalasan, atau ketergantungan pada AI"},
+            {"name": "Kepercayaan pada Rekomendasi AI", "desc": "sejauh mana saran AI dipercaya dibanding sumber lain"},
+            {"name": "Harapan Peran Dosen & Manusia", "desc": "ekspektasi peran pendidik di tengah kehadiran AI"}
+        ]
+    },
+
+    # ============ HUKUM ============
+    "kesadaran_hukum": {
+        "id": "kesadaran_hukum",
+        "title": "Kesadaran Hukum Masyarakat (Legal Consciousness)",
+        "short_title": "Kesadaran Hukum",
+        "icon": "BookOpen",
+        "description": "Menganalisis pengetahuan hukum, sikap terhadap hukum, dan panggilan sosialisasi hukum yang terekspresikan warganet dalam suatu isu.",
+        "theory": "Legal Consciousness (Ewick & Silbey, 1998), Legal Culture (Friedman, 1975)",
+        "target_major": "Ilmu Hukum, Sosiologi Hukum, Kriminologi",
+        "research_persona": "peneliti hukum dengan spesialisasi kesadaran dan budaya hukum masyarakat",
+        "focus": "menganalisis pengetahuan hukum warganet, sikap terhadap hukum (hormat, sinis, acuh), persepsi kepatuhan, serta seruan sosialisasi hukum",
+        "indicators": [
+            {"name": "Pengetahuan & Literasi Hukum", "desc": "kutipan pasal, penjelasan aturan, atau kesalahan pemahaman hukum"},
+            {"name": "Sikap terhadap Hukum", "desc": "menghormati, sinis, mengabaikan, atau menantang hukum"},
+            {"name": "Persepsi Kepatuhan Masyarakat", "desc": "penilaian seberapa patuh masyarakat terhadap aturan"},
+            {"name": "Panggilan Sosialisasi & Edukasi Hukum", "desc": "seruan sosialisasi, edukasi hukum, atau penindakan"},
+            {"name": "Keluhan Rendahnya Kesadaran Hukum", "desc": "kekesalan terhadap masyarakat yang minim literasi hukum"}
+        ]
+    },
+    "persepsi_keadilan": {
+        "id": "persepsi_keadilan",
+        "title": "Persepsi Publik terhadap Keadilan (Perceived Justice & Procedural Justice)",
+        "short_title": "Persepsi Keadilan",
+        "icon": "Scale",
+        "description": "Menganalisis penilaian publik atas keadilan proses hukum, kesetaraan di hadapan hukum, dan kepuasan terhadap putusan atau tindakan aparat.",
+        "theory": "Procedural Justice (Tyler, 1990), Distributive Justice (Rawls, 1971)",
+        "target_major": "Ilmu Hukum, Kriminologi, Ilmu Pemerintahan",
+        "research_persona": "peneliti hukum dengan spesialisasi persepsi keadilan prosedural dan distributif",
+        "focus": "menganalisis persepsi keadilan proses hukum, kesetaraan di hadapan hukum, kepuasan terhadap putusan, simpati pada pihak perkara, dan tuntutan transparansi",
+        "indicators": [
+            {"name": "Persepsi Keadilan Proses Hukum", "desc": "penilaian apakah proses hukum berjalan adil dan sesuai prosedur"},
+            {"name": "Kesetaraan di Hadapan Hukum", "desc": "perbandingan perlakuan orang kuat vs orang kecil (basah-berlaku vs tegak)"},
+            {"name": "Kepuasan terhadap Putusan", "desc": "puas, kecewa, atau menolak hasil putusan/tindakan aparat"},
+            {"name": "Simpati/Antipati pada Pihak Perkara", "desc": "pembelaan terhadap korban/terdakwa atau kecaman terhadap mereka"},
+            {"name": "Tuntutan Transparansi Proses", "desc": "seruan keterbukaan alur perkara dan alasan putusan"}
+        ]
+    },
+    "opini_regulasi": {
+        "id": "opini_regulasi",
+        "title": "Opini Publik terhadap Regulasi (Public Opinion on Regulation)",
+        "short_title": "Opini Regulasi",
+        "icon": "Megaphone",
+        "description": "Menganalisis opini warganet atas aturan/kebijakan hukum: dukungan, penolakan, persepsi urgensi, dampak yang dirasakan, dan tuntutan partisipasi.",
+        "theory": "Public Opinion (Price, 1992), Spiral of Silence (Noelle-Neumann, 1974)",
+        "target_major": "Ilmu Hukum, Ilmu Politik, Kebijakan Publik",
+        "research_persona": "peneliti hukum dengan spesialisasi opini publik terhadap regulasi",
+        "focus": "menganalisis dukungan dan penolakan regulasi, persepsi urgensi aturan, dampak ekonomi-sosial yang dirasakan, serta tuntutan revisi dan partisipasi publik",
+        "indicators": [
+            {"name": "Dukungan terhadap Regulasi", "desc": "persetujuan dan apresiasi atas aturan yang dibahas"},
+            {"name": "Penolakan & Kritik Regulasi", "desc": "penolakan, kritik substansi, atau ejekan terhadap aturan"},
+            {"name": "Persepsi Urgensi Aturan Baru/Revisi", "desc": "tuntutan regulasi baru, revisi, atau pencabutan"},
+            {"name": "Persepsi Dampak Ekonomi-Sosial", "desc": "perkiraan dampak aturan pada kehidupan sehari-hari"},
+            {"name": "Tuntutan Partisipasi Publik", "desc": "seruan uji materi, audiensi publik, atau libatkan masyarakat"}
+        ]
+    },
+    "kepercayaan_penegakan": {
+        "id": "kepercayaan_penegakan",
+        "title": "Kepercayaan Masyarakat terhadap Penegakan Hukum (Institutional Trust & Legal Legitimacy)",
+        "short_title": "Kepercayaan Penegakan",
+        "icon": "ShieldCheck",
+        "description": "Mengukur kepercayaan publik pada aparat dan institusi penegak hukum: transparansi, persepsi korupsi, apresiasi, dan tuntutan reformasi.",
+        "theory": "Trust and Power (Luhmann, 1979), Police & Legal Legitimacy (Tyler, 2004)",
+        "target_major": "Ilmu Hukum, Kriminologi, Ilmu Pemerintahan",
+        "research_persona": "peneliti hukum dengan spesialisasi legitimasi dan kepercayaan pada institusi penegak hukum",
+        "focus": "menganalisis kepercayaan pada aparat/instansi, persepsi transparansi dan akuntabilitas, persepsi korupsi dan pilih kasih, pujian, serta tuntutan reformasi",
+        "indicators": [
+            {"name": "Kepercayaan pada Aparat/Instansi", "desc": "ekspresi percaya atau tidak percaya pada polisi, jaksa, hakim, dsb"},
+            {"name": "Persepsi Transparansi & Akuntabilitas", "desc": "penilaian keterbukaan proses dan pertanggungjawaban"},
+            {"name": "Persepsi Korupsi & Pilih Kasih", "desc": "dugaan suap, intervensi, atau hukum hanya berlaku untuk rakyat kecil"},
+            {"name": "Pujian & Apresiasi Penegakan", "desc": "apresiasi atas tindakan cepat, tegas, dan adil"},
+            {"name": "Tuntutan Reformasi Penegakan Hukum", "desc": "seruan perbaikan sistem, mutasi pejabat, atau pengawasan"}
+        ]
+    },
+
+    # ============ KESEHATAN MASYARAKAT ============
+    "persepsi_risiko_kesehatan": {
+        "id": "persepsi_risiko_kesehatan",
+        "title": "Persepsi Risiko Kesehatan (Health Risk Perception)",
+        "short_title": "Persepsi Risiko Kesehatan",
+        "icon": "Stethoscope",
+        "description": "Menganalisis persepsi warganet atas risiko kesehatan: kerentanan, keparahan, manfaat tindakan, hambatan, dan efikasi diri.",
+        "theory": "Risk Perception (Slovic, 1987), Health Belief Model (Rosenstock, 1974)",
+        "target_major": "Kesehatan Masyarakat, Ilmu Keperawatan, Gizi",
+        "research_persona": "peneliti kesehatan masyarakat dengan spesialisasi persepsi risiko kesehatan",
+        "focus": "menganalisis persepsi kerentanan dan keparahan risiko kesehatan, persepsi manfaat tindakan, hambatan perilaku, dan efikasi diri warganet",
+        "indicators": [
+            {"name": "Persepsi Kerentanan (Susceptibility)", "desc": "perkiraan seberapa mungkin dirinya/kelompoknya terkena"},
+            {"name": "Persepsi Keparahan (Severity)", "desc": "penilaian betapa serius dampaknya bagi kesehatan"},
+            {"name": "Persepsi Manfaat Tindakan", "desc": "keyakinan bahwa tindakan pencegahan berguna"},
+            {"name": "Persepsi Hambatan (Barriers)", "desc": "kendala biaya, akses, kebiasaan, atau informasi"},
+            {"name": "Efikasi Diri (Self-Efficacy)", "desc": "keyakinan mampu melakukan tindakan pencegahan"}
+        ]
+    },
+    "komunikasi_kesehatan_digital": {
+        "id": "komunikasi_kesehatan_digital",
+        "title": "Komunikasi Kesehatan Digital (Digital Health Communication & eHealth Literacy)",
+        "short_title": "Komunikasi Kesehatan",
+        "icon": "Activity",
+        "description": "Menganalisis praktik berbagi informasi kesehatan digital: kredibilitas sumber, literasi kesehatan digital, respons pesan ancaman, dan solidaritas.",
+        "theory": "eHealth Literacy Scale (Norman & Skinner, 2006), Extended Parallel Process Model (Witte, 1992)",
+        "target_major": "Kesehatan Masyarakat, Ilmu Komunikasi, Promosi Kesehatan",
+        "research_persona": "peneliti kesehatan masyarakat dengan spesialisasi komunikasi kesehatan digital",
+        "focus": "menganalisis perilaku berbagi informasi kesehatan, evaluasi kredibilitas sumber, literasi kesehatan digital, respons pesan fear appeal, dan dukungan emosional",
+        "indicators": [
+            {"name": "Berbagi Informasi Kesehatan", "desc": "komentar yang membagikan tips, pengalaman, atau informasi kesehatan"},
+            {"name": "Evaluasi Kredibilitas Sumber", "desc": "memvalidasi sumber: dokter, penelitian, atau sekadar hoaks"},
+            {"name": "Literasi Kesehatan Digital", "desc": "kemampuan mencari, memahami, dan menerapkan info kesehatan daring"},
+            {"name": "Respons Pesan Ancaman (Fear Appeal)", "desc": "reaksi terhadap pesan menakutkan: paham, panik, atau sebaliknya"},
+            {"name": "Dukungan Emosional & Solidaritas", "desc": "doa, semangat, dan pengalaman saling berbagi"}
+        ]
+    },
+    "respons_kampanye_kesehatan": {
+        "id": "respons_kampanye_kesehatan",
+        "title": "Respons Publik terhadap Kampanye Kesehatan (Public Response to Health Campaigns)",
+        "short_title": "Respons Kampanye",
+        "icon": "Megaphone",
+        "description": "Menganalisis respons warganet terhadap kampanye kesehatan: dukungan, kepatuhan pesan, skeptisisme, debat efektivitas, dan mobilisasi kolektif.",
+        "theory": "Elaboration Likelihood Model (Petty & Cacioppo, 1986), Health Belief Model (Rosenstock, 1974)",
+        "target_major": "Kesehatan Masyarakat, Promosi Kesehatan, Ilmu Komunikasi",
+        "research_persona": "peneliti kesehatan masyarakat dengan spesialisasi evaluasi kampanye kesehatan",
+        "focus": "menganalisis dukungan terhadap kampanye kesehatan, kepatuhan pada pesan anjuran, skeptisisme, debat efektivitas, dan mobilisasi kolektif",
+        "indicators": [
+            {"name": "Dukungan terhadap Kampanye", "desc": "apresiasi dan dukungan terhadap pesan kampanye"},
+            {"name": "Kepatuhan pada Pesan Anjuran", "desc": "ekspresi mengikuti anjuran: vaksin, cuci tangan, cek kesehatan, dll"},
+            {"name": "Skeptis & Resistensi Pesan", "desc": "keraguan, teori konspirasi, atau penolakan pesan kampanye"},
+            {"name": "Debat Efektivitas Kampanye", "desc": "perdebatan apakah kampanye efektif atau hanya formalitas"},
+            {"name": "Mobilisasi Kolektif & Penyebaran", "desc": "ajakan kolektif mematuhi dan menyebarluaskan pesan"}
+        ]
+    },
+    "perilaku_pencegahan": {
+        "id": "perilaku_pencegahan",
+        "title": "Perilaku Pencegahan & Kesadaran Kesehatan (Preventive Behaviour & Health Awareness)",
+        "short_title": "Perilaku Pencegahan",
+        "icon": "HeartPulse",
+        "description": "Menganalisis niat dan praktik pencegahan, adopsi pola hidup sehat, kesadaran gejala, serta penolakan misinformasi kesehatan.",
+        "theory": "Theory of Planned Behavior (Ajzen, 1991), Transtheoretical Model (Prochaska & DiClemente, 1983)",
+        "target_major": "Kesehatan Masyarakat, Ilmu Gizi, Keperawatan",
+        "research_persona": "peneliti kesehatan masyarakat dengan spesialisasi perilaku pencegahan",
+        "focus": "menganalisis niat dan praktik pencegahan, kesadaran gejala, adopsi pola hidup sehat, penolakan misinformasi, dan norma kesehatan masyarakat",
+        "indicators": [
+            {"name": "Niat & Praktik Pencegahan", "desc": "ekspresi berniat atau sudah menerapkan tindakan pencegahan"},
+            {"name": "Kesadaran Gejala & Pentingnya Cek", "desc": "penyadaran gejala dan ajakan memeriksakan diri"},
+            {"name": "Adopsi Pola Hidup Sehat", "desc": "praktik olahraga, gizi, tidur, kebersihan, dan lainnya"},
+            {"name": "Penolakan Misinformasi", "desc": "meluruskan hoaks atau pseudoscience kesehatan"},
+            {"name": "Norma Kesehatan Masyarakat", "desc": "referensi pada kebiasaan sehat lingkungan/sekolah/keluarga"}
+        ]
+    },
+
+    # ============ SISTEM INFORMASI & INFORMATIKA ============
+    "penerimaan_teknologi_digital": {
+        "id": "penerimaan_teknologi_digital",
+        "title": "Penerimaan Teknologi Digital (Technology Acceptance & Diffusion of Innovation)",
+        "short_title": "Penerimaan Teknologi",
+        "icon": "Cpu",
+        "description": "Menganalisis penerimaan warganet terhadap teknologi/fitur digital: persepsi kegunaan, kemudahan, niat adopsi, faktor pendukung, dan resistensi.",
+        "theory": "Technology Acceptance Model (Davis, 1989), UTAUT (Venkatesh et al., 2003), Diffusion of Innovations (Rogers, 1962)",
+        "target_major": "Sistem Informasi, Informatika, Teknologi Informasi",
+        "research_persona": "peneliti sistem informasi dengan spesialisasi adopsi dan difusi teknologi digital",
+        "focus": "menganalisis persepsi kegunaan dan kemudahan teknologi digital, niat adopsi, kondisi yang memfasilitasi, serta resistensi dan kekhawatiran pengguna",
+        "indicators": [
+            {"name": "Persepsi Kegunaan (Perceived Usefulness)", "desc": "penilaian manfaat teknologi bagi pekerjaan/kehidupan"},
+            {"name": "Persepsi Kemudahan (Perceived Ease of Use)", "desc": "penilaian kemudahan penggunaan teknologi"},
+            {"name": "Niat Adopsi Teknologi", "desc": "ekspresi berniat memakai atau beralih ke teknologi baru"},
+            {"name": "Faktor Fasilitasi & Kondisi Pendukung", "desc": "dukungan infrastruktur, biaya, komunitas, atau pelatihan"},
+            {"name": "Resistensi & Kekhawatiran Teknologi", "desc": "keraguan, kekhawatiran keamanan, atau kenyamanan cara lama"}
+        ]
+    },
+    "persepsi_ai": {
+        "id": "persepsi_ai",
+        "title": "Persepsi Pengguna terhadap AI (User Perception of AI & Trust in Automation)",
+        "short_title": "Persepsi Pengguna AI",
+        "icon": "Bot",
+        "description": "Menganalisis kepercayaan pengguna pada AI: persepsi akurasi, kenyamanan interaksi manusia-AI, kekhawatiran penggantian manusia, dan penerimaan fitur AI.",
+        "theory": "Trust in Automation (Lee & See, 2004), Uncanny Valley (Mori, 1970)",
+        "target_major": "Sistem Informasi, Informatika, Human-Computer Interaction",
+        "research_persona": "peneliti sistem informasi dengan spesialisasi persepsi dan kepercayaan pada kecerdasan buatan",
+        "focus": "menganalisis kepercayaan pada output AI, persepsi akurasi, kenyamanan interaksi manusia-AI, kekhawatiran penggantian manusia, dan penerimaan fitur AI",
+        "indicators": [
+            {"name": "Kepercayaan pada Output AI", "desc": "sejauh mana hasil AI dipercaya atau diragukan"},
+            {"name": "Persepsi Akurasi & Kemampuan AI", "desc": "penilaian ketepatan, kecepatan, dan kemampuan AI"},
+            {"name": "Kenyamanan Interaksi Manusia-AI", "desc": "rasa nyaman, kagum, atau janggal (uncanny) berinteraksi"},
+            {"name": "Kekhawatiran Penggantian Manusia", "desc": "cemas AI merebut pekerjaan atau menghilangkan peran manusia"},
+            {"name": "Penerimaan Fitur/Produk Berbasis AI", "desc": "sikap pada fitur AI baru: tertarik, netral, atau menolak"}
+        ]
+    },
+    "ux_kepuasan": {
+        "id": "ux_kepuasan",
+        "title": "Kepuasan & Pengalaman Pengguna (User Satisfaction & Experience)",
+        "short_title": "Kepuasan & UX",
+        "icon": "Smile",
+        "description": "Mengukur kepuasan dan pengalaman pengguna sebuah aplikasi/platform: usability, pengalaman estetis-hedonis, keluhan, dan niat terus menggunakan.",
+        "theory": "Expectation-Confirmation Theory (Bhattacherjee, 2001), Pragmatic & Hedonic UX (Hassenzahl, 2003)",
+        "target_major": "Sistem Informasi, Informatika, Desain Interaksi",
+        "research_persona": "peneliti sistem informasi dengan spesialisasi kepuasan dan pengalaman pengguna",
+        "focus": "menganalisis kepuasan pengguna, persepsi usability, pengalaman estetis dan hedonis, keluhan pengalaman, dan niat penggunaan berkelanjutan",
+        "indicators": [
+            {"name": "Kepuasan Pengguna", "desc": "ekspresi puas atau kecewa terhadap aplikasi/platform"},
+            {"name": "Persepsi Usability", "desc": "penilaian mudah dipakai, cepat, dan tidak membingungkan"},
+            {"name": "Pengalaman Estetis & Hedonis", "desc": "kesan tampilan, kesenangan, dan identitas pengguna"},
+            {"name": "Keluhan & Bug Pengalaman", "desc": "keluhan error, lambat, atau alur yang membingungkan"},
+            {"name": "Niat Penggunaan Berkelanjutan", "desc": "niat terus memakai atau beralih ke aplikasi lain"}
+        ]
+    },
+    "keamanan_privasi": {
+        "id": "keamanan_privasi",
+        "title": "Kepercayaan, Keamanan & Privasi Digital (Digital Trust, Security & Privacy)",
+        "short_title": "Keamanan & Privasi",
+        "icon": "Lock",
+        "description": "Menganalisis kekhawatiran privasi, kepercayaan pada platform, persepsi keamanan, perilaku berbagi data pribadi, dan tuntutan perlindungan digital.",
+        "theory": "Privacy Calculus (Culnan & Armstrong, 1999), Trust in Technology (McKnight et al., 2002), Privacy Paradox (Barnes, 2006)",
+        "target_major": "Sistem Informasi, Informatika, Keamanan Siber",
+        "research_persona": "peneliti sistem informasi dengan spesialisasi keamanan, privasi, dan kepercayaan digital",
+        "focus": "menganalisis kekhawatiran privasi data, kepercayaan pada platform, persepsi keamanan sistem, perilaku berbagi informasi pribadi, dan tuntutan perlindungan regulasi",
+        "indicators": [
+            {"name": "Kekhawatiran Privasi Data", "desc": "cemas data pribadi disalahgunakan, dijual, atau bocor"},
+            {"name": "Kepercayaan pada Platform", "desc": "penilaian seberapa layak dipercaya layanan/aplikasi"},
+            {"name": "Persepsi Keamanan Sistem", "desc": "penilaian keamanan akun, transaksi, dan enkripsi"},
+            {"name": "Perilaku Berbagi Informasi Pribadi", "desc": "semangat berbagi data pribadi meski tahu risikonya (privacy paradox)"},
+            {"name": "Tuntutan Perlindungan & Regulasi", "desc": "seruan aturan perlindungan data dan penegakan hukum digital"}
+        ]
     }
 }
 
@@ -232,6 +750,127 @@ def call_clario_llm(prompt: str, preferred_model: str = "clario/gemini-3.7-flash
 def call_llm(prompt: str, preferred_model: str = "clario/gemini-3.7-flash", system_instruction: str = None) -> tuple[str, str]:
     """Menggunakan Clario Gemini 3.7 Flash untuk pemrosesan AI."""
     return call_clario_llm(prompt, preferred_model="clario/gemini-3.7-flash", system_instruction=system_instruction)
+
+def _format_indicator_list(indicators):
+    lines = []
+    for i, ind in enumerate(indicators, 1):
+        lines.append(f"   {i}. {ind['name']} — {ind['desc']}")
+    return "\n".join(lines)
+
+
+def build_generic_framework_prompt(fw: dict, caption: str, formatted_comments: str, count: int) -> tuple[str, str]:
+    """Prompt generik berbasis data untuk kerangka bidang penelitian tambahan.
+
+    Setiap kerangka mendefinisikan `research_persona`, `focus`, dan `indicators`
+    (dimensi analisis teori-spesifik), sehingga skema output tetap seragam untuk
+    frontend namun klasifikasi isinya mengikuti karakteristik teori masing-masing.
+    """
+    indicators_block = _format_indicator_list(fw["indicators"])
+    sys_inst = (
+        f"Anda adalah asisten peneliti ahli {fw['research_persona']}. "
+        f"Tugas Anda menganalisis dataset komentar media sosial untuk penelitian skripsi/tugas akhir "
+        f"bidang {fw['target_major']} menggunakan sudut pandang: {fw['title']}. "
+        "Klasifikasikan komentar SESUAI dengan indikator/dimensi analisis yang diberikan, bukan dengan indikator generik. "
+        "WAJIB memberikan output dalam format JSON murni yang valid tanpa teks pembuka/penutup."
+    )
+    prompt = f"""Analisis dataset komentar media sosial berikut dari perspektif {fw['title']} untuk skripsi:
+
+CAPTION KONTEN:
+\"\"\"{caption}\"\"\"
+
+SAMPEL KOMENTAR ({count} komentar):
+\"\"\"{formatted_comments}\"\"\"
+
+LANDASAN TEORI:
+{fw['theory']}
+
+FOKUS KAJIAN:
+{fw['focus']}
+
+KLASIFIKASIKAN komentar ke dalam indikator/dimensi analisis berikut (klasifikasi tiap komentar wajib memakai salah satu indikator ini):
+{indicators_block}
+
+Kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100, jumlah persen indikator 100):
+
+{{
+  "context_summary": {{
+    "research_object": "Objek/fenomena yang dianalisis dalam konten dan komentar",
+    "main_topic": "Topik diskusi dominan di antara warganet",
+    "analysis_note": "Catatan kontekstual penting yang relevan dengan landasan teori"
+  }},
+  "sentiment_distribution": {{
+    "positive_pct": 30,
+    "neutral_pct": 25,
+    "negative_pct": 45,
+    "dominant_sentiment": "Positif / Netral / Negatif",
+    "sentiment_summary": "Rangkuman sentimen warganet terhadap konten"
+  }},
+  "indicator_analysis": {{
+    "dominant_indicator": "Nama indikator yang paling dominan",
+    "dominant_explanation": "Uraian mengapa indikator tersebut mendominasi menurut perspektif teori",
+    "indicators": [
+      {{
+        "name": "Nama Indikator 1 (WAJIB sama dengan daftar indikator di atas)",
+        "description": "Uraian bagaimana indikator ini muncul dan apa maknanya menurut teori",
+        "pct": 40,
+        "sample_quote": "Kutipan komentar representatif dari sampel"
+      }},
+      {{
+        "name": "Nama Indikator 2",
+        "description": "Uraian indikator",
+        "pct": 30,
+        "sample_quote": "Kutipan representatif"
+      }},
+      {{
+        "name": "Nama Indikator N (uraikan SEMUA indikator yang diberikan)",
+        "description": "Uraian indikator",
+        "pct": 5,
+        "sample_quote": "Kutipan representatif"
+      }}
+    ]
+  }},
+  "stance_dynamics": {{
+    "side_a_name": "Kubu A yang relevan dengan topik (sebutkan perannya)",
+    "side_a_pct": 40,
+    "side_b_name": "Kubu B yang relevan dengan topik (sebutkan perannya)",
+    "side_b_pct": 45,
+    "neutral_pct": 15,
+    "controversy_level": "Rendah / Sedang / Tinggi",
+    "polarization_summary": "Uraian dinamika dua kubu dalam kolom komentar"
+  }},
+  "topic_clusters": [
+    {{
+      "topic_name": "Klaster Topik 1 yang relevan dengan fokus kajian",
+      "pct": 40,
+      "description": "Uraian pembicaraan warganet pada topik ini",
+      "sample_quote": "Kutipan komentar representatif dari sampel"
+    }},
+    {{
+      "topic_name": "Klaster Topik 2",
+      "pct": 35,
+      "description": "Uraian pembicaraan warganet pada topik ini",
+      "sample_quote": "Kutipan representatif"
+    }},
+    {{
+      "topic_name": "Klaster Topik 3",
+      "pct": 25,
+      "description": "Uraian pembicaraan warganet pada topik ini",
+      "sample_quote": "Kutipan representatif"
+    }}
+  ],
+  "academic_insights": {{
+    "key_findings": [
+      "Temuan empiris 1 untuk skripsi sesuai perspektif teori",
+      "Temuan empiris 2 untuk skripsi",
+      "Temuan empiris 3 untuk skripsi"
+    ],
+    "theoretical_relevance": "Kaitan temuan dengan landasan teori: {fw['theory']}",
+    "thesis_summary_paragraph": "Paragraf ringkasan kesimpulan akademik komprehensif yang siap disalin untuk Bab 4 Skripsi."
+  }}
+}}
+"""
+    return prompt, sys_inst
+
 
 def build_prompt_and_system(analysis_type: str, caption: str, formatted_comments: str, count: int) -> tuple[str, str]:
     """Menghasilkan prompt dan system instruction sesuai sudut pandang penelitian skripsi."""
@@ -1048,6 +1687,12 @@ Kembalikan HANYA format JSON valid berikut (semua persen harus angka bulat 0-100
 }}
 """
         return prompt, sys_inst
+
+    # 11+. KERANGKA BIDANG PENELITIAN TAMBAHAN (Psikologi, Sosiologi, Manajemen & Bisnis,
+    #     Pendidikan, Hukum, Kesehatan Masyarakat, Sistem Informasi & Informatika)
+    fw_meta = ANALYSIS_FRAMEWORKS.get(analysis_type)
+    if fw_meta and fw_meta.get("indicators"):
+        return build_generic_framework_prompt(fw_meta, caption, formatted_comments, count)
 
     # Fallback to emotion_marketing if unrecognized
     return build_prompt_and_system("emotion_marketing", caption, formatted_comments, count)
