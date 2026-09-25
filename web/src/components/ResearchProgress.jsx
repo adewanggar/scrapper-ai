@@ -6,22 +6,21 @@ import {
   Clock,
   CheckCircle2,
   Sparkles,
-  Layers,
   Lightbulb
 } from 'lucide-react';
 
 const SCRAPE_STEPS = [
-  { label: 'Validasi Tautan', desc: 'Menghubungkan ke platform & memverifikasi video...' },
-  { label: 'Komentar Utama', desc: 'Mengambil data komentar, username, dan timestamp...' },
-  { label: 'Thread Balasan', desc: 'Mengurai percakapan bersarang (nested replies)...' },
-  { label: 'Finalisasi Cloud', desc: 'Menyusun dataset & sinkronisasi ke ruang riset privat...' }
+  { label: 'Verifikasi Sumber', desc: 'Menghubungkan dan memeriksa video yang dipilih...' },
+  { label: 'Komentar Utama', desc: 'Membaca komentar publik beserta data penulis...' },
+  { label: 'Diskusi & Balasan', desc: 'Mengumpulkan percakapan balasan dan tanggapan audiens...' },
+  { label: 'Penyusunan Dataset', desc: 'Menyusun dan merapikan data ke dalam ruang riset Anda...' }
 ];
 
 const AI_STEPS = [
-  { label: 'Persiapan Sampel', desc: 'Menyiapkan sampel percakapan & parameter riset...' },
-  { label: 'Konstruksi Prompt', desc: 'Membangun kerangka epistemologi sesuai teori...' },
-  { label: 'Penalaran LLM', desc: 'Model AI membedah makna kualitatif & pola audiens...' },
-  { label: 'Sintesis Bab 4', desc: 'Menyusun metrik, kutipan verbatim, dan narasi skripsi...' }
+  { label: 'Persiapan Sampel', desc: 'Menyiapkan sampel percakapan yang representatif...' },
+  { label: 'Penerapan Teori', desc: 'Menyesuaikan indikator telaah dengan teori penelitian...' },
+  { label: 'Analisis Makna', desc: 'Membedah isi pesan, kecenderungan opini, dan sentimen...' },
+  { label: 'Penyusunan Bab 4', desc: 'Menyusun ringkasan temuan, kutipan penting, dan draf pembahasan...' }
 ];
 
 export function ScrapeProgressBar({ isScraping, platform = 'tiktok' }) {
@@ -64,7 +63,6 @@ export function ScrapeProgressBar({ isScraping, platform = 'tiktok' }) {
 
   if (!isScraping && progress === 0) return null;
 
-  // Determine active step index (0 to 3)
   const activeStepIdx = progress < 25 ? 0 : progress < 55 ? 1 : progress < 85 ? 2 : 3;
   const currentStep = SCRAPE_STEPS[activeStepIdx];
   const roundedPct = Math.min(100, Math.round(progress));
@@ -86,7 +84,7 @@ export function ScrapeProgressBar({ isScraping, platform = 'tiktok' }) {
                 ? 'Pengumpulan Selesai!'
                 : `Mengumpulkan Komentar ${platform === 'youtube' ? 'YouTube' : 'TikTok'}...`}
             </h4>
-            <p>Dataset sedang diproses secara metodologis ke akun Anda</p>
+            <p>Data percakapan sedang dihimpun secara terstruktur untuk penelitian Anda</p>
           </div>
         </div>
 
@@ -108,7 +106,7 @@ export function ScrapeProgressBar({ isScraping, platform = 'tiktok' }) {
       <div className="progress-active-stage">
         <span className="progress-stage-dot" />
         <span>
-          <strong>Tahap {activeStepIdx + 1}/4:</strong> {currentStep.desc}
+          <strong>Langkah {activeStepIdx + 1}/4:</strong> {currentStep.desc}
         </span>
       </div>
 
@@ -139,15 +137,15 @@ export function ScrapeProgressBar({ isScraping, platform = 'tiktok' }) {
       <div className="progress-tip-box">
         <Lightbulb size={15} color="#D97706" style={{ flexShrink: 0, marginTop: '1px' }} />
         <span>
-          <strong>Tips Riset:</strong> Proses ekstraksi menyaring teks, username, dan balasan bersarang 
-          sehingga dataset siap dianalisis untuk Bab 4 atau diekspor ke SPSS/SmartPLS.
+          <strong>Catatan Riset:</strong> Mengambil komentar beserta balasannya agar konteks percakapan 
+          dapat dipahami secara utuh saat dibahas dalam skripsi atau diolah ke SPSS/Excel.
         </span>
       </div>
     </div>
   );
 }
 
-export function AiProgressBar({ aiLoading, framework, model, sampleSize }) {
+export function AiProgressBar({ aiLoading, framework, sampleSize }) {
   const [progress, setProgress] = useState(0);
   const [elapsed, setElapsed] = useState(0);
 
@@ -206,16 +204,16 @@ export function AiProgressBar({ aiLoading, framework, model, sampleSize }) {
             <h4>
               {progress >= 100
                 ? 'Analisis Selesai!'
-                : `Menganalisis: ${framework?.title || 'Riset Akademik'}`}
+                : `Menganalisis: ${framework?.title || 'Kajian Penelitian'}`}
             </h4>
             <p>
-              Model: <strong>{model || 'AI Model'}</strong> • Sampel: <strong>{sampleSize || 50} komentar</strong>
+              Fokus: <strong>{framework?.badge || 'Kajian Ilmiah'}</strong> • Sampel: <strong>{sampleSize || 50} komentar</strong>
             </p>
           </div>
         </div>
 
         <div className="progress-meta-stats">
-          <div className="progress-timer-pill" title="Waktu pemrosesan">
+          <div className="progress-timer-pill" title="Waktu telaah">
             <Clock size={13} />
             <span>{elapsed}d</span>
           </div>
@@ -232,7 +230,7 @@ export function AiProgressBar({ aiLoading, framework, model, sampleSize }) {
       <div className="progress-active-stage">
         <span className="progress-stage-dot ai-dot" />
         <span>
-          <strong>Tahap {activeStepIdx + 1}/4:</strong> {currentStep.desc}
+          <strong>Langkah {activeStepIdx + 1}/4:</strong> {currentStep.desc}
         </span>
       </div>
 
@@ -263,8 +261,8 @@ export function AiProgressBar({ aiLoading, framework, model, sampleSize }) {
       <div className="progress-tip-box">
         <Sparkles size={15} color="#7C3AED" style={{ flexShrink: 0, marginTop: '1px' }} />
         <span>
-          <strong>Landasan Teori:</strong> {framework?.theory || 'Analisis kualitatif berbasis AI'}.
-          Sistem sedang mengekstraksi kutipan verbatim dan sintesis narasi untuk draf Bab 4.
+          <strong>Landasan Teori:</strong> {framework?.theory || 'Kajian ilmiah berbasis data percakapan'}.
+          Temuan akan disajikan lengkap dengan kutipan verbatim pendukung untuk memperkuat Bab 4.
         </span>
       </div>
     </div>

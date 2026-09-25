@@ -655,7 +655,6 @@ export default function AnalysisPage({
                   <AiProgressBar
                     aiLoading={aiLoading}
                     framework={currentFw}
-                    model={aiModel}
                     sampleSize={aiSampleSize}
                   />
                 )}
