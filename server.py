@@ -106,6 +106,7 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
         self.send_response(status_code)
         self._send_cors_headers()
         self.send_header('Content-Type', 'application/json; charset=utf-8')
+        self.send_header('Cache-Control', 'no-store')
         self.send_header('Content-Length', str(len(payload)))
         self.end_headers()
         self.wfile.write(payload)
@@ -268,7 +269,8 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
                 filename,
                 sample_size=sample_size,
                 preferred_model=preferred_model,
-                analysis_type=analysis_type
+                analysis_type=analysis_type,
+                request_id=body.get('request_id')
             )
             self._send_json(200, {"success": True, "analysis": result})
         except Exception as e:

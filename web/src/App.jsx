@@ -15,6 +15,7 @@ import DatasetsPage from './pages/DatasetsPage';
 import SettingsPage from './pages/SettingsPage';
 import ErrorBoundary from './components/ErrorBoundary';
 import { normalizeAiAnalysis } from './utils/aiNormalize';
+import { getServerAnalysis, requestAnalysis } from './utils/analysisRequest';
 import { readCommentPreference, saveCommentPreferences } from './utils/commentPreferences';
 
 import {
@@ -276,7 +277,13 @@ export default function App() {
       return;
     }
     try {
-      const cached = await getUserAiAnalysis(currentUser.uid, filename, type);
+      let cached;
+      try {
+        cached = await getUserAiAnalysis(currentUser.uid, filename, type);
+      } catch (err) {
+        console.warn('Unable to read analysis history:', err);
+      }
+      if (!cached) cached = await getServerAnalysis(API_BASE, filename, type);
       if (cached) {
         setAiAnalysis(normalizeAiAnalysis(cached));
         setAiError('');
@@ -301,31 +308,26 @@ export default function App() {
 
   // Run AI Analysis for current active file
   const runAiAnalysis = async () => {
-    if (!selectedFile) return;
+    if (!selectedFile || aiLoading) return;
     setAiLoading(true);
     setAiError('');
     try {
-      const res = await fetch(`${API_BASE}/api/ai/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          filename: selectedFile,
-          analysis_type: analysisType,
-          sample_size: aiSampleSize,
-          comments_data: data?.comments || []
-        })
+      const json = await requestAnalysis(API_BASE, {
+        filename: selectedFile,
+        analysis_type: analysisType,
+        sample_size: aiSampleSize,
+        comments_data: data?.comments || []
       });
-
-      const json = await res.json();
-      if (!res.ok || json.error) {
-        throw new Error(json.error || 'Gagal melakukan analisis AI');
-      }
 
       const normalized = normalizeAiAnalysis(json);
       setAiAnalysis(normalized);
 
       if (currentUser) {
-        await saveUserAiAnalysis(currentUser.uid, selectedFile, analysisType, normalized);
+        try {
+          await saveUserAiAnalysis(currentUser.uid, selectedFile, analysisType, normalized);
+        } catch (err) {
+          console.warn('Analysis is available, but history sync failed:', err);
+        }
       }
     } catch (err) {
       console.error('AI Analysis failed:', err);

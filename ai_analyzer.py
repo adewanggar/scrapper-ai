@@ -1701,7 +1701,8 @@ def analyze_video_comments(
     filename: str,
     sample_size: int = 50,
     preferred_model: str = "clario/gemini-3.7-flash",
-    analysis_type: str = "emotion_marketing"
+    analysis_type: str = "emotion_marketing",
+    request_id: str = None
 ) -> dict:
     safe_filename = os.path.basename(filename)
     file_path = os.path.join(DATA_DIR, safe_filename)
@@ -1774,6 +1775,7 @@ def analyze_video_comments(
             raise ValueError("Output dari AI bukan format JSON yang valid.")
 
     analysis_meta = {
+        "request_id": request_id,
         "filename": safe_filename,
         "analysis_type": analysis_type,
         "framework_title": framework_meta["title"],
