@@ -636,14 +636,24 @@ export default function AnalysisPage({
       <details className="ai-frameworks-section" open={!hasMatchingAnalysis}>
         <summary className="ai-frameworks-header">
           <div className="ai-frameworks-title">
-            <span>Pilih kerangka analisis</span>
+            <span className="analysis-framework-icon" aria-hidden="true">
+              {React.createElement(currentFw.icon, { size: 17 })}
+            </span>
+            <span className="analysis-framework-title-copy">
+              <strong>Kerangka analisis</strong>
+              <small>{currentFw.title}</small>
+            </span>
           </div>
           <span className="ai-frameworks-subtitle">
             {fwStep === "jurusan" && !fwSearchQuery.trim()
-              ? "Pilih bidang penelitian untuk melihat kerangka yang tersedia."
+              ? "Pilih bidang dan teori yang sesuai dengan tujuan penelitian."
               : `${activeCat ? activeCat.label : "Semua bidang"} · ${filteredFrameworks.length} kerangka`}
           </span>
-          <ChevronDown size={16} className="analysis-framework-chevron" />
+          <span className="analysis-framework-action">
+            <span className="analysis-framework-action-open">Ubah kerangka</span>
+            <span className="analysis-framework-action-close">Tutup pilihan</span>
+            <ChevronDown size={16} className="analysis-framework-chevron" />
+          </span>
         </summary>
 
         {fwStep === "jurusan" && !fwSearchQuery.trim() ? (
