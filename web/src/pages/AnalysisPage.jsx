@@ -870,16 +870,9 @@ export default function AnalysisPage({
         <div>
           {/* 1. Context Banner (Perspective-Specific) */}
           <div className="ai-context-banner">
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                marginBottom: "8px",
-              }}
-            >
-              <Lightbulb size={18} color="#B45309" />
-              <strong style={{ fontSize: "14px", color: "#92400E" }}>
+            <div className="analysis-context-heading">
+              <Lightbulb size={18} />
+              <strong>
                 Konteks Analisis: {activeResultFw.title} ({activeResultFw.badge}
                 )
               </strong>
