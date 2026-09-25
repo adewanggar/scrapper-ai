@@ -13,6 +13,7 @@ import CommentsPage from './pages/CommentsPage';
 import AnalysisPage from './pages/AnalysisPage';
 import DatasetsPage from './pages/DatasetsPage';
 import SettingsPage from './pages/SettingsPage';
+import { readCommentPreference, saveCommentPreferences } from './utils/commentPreferences';
 
 import {
   STOPWORDS,
@@ -88,10 +89,11 @@ export default function App() {
   const [searchScope, setSearchScope] = useState('all'); // 'all' | 'comments' | 'replies'
   const [hasRepliesOnly, setHasRepliesOnly] = useState(false);
   const [caseSensitive, setCaseSensitive] = useState(false);
-  const [sortBy, setSortBy] = useState('newest'); // 'newest' | 'oldest' | 'most_replies'
+  const [sortBy, setSortBy] = useState(() => readCommentPreference('sortBy', 'newest', ['newest', 'oldest', 'most_replies']));
   const [expandedReplies, setExpandedReplies] = useState(new Set());
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
+  const [pageSize, setPageSize] = useState(() => readCommentPreference('pageSize', 20, [10, 20, 50, 100]));
+  useEffect(() => { saveCommentPreferences(pageSize, sortBy); }, [pageSize, sortBy]);
   const [copiedId, setCopiedId] = useState(null);
 
   // AI Analysis (Skripsi Focus) State
@@ -880,6 +882,10 @@ export default function App() {
             <SettingsPage
               currentUser={currentUser}
               handleLogout={handleLogout}
+              pageSize={pageSize}
+              setPageSize={(value) => { setPageSize(value); setCurrentPage(1); }}
+              sortBy={sortBy}
+              setSortBy={setSortBy}
             />
           )}
         </main>

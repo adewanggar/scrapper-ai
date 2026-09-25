@@ -1,75 +1,159 @@
-import React from 'react';
-import { ShieldCheck, LogOut } from 'lucide-react';
-
+import React from "react";
+import { LogOut, User, SlidersHorizontal, Info } from "lucide-react";
+import "./settings.css";
 export default function SettingsPage({
   currentUser,
-  handleLogout
+  handleLogout,
+  pageSize,
+  setPageSize,
+  sortBy,
+  setSortBy,
 }) {
+  const provider = currentUser?.providerData?.some(
+    (item) => item.providerId === "google.com",
+  )
+    ? "Google"
+    : "Email dan kata sandi";
   return (
-    <div>
-      <div className="dashboard-hero">
-        <h2>Pengaturan Akun & Preferensi Riset</h2>
-        <p>Kelola profil peneliti, status keamanan akun, dan preferensi workspace penelitian.</p>
-      </div>
-
-      <div className="settings-card">
-        <div className="settings-group">
-          <div className="settings-group-title">Profil Peneliti</div>
-          <div className="settings-group-desc">
-            Akun Anda terlindungi dengan privasi penuh. Seluruh data penelitian, dataset komentar, dan draf bab skripsi hanya dapat diakses oleh akun Anda.
-            <div style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ fontSize: '13px' }}>
-                👤 <strong>Nama Peneliti:</strong> {currentUser?.displayName || 'Peneliti'}
+    <div className="settings-workspace">
+      <header className="settings-heading">
+        <h1>Pengaturan</h1>
+        <p>Kelola akun dan cara Anda bekerja dengan data.</p>
+      </header>
+      <div className="settings-layout">
+        <nav className="settings-nav" aria-label="Bagian pengaturan">
+          <a href="#settings-account">
+            <User size={16} />
+            Akun
+          </a>
+          <a href="#settings-preferences">
+            <SlidersHorizontal size={16} />
+            Preferensi
+          </a>
+          <a href="#settings-about">
+            <Info size={16} />
+            Tentang
+          </a>
+        </nav>
+        <div className="settings-sections">
+          <section id="settings-account" className="settings-panel">
+            <div className="settings-panel-heading">
+              <h2>Akun</h2>
+              <p>Informasi akun yang sedang digunakan.</p>
+            </div>
+            <div className="settings-profile">
+              <div className="settings-avatar">
+                {(currentUser?.displayName || currentUser?.email || "P")
+                  .charAt(0)
+                  .toUpperCase()}
               </div>
-              <div style={{ fontSize: '13px' }}>
-                ✉️ <strong>Alamat Email:</strong> {currentUser?.email}
-              </div>
-              <div style={{ fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <ShieldCheck size={15} color="#16A34A" />
-                <span><strong>Status Privasi:</strong> Ruang Riset Privat & Terenkripsi</span>
-              </div>
-              <div style={{ marginTop: '8px' }}>
-                <button
-                  className="btn btn-white-bordered"
-                  onClick={handleLogout}
-                  style={{ color: '#DC2626', borderColor: '#FCA5A5', background: '#FEF2F2', padding: '7px 16px', fontSize: '12.5px' }}
-                >
-                  <LogOut size={13} style={{ marginRight: '6px' }} /> Keluar dari Akun (Logout)
-                </button>
+              <div>
+                <strong>{currentUser?.displayName || "Peneliti"}</strong>
+                <span>{currentUser?.email || "Email belum tersedia"}</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="settings-group">
-          <div className="settings-group-title">Mesin Analisis Kecerdasan Buatan (AI Engine)</div>
-          <div className="settings-group-desc">
-            Workspace riset ini ditenagai oleh model AI penalaran tingkat lanjut untuk analisis kuantitatif dan kualitatif:
-            <ul style={{ paddingLeft: '20px', marginTop: '8px', lineHeight: '1.7' }}>
-              <li><strong>Model Penalaran:</strong> Gemini 3.8 Flash (Multimodal & Fast Reasoning)</li>
-              <li><strong>Kerangka Teoretis:</strong> Framing Robert Entman (1993), Sentimen Publik, Perilaku Konsumen, Psikologi Sosial</li>
-              <li><strong>Validitas Metodologis:</strong> Dilengkapi Kalkulator Reliabilitas Antar-Pengkode (Cohen's Kappa)</li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="settings-group">
-          <div className="settings-group-title">Dukungan Platform Media Sosial</div>
-          <div className="settings-group-desc">
-            Workspace mendukung pengumpulan data komentar dari platform:
-            <ul style={{ paddingLeft: '20px', marginTop: '8px', lineHeight: '1.7' }}>
-              <li><strong>YouTube:</strong> Video Reguler & YouTube Shorts</li>
-              <li><strong>TikTok:</strong> Video Publik, Caption & Balasan Komentar Bertingkat</li>
-              {/* <li><strong>Instagram:</strong> Postingan Feed & Reels (Dinonaktifkan sementara)</li> */}
-            </ul>
-          </div>
-        </div>
-
-        <div className="settings-group">
-          <div className="settings-group-title">Tentang Workspace</div>
-          <div className="settings-group-desc">
-            Tassiori — AI Research Workspace • Dirancang khusus untuk mahasiswa dan peneliti Ilmu Komunikasi & Sosial Humaniora.
-          </div>
+            <dl className="settings-details">
+              <div>
+                <dt>Nama</dt>
+                <dd>{currentUser?.displayName || "Belum diatur"}</dd>
+              </div>
+              <div>
+                <dt>Alamat email</dt>
+                <dd>{currentUser?.email || "Belum tersedia"}</dd>
+              </div>
+              <div>
+                <dt>Metode masuk</dt>
+                <dd>{provider}</dd>
+              </div>
+              <div>
+                <dt>Verifikasi email</dt>
+                <dd>
+                  {currentUser?.emailVerified
+                    ? "Terverifikasi"
+                    : "Belum terverifikasi"}
+                </dd>
+              </div>
+            </dl>
+            <div className="settings-signout">
+              <div>
+                <h3>Keluar dari akun</h3>
+                <p>Anda perlu masuk kembali untuk mengakses dataset.</p>
+              </div>
+              <button onClick={handleLogout}>
+                <LogOut size={15} />
+                Keluar
+              </button>
+            </div>
+          </section>
+          <section id="settings-preferences" className="settings-panel">
+            <div className="settings-panel-heading">
+              <h2>Preferensi komentar</h2>
+              <p>Perubahan langsung diterapkan dan disimpan di browser ini.</p>
+            </div>
+            <div className="setting-row">
+              <div>
+                <label htmlFor="setting-page-size">Komentar per halaman</label>
+                <p>Jumlah komentar yang ditampilkan dalam satu halaman.</p>
+              </div>
+              <select
+                id="setting-page-size"
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+              >
+                {[10, 20, 50, 100].map((n) => (
+                  <option value={n} key={n}>
+                    {n} komentar
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="setting-row">
+              <div>
+                <label htmlFor="setting-sort">Urutan komentar</label>
+                <p>Urutan yang digunakan saat menelusuri percakapan.</p>
+              </div>
+              <select
+                id="setting-sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+              >
+                <option value="newest">Terbaru</option>
+                <option value="oldest">Terlama</option>
+                <option value="most_replies">Balasan terbanyak</option>
+              </select>
+            </div>
+            <div className="settings-reset">
+              <button
+                className="btn btn-white-bordered"
+                onClick={() => {
+                  setPageSize(20);
+                  setSortBy("newest");
+                }}
+              >
+                Kembalikan ke bawaan
+              </button>
+            </div>
+          </section>
+          <section id="settings-about" className="settings-panel">
+            <div className="settings-panel-heading">
+              <h2>Tentang Tassiori</h2>
+              <p>Ruang kerja untuk pengumpulan dan analisis komentar.</p>
+            </div>
+            <dl className="settings-details">
+              <div>
+                <dt>Platform</dt>
+                <dd>TikTok dan YouTube</dd>
+              </div>
+              <div>
+                <dt>Data</dt>
+                <dd>Komentar, balasan, dan caption video</dd>
+              </div>
+              <div>
+                <dt>Alat penelitian</dt>
+                <dd>Analisis, sitasi, kutipan, dan uji reliabilitas</dd>
+              </div>
+            </dl>
+          </section>
         </div>
       </div>
     </div>

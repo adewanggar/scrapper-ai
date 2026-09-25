@@ -1,0 +1,373 @@
+/* Consistent research dialogs; status colors remain meaningful. */
+.stat-modal-overlay {
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: none;
+  padding: 24px;
+  z-index: 1100;
+}
+.stat-modal-container.research-modal {
+  border-radius: 10px;
+  border: 1px solid var(--color-border);
+  background: white;
+  max-width: 920px;
+  width: 100%;
+  max-height: calc(100dvh - 48px);
+  box-shadow: 0 20px 60px #0f172a24;
+  animation: none;
+  outline: none;
+  overflow: hidden;
+}
+.research-modal .stat-modal-header {
+  padding: 24px;
+  background: white;
+  border-bottom: 1px solid var(--color-border);
+  align-items: flex-start;
+  gap: 16px;
+}
+.research-modal .stat-modal-title-wrap {
+  min-width: 0;
+}
+.research-modal .stat-modal-icon-badge {
+  display: none;
+}
+.research-modal .stat-modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--color-text-primary);
+  line-height: 1.4;
+}
+.research-modal .stat-modal-subtitle {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin-top: 6px;
+}
+.research-modal .stat-modal-close {
+  flex-shrink: 0;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  background: white;
+}
+.research-modal .stat-modal-close:hover {
+  background: #f1f5f9;
+  color: var(--color-text-primary);
+}
+.research-modal .stat-modal-body {
+  padding: 24px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+.research-modal .stat-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--color-border);
+  background: white;
+  gap: 16px;
+}
+.research-modal .stat-footer-left {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.research-modal .btn {
+  border-radius: 5px;
+  box-shadow: none;
+  font-size: 13px;
+}
+.research-modal .btn-primary {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+.research-modal .btn-primary:hover {
+  background: var(--color-primary-dark);
+  transform: none;
+}
+.research-modal .citation-meta-box,
+.research-modal .quote-comment-highlight {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 18px;
+}
+.research-modal .citation-meta-title {
+  color: var(--color-text-primary);
+  font-size: 13px;
+}
+.research-modal .meta-field label {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+.research-modal .meta-field input {
+  border-radius: 5px;
+  font-size: 14px;
+  background: white;
+}
+.research-modal .citation-tab-bar {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  border-bottom: 1px solid var(--color-border);
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.research-modal .citation-tab {
+  background: transparent;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: var(--color-text-secondary);
+  padding: 12px;
+  font-size: 13px;
+  box-shadow: none;
+}
+.research-modal .citation-tab.active {
+  color: #c2410c;
+  border-bottom-color: var(--color-primary);
+  background: none;
+}
+.research-modal .citation-card-block,
+.research-modal .quote-variant-card,
+.research-modal .cite-export-card {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: none;
+  background: white;
+}
+.research-modal .cite-preview-text,
+.research-modal .apa-font,
+.research-modal .quote-academic-font,
+.research-modal .quote-text-original {
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--color-text-primary);
+  background: white;
+}
+.research-modal .cite-preview-text {
+  border-left: 2px solid var(--color-primary-border);
+  border-radius: 0;
+}
+.research-modal .variant-header,
+.research-modal .cite-block-header {
+  background: #f8fafc;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.research-modal .variant-badge,
+.research-modal .cite-badge {
+  background: #f1f5f9;
+  color: var(--color-text-secondary);
+  border: 0;
+  border-radius: 4px;
+  font-size: 11px;
+}
+.research-modal .stat-quick-guide {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  line-height: 1.7;
+}
+.research-modal .quote-ethics-bar {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+.research-modal .quote-ethics-info strong {
+  color: var(--color-text-primary);
+}
+.research-modal .quote-toggle-switch input:checked + .toggle-slider {
+  background: var(--color-primary);
+}
+.research-modal .stat-summary-bar {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: none;
+}
+.research-modal .stat-software-grid {
+  gap: 10px;
+}
+.research-modal .stat-software-card {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: none;
+}
+.research-modal .stat-software-card:hover {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--color-primary);
+}
+.research-modal .stat-software-card.active {
+  background: var(--color-primary-bg);
+  border-color: var(--color-primary);
+  box-shadow: none;
+}
+.research-modal .kappa-score-dashboard {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  box-shadow: none;
+  padding: 20px;
+}
+.research-modal .kappa-main-gauge {
+  background: none;
+}
+.research-modal .kappa-big-number {
+  font-size: 36px;
+  color: var(--color-text-primary);
+}
+.research-modal .kappa-metric-box {
+  background: white;
+  border: 1px solid var(--color-border);
+  border-radius: 5px;
+  box-shadow: none;
+}
+.research-modal .kappa-interactive-panel,
+.research-modal .kappa-matrix-panel {
+  padding: 18px 0;
+  background: white;
+}
+.research-modal .kappa-action-bar {
+  background: #f8fafc;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+}
+.research-modal .stat-table-wrapper,
+.research-modal .matrix-input-table-wrap {
+  overflow: auto;
+  max-width: 100%;
+}
+.research-modal .code-snippet-preview {
+  overflow: auto;
+  background: #f8fafc;
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+}
+.research-modal .stat-alert-success {
+  font-size: 13px;
+  margin: 12px 24px 0;
+  border-radius: 5px;
+}
+@media (max-width: 640px) {
+  .stat-modal-overlay {
+    padding: 10px;
+  }
+  .stat-modal-container.research-modal {
+    max-height: calc(100dvh - 20px) !important;
+    border-radius: 8px !important;
+  }
+  .research-modal .stat-modal-header {
+    padding: 18px;
+  }
+  .research-modal .stat-modal-title {
+    font-size: 18px;
+  }
+  .research-modal .stat-modal-body {
+    padding: 16px;
+  }
+  .research-modal .stat-modal-footer {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+  .research-modal .stat-footer-left {
+    width: 100%;
+  }
+  .research-modal .citation-meta-grid,
+  .research-modal .citation-in-text-grid,
+  .research-modal .citation-export-cards {
+    grid-template-columns: 1fr;
+  }
+  .research-modal .citation-tab {
+    padding: 10px 8px;
+    font-size: 12px;
+  }
+  .research-modal .stat-software-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .research-modal .kappa-score-dashboard {
+    grid-template-columns: 1fr;
+  }
+  .research-modal .kappa-metrics-summary {
+    flex-wrap: wrap;
+  }
+  .research-modal input,
+  .research-modal select {
+    max-width: 100%;
+  }
+  .research-modal .variant-meta {
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+}
+.stat-modal-overlay:has(.research-modal) {
+  animation: none;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: none;
+  z-index: 1100;
+}
+.dataset-modal-backdrop:has(.dataset-modal-box[role="dialog"]) {
+  z-index: 1100;
+  background: rgba(15, 23, 42, 0.42);
+  backdrop-filter: none;
+}
+.dataset-modal-box[role="dialog"] {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 20px 60px #0f172a24;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  outline: none;
+}
+.dataset-modal-box[role="dialog"] code {
+  overflow-wrap: anywhere;
+}
+.research-modal .stat-modal-body > * {
+  flex-shrink: 0;
+}
+.research-modal .stat-modal-header,
+.research-modal .stat-modal-footer {
+  flex-shrink: 0;
+}
+.research-modal .stat-software-card {
+  text-align: left;
+  font-family: var(--font-family);
+  cursor: pointer;
+}
+.research-modal .stat-sw-badge,
+.research-modal .stat-sw-desc {
+  display: none;
+}
+.research-modal .stat-sw-name {
+  font-size: 14px;
+}
+.research-modal .stat-sw-ext {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-family);
+}
+.research-modal .stat-software-card.active .stat-sw-name {
+  color: #c2410c;
+}
+.research-modal .kappa-main-gauge {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+.research-modal .kappa-big-number {
+  font-family: var(--font-family);
+}
+.research-modal .btn-sample-chip.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+.research-modal .km-comment-text {
+  border-left-color: var(--color-primary-border);
+}

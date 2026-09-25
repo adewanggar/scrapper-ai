@@ -1,3 +1,5 @@
+import useModalDialog from './useModalDialog';
+import './research-modals.css';
 import React, { useState, useMemo } from 'react';
 import {
   X,
@@ -25,6 +27,7 @@ export default function CitationModal({
   data,
   selectedFileName = 'video'
 }) {
+  const dialogRef = useModalDialog(isOpen, onClose);
   const [copiedKey, setCopiedKey] = useState(null);
   const [successToast, setSuccessToast] = useState('');
 
@@ -95,7 +98,7 @@ export default function CitationModal({
 
   return (
     <div className="stat-modal-overlay" onClick={onClose}>
-      <div className="stat-modal-container citation-modal-container" onClick={(e) => e.stopPropagation()}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Sitasi video" tabIndex={-1} className="stat-modal-container research-modal citation-modal-container" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="stat-modal-header">
           <div className="stat-modal-title-wrap">
@@ -103,7 +106,7 @@ export default function CitationModal({
               <Quote size={22} color="#db2777" />
             </div>
             <div>
-              <h3 className="stat-modal-title">Sitasi Otomatis Video & Objek Penelitian</h3>
+              <h3 className="stat-modal-title">Sitasi video</h3>
               <p className="stat-modal-subtitle">
                 Format standar Daftar Pustaka (APA 7th, Harvard, Mendeley, BibTeX) untuk Skripsi & Tugas Akhir.
               </p>
@@ -181,7 +184,7 @@ export default function CitationModal({
               onClick={() => setActiveTab('apa7')}
             >
               <span>APA 7th Edition</span>
-              <span className="cite-badge">Skripsi Favorit</span>
+
             </button>
             <button
               className={`citation-tab ${activeTab === 'harvard' ? 'active' : ''}`}
@@ -200,7 +203,7 @@ export default function CitationModal({
               onClick={() => setActiveTab('mendeley')}
             >
               <span>Mendeley & BibTeX</span>
-              <span className="cite-badge">Export File</span>
+
             </button>
           </div>
 

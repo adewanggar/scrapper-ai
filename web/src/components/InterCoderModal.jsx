@@ -1,3 +1,5 @@
+import useModalDialog from './useModalDialog';
+import './research-modals.css';
 import React, { useState, useMemo } from 'react';
 import {
   X,
@@ -28,6 +30,7 @@ export default function InterCoderModal({
   allComments = [],
   selectedFileName = 'dataset'
 }) {
+  const dialogRef = useModalDialog(isOpen, onClose);
   const [activeTab, setActiveTab] = useState('interactive'); // 'interactive' | 'matrix'
   const [sampleSize, setSampleSize] = useState(30); // 30, 50, 100
   const [coder1Name, setCoder1Name] = useState('Peneliti (Pengkode 1)');
@@ -136,7 +139,7 @@ export default function InterCoderModal({
 
   return (
     <div className="stat-modal-overlay" onClick={onClose}>
-      <div className="stat-modal-container kappa-modal-container" onClick={(e) => e.stopPropagation()}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Uji reliabilitas pengkode" tabIndex={-1} className="stat-modal-container research-modal kappa-modal-container" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="stat-modal-header">
           <div className="stat-modal-title-wrap">
@@ -144,7 +147,7 @@ export default function InterCoderModal({
               <Calculator size={22} color="#0891b2" />
             </div>
             <div>
-              <h3 className="stat-modal-title">Kalkulator Inter-Coder Reliability (Cohen's Kappa κ)</h3>
+              <h3 className="stat-modal-title">Uji reliabilitas pengkode</h3>
               <p className="stat-modal-subtitle">
                 Uji validitas & reliabilitas metodologis analisis isi data teks komentar untuk Bab 3 Tesis S2 & Skripsi.
               </p>

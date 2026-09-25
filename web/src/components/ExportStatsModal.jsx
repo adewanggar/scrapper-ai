@@ -1,3 +1,5 @@
+import useModalDialog from './useModalDialog';
+import './research-modals.css';
 import React, { useState, useMemo } from 'react';
 import {
   X,
@@ -34,6 +36,7 @@ export default function ExportStatsModal({
   selectedFileName = 'dataset',
   searchKeyword = ''
 }) {
+  const dialogRef = useModalDialog(isOpen, onClose);
   const [activeSoftware, setActiveSoftware] = useState('excel'); // 'excel' | 'spss' | 'smartpls' | 'jasp'
   const [dataScope, setDataScope] = useState('all'); // 'all' | 'filtered'
   const [includeReplies, setIncludeReplies] = useState(true);
@@ -179,7 +182,7 @@ export default function ExportStatsModal({
 
   return (
     <div className="stat-modal-overlay" onClick={onClose}>
-      <div className="stat-modal-container" onClick={(e) => e.stopPropagation()}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Ekspor statistik" tabIndex={-1} className="stat-modal-container research-modal" onClick={(e) => e.stopPropagation()}>
         {/* Modal Header */}
         <div className="stat-modal-header">
           <div className="stat-modal-title-wrap">
@@ -187,9 +190,7 @@ export default function ExportStatsModal({
               <FileSpreadsheet size={22} color="var(--color-primary)" />
             </div>
             <div>
-              <h3 className="stat-modal-title">
-                Ekspor Multi-Format untuk Software Statistik
-              </h3>
+              <h3 className="stat-modal-title">Ekspor statistik</h3>
               <p className="stat-modal-subtitle">
                 Olah data skripsi langsung ke SPSS, Excel, SmartPLS, dan JASP tanpa pusing format ulang.
               </p>
@@ -278,7 +279,9 @@ export default function ExportStatsModal({
             const Icon = sw.icon;
             const isSelected = activeSoftware === sw.id;
             return (
-              <div
+              <button
+                type="button"
+                aria-pressed={isSelected}
                 key={sw.id}
                 className={`stat-software-card ${isSelected ? 'active' : ''}`}
                 onClick={() => setActiveSoftware(sw.id)}
@@ -299,7 +302,7 @@ export default function ExportStatsModal({
                     <span>Terpilih</span>
                   </div>
                 )}
-              </div>
+              </button>
             );
           })}
         </div>
@@ -327,7 +330,7 @@ export default function ExportStatsModal({
                 <div className="stat-button-group">
                   <button
                     className="btn btn-primary stat-dl-btn"
-                    style={{ backgroundColor: '#107C41', borderColor: '#107C41' }}
+
                     onClick={() => handleDownload('excel')}
                   >
                     <Download size={16} />
@@ -374,7 +377,7 @@ export default function ExportStatsModal({
                 <div className="stat-button-group">
                   <button
                     className="btn btn-primary stat-dl-btn"
-                    style={{ backgroundColor: '#0062FF', borderColor: '#0062FF' }}
+
                     onClick={() => handleDownload('spss_data')}
                   >
                     <Download size={16} />
@@ -439,7 +442,7 @@ export default function ExportStatsModal({
                 <div className="stat-button-group">
                   <button
                     className="btn btn-primary stat-dl-btn"
-                    style={{ backgroundColor: '#F97316', borderColor: '#F97316' }}
+
                     onClick={() => handleDownload('smartpls')}
                   >
                     <Download size={16} />
@@ -479,7 +482,7 @@ export default function ExportStatsModal({
                 <div className="stat-button-group">
                   <button
                     className="btn btn-primary stat-dl-btn"
-                    style={{ backgroundColor: '#7C3AED', borderColor: '#7C3AED' }}
+
                     onClick={() => handleDownload('jasp')}
                   >
                     <Download size={16} />

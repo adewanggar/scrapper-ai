@@ -1,3 +1,5 @@
+import useModalDialog from './useModalDialog';
+import './research-modals.css';
 import React, { useState, useMemo } from 'react';
 import {
   X,
@@ -24,6 +26,7 @@ export default function VerbatimQuoteModal({
   videoTitle = '',
   videoUrl = ''
 }) {
+  const dialogRef = useModalDialog(isOpen && Boolean(comment), onClose);
   const [anonymous, setAnonymous] = useState(false);
   const [copiedKey, setCopiedKey] = useState(null);
   const [successToast, setSuccessToast] = useState('');
@@ -66,7 +69,7 @@ export default function VerbatimQuoteModal({
 
   return (
     <div className="stat-modal-overlay" onClick={onClose}>
-      <div className="stat-modal-container quote-modal-container" onClick={(e) => e.stopPropagation()}>
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Kutip komentar" tabIndex={-1} className="stat-modal-container research-modal quote-modal-container" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className="stat-modal-header">
           <div className="stat-modal-title-wrap">
@@ -74,7 +77,7 @@ export default function VerbatimQuoteModal({
               <Quote size={22} color="#059669" />
             </div>
             <div>
-              <h3 className="stat-modal-title">Kutipan Verbatim untuk Bab 4 Skripsi</h3>
+              <h3 className="stat-modal-title">Kutip komentar</h3>
               <p className="stat-modal-subtitle">
                 Salin kutipan langsung respon komentar dengan kaidah penulisan karya ilmiah akademik.
               </p>

@@ -1,4 +1,6 @@
 import React, { useState, useMemo } from 'react';
+import useModalDialog from '../components/useModalDialog';
+import '../components/research-modals.css';
 import {
   Brain,
   Database,
@@ -11,6 +13,7 @@ import {
   Search,
   Sparkles,
   Trash2,
+  X,
   Users,
   Video,
   RefreshCw
@@ -37,6 +40,7 @@ export default function DatasetsPage({
   const [fileViewMode, setFileViewMode] = useState('grid'); // 'grid' | 'table'
   const [fileToDelete, setFileToDelete] = useState(null); // File object awaiting confirmation
   const [deletingFile, setDeletingFile] = useState(false);
+  const deleteDialogRef = useModalDialog(Boolean(fileToDelete), () => { if (!deletingFile) setFileToDelete(null); });
 
   const filteredAndSortedFiles = useMemo(() => {
     return files
@@ -484,7 +488,7 @@ export default function DatasetsPage({
               {/* Modal Konfirmasi Hapus Dataset */}
               {fileToDelete && (
                 <div className="dataset-modal-backdrop" onClick={() => !deletingFile && setFileToDelete(null)}>
-                  <div className="dataset-modal-box" onClick={(e) => e.stopPropagation()}>
+                  <div ref={deleteDialogRef} role="dialog" aria-modal="true" aria-label="Hapus dataset" tabIndex={-1} className="dataset-modal-box" onClick={(e) => e.stopPropagation()}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '14px' }}>
                       <div style={{ width: '42px', height: '42px', borderRadius: '10px', background: '#FEE2E2', color: '#DC2626', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Trash2 size={22} />

@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import "./comments.css";
 import {
   Database,
   ChevronDown,
@@ -9,11 +10,8 @@ import {
   ExternalLink,
   MessageSquare,
   CornerDownRight,
-  Users,
-  Layers,
   Search,
   X,
-  Flame,
   Calculator,
   FileSpreadsheet,
   Download,
@@ -22,8 +20,8 @@ import {
   Copy,
   Check,
   ChevronLeft,
-  ChevronRight
-} from 'lucide-react';
+  ChevronRight,
+} from "lucide-react";
 
 export default function CommentsPage({
   files,
@@ -66,35 +64,66 @@ export default function CommentsPage({
   setPageSize,
   totalPages,
   getPageNumbers,
-  fileInputRef
+  fileInputRef,
 }) {
   return (
-    <div>
+    <div className="comments-workspace">
+      <header className="comments-page-heading">
+        <div>
+          <h1>Hasil komentar</h1>
+          <p>Telusuri percakapan dan pilih kutipan untuk penelitian Anda.</p>
+        </div>
+        <button
+          className="btn comments-analysis-button"
+          onClick={() => switchTab("ai-analysis")}
+        >
+          <Brain size={16} />
+          Analisis riset
+        </button>
+      </header>
       {/* Video Selector Bar */}
       <div className="video-selector-row">
         <div className="video-selector-bar">
           <div className="selector-icon">
             <Database size={18} />
           </div>
-          <span className="selector-label">Pilih Dataset Riset:</span>
+          <label htmlFor="comments-dataset" className="selector-label">
+            Dataset
+          </label>
           {files.length > 0 ? (
             <select
+              id="comments-dataset"
               className="selector-select"
               value={selectedFile}
               onChange={(e) => loadFileContent(e.target.value)}
             >
               {files.map((f) => (
                 <option key={f.filename} value={f.filename}>
-                  {f.caption ? `${f.caption.slice(0, 48)}...` : f.filename.replace(/\.json$/i, '')} ({f.comments_count} komentar)
+                  {f.caption
+                    ? `${f.caption.slice(0, 48)}...`
+                    : f.filename.replace(/\.json$/i, "")}{" "}
+                  ({f.comments_count} komentar)
                 </option>
               ))}
             </select>
           ) : (
-            <span style={{ fontSize: '13px', color: 'var(--color-text-secondary)', flex: 1 }}>
-              {selectedFile ? selectedFile.replace(/\.json$/i, '') : 'Belum ada dataset penelitian tersimpan'}
+            <span
+              style={{
+                fontSize: "13px",
+                color: "var(--color-text-secondary)",
+                flex: 1,
+              }}
+            >
+              {selectedFile
+                ? selectedFile.replace(/\.json$/i, "")
+                : "Belum ada dataset penelitian tersimpan"}
             </span>
           )}
-          <ChevronDown size={16} color="var(--color-text-secondary)" style={{ pointerEvents: 'none', flexShrink: 0 }} />
+          <ChevronDown
+            size={16}
+            color="var(--color-text-secondary)"
+            style={{ pointerEvents: "none", flexShrink: 0 }}
+          />
         </div>
 
         <div className="selector-actions-group">
@@ -106,16 +135,6 @@ export default function CommentsPage({
             <RefreshCw size={14} />
             Segarkan
           </button>
-
-          <button
-            className="btn btn-white-bordered"
-            onClick={() => switchTab('ai-analysis')}
-            style={{ color: '#7C3AED', borderColor: '#DDD6FE', background: '#F5F3FF' }}
-            title="Lihat analisis AI untuk video ini"
-          >
-            <Brain size={15} />
-            Analisis AI
-          </button>
         </div>
       </div>
 
@@ -124,7 +143,7 @@ export default function CommentsPage({
         <section className="caption-card">
           <div className="caption-content">
             <div className="caption-header">
-              <span className="caption-eyebrow">CAPTION VIDEO</span>
+              <span className="caption-eyebrow">SUMBER PERCAKAPAN</span>
               <div className="caption-actions">
                 <button
                   className="btn-cite-pill"
@@ -132,7 +151,7 @@ export default function CommentsPage({
                   title="Buat sitasi otomatis untuk Daftar Pustaka (APA 7th, Harvard, Mendeley, BibTeX)"
                 >
                   <Quote size={13} />
-                  Sitasi Video (APA / Mendeley)
+                  Buat sitasi
                 </button>
                 {data.video_url && (
                   <a
@@ -142,61 +161,37 @@ export default function CommentsPage({
                     className="btn-tiktok-pill"
                   >
                     <ExternalLink size={13} />
-                    Buka Video
+                    Buka video
                   </a>
                 )}
               </div>
             </div>
             <p className="caption-body">
-              {data.caption || 'Tidak ada caption dalam video ini.'}
+              {data.caption || "Tidak ada caption dalam video ini."}
             </p>
           </div>
         </section>
       )}
 
-      {/* Stat Cards (4 columns, distinct pastel fills) */}
       {data && stats && (
-        <section className="stats-grid">
-          <div className="stat-card stat-card-blue">
-            <div className="stat-icon-wrapper">
-              <MessageSquare size={18} />
-            </div>
-            <div>
-              <div className="stat-number">{stats.totalComments.toLocaleString()}</div>
-              <div className="stat-label">Komentar Utama</div>
-            </div>
+        <dl className="comments-summary">
+          <div>
+            <dt>Komentar</dt>
+            <dd>{stats.totalComments.toLocaleString("id-ID")}</dd>
           </div>
-
-          <div className="stat-card stat-card-rose">
-            <div className="stat-icon-wrapper">
-              <CornerDownRight size={18} />
-            </div>
-            <div>
-              <div className="stat-number">{stats.totalReplies.toLocaleString()}</div>
-              <div className="stat-label">Total Balasan</div>
-            </div>
+          <div>
+            <dt>Balasan</dt>
+            <dd>{stats.totalReplies.toLocaleString("id-ID")}</dd>
           </div>
-
-          <div className="stat-card stat-card-violet">
-            <div className="stat-icon-wrapper">
-              <Users size={18} />
-            </div>
-            <div>
-              <div className="stat-number">{stats.totalUsers.toLocaleString()}</div>
-              <div className="stat-label">Partisipan Unik</div>
-            </div>
+          <div>
+            <dt>Partisipan</dt>
+            <dd>{stats.totalUsers.toLocaleString("id-ID")}</dd>
           </div>
-
-          <div className="stat-card stat-card-amber">
-            <div className="stat-icon-wrapper">
-              <Layers size={18} />
-            </div>
-            <div>
-              <div className="stat-number">{filteredComments.length.toLocaleString()}</div>
-              <div className="stat-label">Hasil Terfilter</div>
-            </div>
+          <div>
+            <dt>Hasil filter</dt>
+            <dd>{filteredComments.length.toLocaleString("id-ID")}</dd>
           </div>
-        </section>
+        </dl>
       )}
 
       {/* Search & Filter Panel */}
@@ -209,14 +204,15 @@ export default function CommentsPage({
               <input
                 type="text"
                 className="search-input-field"
-                placeholder="Cari komentar berdasarkan kata kunci (contoh: etawalin, curiga, kasir)..."
+                aria-label="Cari komentar"
+                placeholder="Cari kata atau frasa dalam komentar…"
                 value={searchKeyword}
                 onChange={(e) => setSearchKeyword(e.target.value)}
               />
               {searchKeyword && (
                 <button
                   className="search-clear-btn"
-                  onClick={() => setSearchKeyword('')}
+                  onClick={() => setSearchKeyword("")}
                   title="Hapus filter"
                 >
                   <X size={15} />
@@ -225,6 +221,7 @@ export default function CommentsPage({
             </div>
 
             <select
+              aria-label="Urutkan komentar"
               className="sort-select-box"
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
@@ -238,24 +235,27 @@ export default function CommentsPage({
           {/* Row 2: Search Scope Tabs + Checkboxes */}
           <div className="filter-row-2">
             <div className="filter-tabs-group">
-              <span className="filter-tabs-label">Cari Di:</span>
+              <span className="filter-tabs-label">Cari di:</span>
               <button
-                className={`filter-tab-pill ${searchScope === 'all' ? 'active' : 'inactive'}`}
-                onClick={() => setSearchScope('all')}
+                className={`filter-tab-pill ${searchScope === "all" ? "active" : "inactive"}`}
+                aria-pressed={searchScope === "all"}
+                onClick={() => setSearchScope("all")}
               >
                 Semua
               </button>
               <button
-                className={`filter-tab-pill ${searchScope === 'comments' ? 'active' : 'inactive'}`}
-                onClick={() => setSearchScope('comments')}
+                className={`filter-tab-pill ${searchScope === "comments" ? "active" : "inactive"}`}
+                aria-pressed={searchScope === "comments"}
+                onClick={() => setSearchScope("comments")}
               >
-                Komentar Saja
+                Komentar
               </button>
               <button
-                className={`filter-tab-pill ${searchScope === 'replies' ? 'active' : 'inactive'}`}
-                onClick={() => setSearchScope('replies')}
+                className={`filter-tab-pill ${searchScope === "replies" ? "active" : "inactive"}`}
+                aria-pressed={searchScope === "replies"}
+                onClick={() => setSearchScope("replies")}
               >
-                Balasan Saja
+                Balasan
               </button>
             </div>
 
@@ -275,7 +275,7 @@ export default function CommentsPage({
                   checked={caseSensitive}
                   onChange={(e) => setCaseSensitive(e.target.checked)}
                 />
-                Case sensitive (Aa)
+                Bedakan huruf besar/kecil
               </label>
             </div>
           </div>
@@ -283,20 +283,21 @@ export default function CommentsPage({
           {/* Row 3: Frequent Keywords Pills */}
           {topKeywords && topKeywords.length > 0 && (
             <div className="filter-row-3">
-              <div className="keyword-eyebrow">
-                <Flame size={14} color="#F97316" />
-                KATA KUNCI TERPOPULER (KLIK UNTUK MEMFILTER)
-              </div>
+              <div className="keyword-eyebrow">Kata yang sering muncul</div>
               <div className="keyword-pills-wrap">
                 {topKeywords.map((item) => {
-                  const isActive = searchKeyword.toLowerCase() === item.word.toLowerCase();
+                  const isActive =
+                    searchKeyword.toLowerCase() === item.word.toLowerCase();
                   return (
                     <button
                       key={item.word}
-                      className={`keyword-pill ${isActive ? 'active' : ''}`}
-                      onClick={() => setSearchKeyword(isActive ? '' : item.word)}
+                      aria-pressed={isActive}
+                      className={`keyword-pill ${isActive ? "active" : ""}`}
+                      onClick={() =>
+                        setSearchKeyword(isActive ? "" : item.word)
+                      }
                     >
-                      <span>#{item.word}</span>
+                      <span>{item.word}</span>
                       <span className="keyword-count">{item.count}</span>
                     </button>
                   );
@@ -312,59 +313,94 @@ export default function CommentsPage({
         <section>
           <div className="comment-section-header">
             <div className="comment-section-title">
-              Daftar Komentar <span>({filteredComments.length} dari {data.comments?.length || 0} komentar)</span>
+              Percakapan{" "}
+              <span>
+                ({filteredComments.length} dari {data.comments?.length || 0}{" "}
+                komentar)
+              </span>
             </div>
 
-            <div className="export-actions-group">
-              <button
-                className="btn btn-white-bordered"
-                onClick={() => setShowInterCoderModal(true)}
-                title="Kalkulator uji reliabilitas antar-pengkode (Cohen's Kappa) untuk Bab 3"
+            <details className="comments-tools">
+              <summary>
+                <Download size={15} /> Ekspor & alat riset{" "}
+                <ChevronDown size={14} />
+              </summary>
+              <div
+                className="comments-tools-menu"
+                onClick={(e) => {
+                  if (e.target.closest("button"))
+                    e.currentTarget.closest("details").removeAttribute("open");
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Escape") {
+                    const details = e.currentTarget.closest("details");
+                    details.removeAttribute("open");
+                    details.querySelector("summary").focus();
+                  }
+                }}
               >
-                <Calculator size={14} color="#0891b2" />
-                <span>Uji Cohen's Kappa</span>
-              </button>
-              <button
-                className="btn btn-stat-export"
-                onClick={() => setShowExportStatsModal(true)}
-                title="Ekspor dataset terstandarisasi untuk SPSS, Excel, SmartPLS, dan JASP"
-              >
-                <FileSpreadsheet size={15} />
-                <span className="btn-stat-text-desktop">Ekspor Statistik (SPSS, Excel, PLS, JASP)</span>
-                <span className="btn-stat-text-mobile">Ekspor Statistik (SPSS/PLS)</span>
-              </button>
-              <button
-                className="btn btn-white-bordered"
-                onClick={exportToCSV}
-                title="Ekspor ke format Excel / CSV standar"
-              >
-                <Download size={14} />
-                <span>Ekspor CSV</span>
-              </button>
-              <button
-                className="btn btn-white-bordered"
-                onClick={exportToJSON}
-                title="Ekspor ke format JSON"
-              >
-                <FileJson size={14} />
-                <span>Ekspor JSON</span>
-              </button>
-            </div>
+                <button onClick={exportToCSV}>
+                  <Download size={16} />
+                  <span>
+                    Unduh CSV<small>Spreadsheet dan pengolahan data</small>
+                  </span>
+                </button>
+                <button onClick={exportToJSON}>
+                  <FileJson size={16} />
+                  <span>
+                    Unduh JSON<small>Salinan dataset lengkap</small>
+                  </span>
+                </button>
+                <button onClick={() => setShowExportStatsModal(true)}>
+                  <FileSpreadsheet size={16} />
+                  <span>
+                    Ekspor statistik<small>SPSS, Excel, SmartPLS, JASP</small>
+                  </span>
+                </button>
+                <button onClick={() => setShowInterCoderModal(true)}>
+                  <Calculator size={16} />
+                  <span>
+                    Uji Cohen’s Kappa<small>Reliabilitas antar-pengkode</small>
+                  </span>
+                </button>
+              </div>
+            </details>
           </div>
 
           {loading ? (
             <div className="empty-state-box">
-              <div className="spinner-icon" style={{ borderColor: 'rgba(0,0,0,0.2)', borderTopColor: 'var(--color-primary)', margin: '0 auto 12px' }} />
+              <div
+                className="spinner-icon"
+                style={{
+                  borderColor: "rgba(0,0,0,0.2)",
+                  borderTopColor: "var(--color-primary)",
+                  margin: "0 auto 12px",
+                }}
+              />
               <p>Memuat data komentar...</p>
             </div>
           ) : filteredComments.length === 0 ? (
             <div className="empty-state-box">
               <Search size={36} className="empty-state-icon" />
               <h4>Tidak ada komentar yang cocok</h4>
-              <p>Coba gunakan kata kunci lain atau ubah pengaturan cakupan pencarian.</p>
-              {searchKeyword && (
-                <button className="btn btn-white-bordered" onClick={() => setSearchKeyword('')}>
-                  Reset Pencarian
+              <p>
+                Coba gunakan kata kunci lain atau ubah pengaturan cakupan
+                pencarian.
+              </p>
+              {(searchKeyword ||
+                hasRepliesOnly ||
+                caseSensitive ||
+                searchScope !== "all") && (
+                <button
+                  className="btn btn-white-bordered"
+                  onClick={() => {
+                    setSearchKeyword("");
+                    setHasRepliesOnly(false);
+                    setCaseSensitive(false);
+                    setSearchScope("all");
+                  }}
+                >
+                  Reset filter
                 </button>
               )}
             </div>
@@ -372,12 +408,18 @@ export default function CommentsPage({
             <>
               <div className="comment-list-container">
                 {paginatedComments.map((comment, index) => {
-                  const isExpanded = expandedReplies.has(comment.comment_id || index);
+                  const isExpanded = expandedReplies.has(
+                    comment.comment_id || index,
+                  );
                   const replyCount =
-                    comment.total_reply || (comment.replies ? comment.replies.length : 0);
+                    comment.total_reply ||
+                    (comment.replies ? comment.replies.length : 0);
 
                   return (
-                    <div key={comment.comment_id || index} className="comment-row">
+                    <div
+                      key={comment.comment_id || index}
+                      className="comment-row"
+                    >
                       <div className="comment-row-top">
                         <div className="author-meta-wrap">
                           <div className="author-avatar">
@@ -386,18 +428,22 @@ export default function CommentsPage({
                                 src={comment.avatar}
                                 alt={comment.nickname || comment.username}
                                 onError={(e) => {
-                                  e.target.style.display = 'none';
+                                  e.target.style.display = "none";
                                 }}
                               />
                             ) : null}
                             <span>
-                              {(comment.nickname || comment.username || '?').charAt(0).toUpperCase()}
+                              {(comment.nickname || comment.username || "?")
+                                .charAt(0)
+                                .toUpperCase()}
                             </span>
                           </div>
 
                           <div className="author-names-line">
                             <span className="author-name-bold">
-                              {comment.nickname || comment.username || 'Pengguna'}
+                              {comment.nickname ||
+                                comment.username ||
+                                "Pengguna"}
                             </span>
                             <span className="author-handle-gray">
                               @{comment.username}
@@ -427,7 +473,12 @@ export default function CommentsPage({
                             <button
                               className="comment-icon-subtle"
                               title="Salin isi komentar"
-                              onClick={() => copyToClipboard(comment.comment, comment.comment_id || index)}
+                              onClick={() =>
+                                copyToClipboard(
+                                  comment.comment,
+                                  comment.comment_id || index,
+                                )
+                              }
                               aria-label="Salin isi komentar"
                             >
                               {copiedId === (comment.comment_id || index) ? (
@@ -448,92 +499,125 @@ export default function CommentsPage({
                         <div>
                           {replyCount > 0 ? (
                             <button
+                              aria-expanded={isExpanded}
                               className="btn-replies-toggle"
-                              onClick={() => toggleReply(comment.comment_id || index)}
+                              onClick={() =>
+                                toggleReply(comment.comment_id || index)
+                              }
                             >
                               <CornerDownRight size={13} />
                               <span>{replyCount} Balasan</span>
-                              {isExpanded ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                              {isExpanded ? (
+                                <ChevronUp size={13} />
+                              ) : (
+                                <ChevronDown size={13} />
+                              )}
                             </button>
                           ) : (
                             <span className="no-replies-text">
-                              Tidak ada balasan
+                              Tanpa balasan
                             </span>
                           )}
                         </div>
                       </div>
 
                       {/* Thread: Replies */}
-                      {isExpanded && comment.replies && comment.replies.length > 0 && (
-                        <div className="replies-thread-box">
-                          {comment.replies.map((reply, rIdx) => (
-                            <div key={reply.comment_id || rIdx} className="reply-row">
-                              <div className="comment-row-top" style={{ marginBottom: '4px' }}>
-                                <div className="author-meta-wrap">
-                                  <div className="author-avatar">
-                                    {reply.avatar ? (
-                                      <img
-                                        src={reply.avatar}
-                                        alt={reply.nickname || reply.username}
-                                        onError={(e) => {
-                                          e.target.style.display = 'none';
+                      {isExpanded &&
+                        comment.replies &&
+                        comment.replies.length > 0 && (
+                          <div className="replies-thread-box">
+                            {comment.replies.map((reply, rIdx) => (
+                              <div
+                                key={reply.comment_id || rIdx}
+                                className="reply-row"
+                              >
+                                <div
+                                  className="comment-row-top"
+                                  style={{ marginBottom: "4px" }}
+                                >
+                                  <div className="author-meta-wrap">
+                                    <div className="author-avatar">
+                                      {reply.avatar ? (
+                                        <img
+                                          src={reply.avatar}
+                                          alt={reply.nickname || reply.username}
+                                          onError={(e) => {
+                                            e.target.style.display = "none";
+                                          }}
+                                        />
+                                      ) : null}
+                                      <span>
+                                        {(
+                                          reply.nickname ||
+                                          reply.username ||
+                                          "?"
+                                        )
+                                          .charAt(0)
+                                          .toUpperCase()}
+                                      </span>
+                                    </div>
+                                    <div className="author-names-line">
+                                      <span className="author-name-bold">
+                                        {reply.nickname || reply.username}
+                                      </span>
+                                      <span className="author-handle-gray">
+                                        @{reply.username}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="comment-right-meta">
+                                    <div className="comment-timestamp">
+                                      <Clock size={12} />
+                                      {formatDate(reply.create_time)}
+                                    </div>
+                                    <div className="comment-actions-inline">
+                                      <button
+                                        className="comment-icon-subtle quote-btn"
+                                        title="Kutip balasan untuk Bab 4 Skripsi"
+                                        onClick={() => {
+                                          setVerbatimModalComment(reply);
+                                          setVerbatimModalIndex(rIdx + 1);
                                         }}
-                                      />
-                                    ) : null}
-                                    <span>
-                                      {(reply.nickname || reply.username || '?').charAt(0).toUpperCase()}
-                                    </span>
-                                  </div>
-                                  <div className="author-names-line">
-                                    <span className="author-name-bold">
-                                      {reply.nickname || reply.username}
-                                    </span>
-                                    <span className="author-handle-gray">
-                                      @{reply.username}
-                                    </span>
+                                        aria-label="Kutip balasan verbatim"
+                                      >
+                                        <Quote size={12} />
+                                      </button>
+                                      <button
+                                        className="comment-icon-subtle"
+                                        title="Salin balasan"
+                                        onClick={() =>
+                                          copyToClipboard(
+                                            reply.comment,
+                                            reply.comment_id || rIdx,
+                                          )
+                                        }
+                                        aria-label="Salin balasan"
+                                      >
+                                        {copiedId ===
+                                        (reply.comment_id || rIdx) ? (
+                                          <Check
+                                            size={13}
+                                            color="var(--color-success)"
+                                          />
+                                        ) : (
+                                          <Copy size={13} />
+                                        )}
+                                      </button>
+                                    </div>
                                   </div>
                                 </div>
 
-                                <div className="comment-right-meta">
-                                  <div className="comment-timestamp">
-                                    <Clock size={12} />
-                                    {formatDate(reply.create_time)}
-                                  </div>
-                                  <div className="comment-actions-inline">
-                                    <button
-                                      className="comment-icon-subtle quote-btn"
-                                      title="Kutip balasan untuk Bab 4 Skripsi"
-                                      onClick={() => {
-                                        setVerbatimModalComment(reply);
-                                        setVerbatimModalIndex(rIdx + 1);
-                                      }}
-                                      aria-label="Kutip balasan verbatim"
-                                    >
-                                      <Quote size={12} />
-                                    </button>
-                                    <button
-                                      className="comment-icon-subtle"
-                                      title="Salin balasan"
-                                      onClick={() => copyToClipboard(reply.comment, reply.comment_id || rIdx)}
-                                      aria-label="Salin balasan"
-                                    >
-                                      {copiedId === (reply.comment_id || rIdx) ? (
-                                        <Check size={13} color="var(--color-success)" />
-                                      ) : (
-                                        <Copy size={13} />
-                                      )}
-                                    </button>
-                                  </div>
+                                <div className="comment-body-text">
+                                  {renderHighlighted(
+                                    reply.comment,
+                                    searchKeyword,
+                                  )}
                                 </div>
                               </div>
-
-                              <div className="comment-body-text">
-                                {renderHighlighted(reply.comment, searchKeyword)}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                            ))}
+                          </div>
+                        )}
                     </div>
                   );
                 })}
@@ -543,13 +627,28 @@ export default function CommentsPage({
               {filteredComments.length > 0 && (
                 <div className="pagination-bar">
                   <div className="pagination-info">
-                    Menampilkan <strong>{Math.min((currentPage - 1) * pageSize + 1, filteredComments.length)}</strong> - <strong>{Math.min(currentPage * pageSize, filteredComments.length)}</strong> dari <strong>{filteredComments.length}</strong> komentar
+                    Menampilkan{" "}
+                    <strong>
+                      {Math.min(
+                        (currentPage - 1) * pageSize + 1,
+                        filteredComments.length,
+                      )}
+                    </strong>{" "}
+                    -{" "}
+                    <strong>
+                      {Math.min(
+                        currentPage * pageSize,
+                        filteredComments.length,
+                      )}
+                    </strong>{" "}
+                    dari <strong>{filteredComments.length}</strong> komentar
                   </div>
 
                   <div className="pagination-controls-wrap">
                     <div className="page-size-selector">
                       <span>Per halaman:</span>
                       <select
+                        aria-label="Komentar per halaman"
                         className="page-size-select"
                         value={pageSize}
                         onChange={(e) => {
@@ -569,7 +668,7 @@ export default function CommentsPage({
                         className="pagination-btn"
                         onClick={() => {
                           setCurrentPage((p) => Math.max(p - 1, 1));
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
                         disabled={currentPage === 1}
                         title="Halaman Sebelumnya"
@@ -578,29 +677,36 @@ export default function CommentsPage({
                       </button>
 
                       {getPageNumbers().map((num, idx) =>
-                        num === '...' ? (
-                          <span key={`ellipsis-${idx}`} className="pagination-ellipsis">
+                        num === "..." ? (
+                          <span
+                            key={`ellipsis-${idx}`}
+                            className="pagination-ellipsis"
+                          >
                             ...
                           </span>
                         ) : (
                           <button
                             key={num}
-                            className={`pagination-btn ${currentPage === num ? 'active' : ''}`}
+                            aria-current={
+                              currentPage === num ? "page" : undefined
+                            }
+                            aria-label={`Halaman ${num}`}
+                            className={`pagination-btn ${currentPage === num ? "active" : ""}`}
                             onClick={() => {
                               setCurrentPage(num);
-                              window.scrollTo({ top: 0, behavior: 'smooth' });
+                              window.scrollTo({ top: 0, behavior: "smooth" });
                             }}
                           >
                             {num}
                           </button>
-                        )
+                        ),
                       )}
 
                       <button
                         className="pagination-btn"
                         onClick={() => {
                           setCurrentPage((p) => Math.min(p + 1, totalPages));
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                          window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
                         disabled={currentPage === totalPages}
                         title="Halaman Selanjutnya"
@@ -616,17 +722,34 @@ export default function CommentsPage({
         </section>
       )}
 
+      {!data && loading && (
+        <div className="empty-state-box" role="status">
+          Memuat data komentar…
+        </div>
+      )}
       {/* Empty state when no data loaded */}
       {!data && !loading && (
         <div className="empty-state-box">
           <MessageSquare size={42} className="empty-state-icon" />
           <h4>Belum ada data komentar yang dipilih</h4>
-          <p>Mulai scraping konten baru di tab Dashboard, atau pilih dataset dari riwayat penelitian Anda.</p>
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '10px' }}>
-            <button className="btn btn-scrape-primary" onClick={() => switchTab('dashboard')} style={{ height: '38px', padding: '0 16px' }}>
-              Buka Form Scraper
+          <p>
+            Pilih dataset di atas, ambil komentar baru, atau unggah dataset
+            Anda.
+          </p>
+          <div
+            style={{ display: "flex", justifyContent: "center", gap: "10px" }}
+          >
+            <button
+              className="btn btn-scrape-primary"
+              onClick={() => switchTab("dashboard")}
+              style={{ height: "38px", padding: "0 16px" }}
+            >
+              Ambil komentar
             </button>
-            <button className="btn btn-white-bordered" onClick={() => fileInputRef.current?.click()}>
+            <button
+              className="btn btn-white-bordered"
+              onClick={() => fileInputRef.current?.click()}
+            >
               Unggah Dataset
             </button>
           </div>
