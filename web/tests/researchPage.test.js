@@ -7,7 +7,7 @@ import { createServer } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { emptyResearch } from '../src/utils/researchContext.js';
 
-let server, ResearchPage, root, dom;
+let server, ResearchPage, AiHistory, root, dom;
 const originalFetch = globalThis.fetch;
 before(async () => {
   dom = new JSDOM('<!doctype html><div id="root"></div>', { url: 'http://localhost/' });
@@ -17,6 +17,7 @@ before(async () => {
   globalThis.IS_REACT_ACT_ENVIRONMENT = true;
   server = await createServer({ root: fileURLToPath(new URL('..', import.meta.url)), server: { middlewareMode: true }, appType: 'custom' });
   ResearchPage = (await server.ssrLoadModule('/src/pages/ResearchPage.jsx')).default;
+  AiHistory = (await server.ssrLoadModule('/src/components/AiHistory.jsx')).default;
 });
 afterEach(async () => { if (root) await act(() => root.unmount()); root = null; globalThis.fetch = originalFetch; });
 after(async () => { await server?.close(); dom?.window.close(); });
@@ -28,8 +29,8 @@ const response = (payload) => new Response(JSON.stringify({ kind: payload.kind, 
 const button = name => [...document.querySelectorAll('button')].find(b => b.textContent === name);
 async function click(name) { const el = button(name); assert.ok(el, `Button ${name}`); await act(async () => el.click()); }
 
-async function mount({ kind = 'titles', empty = false, saveFailure = false } = {}) {
-  const store = { selectedFile: empty ? '' : 'a.json', state: emptyResearch(), kind, saves: [], frameworks: [] };
+async function mount({ kind = 'titles', empty = false, saveFailure = false, resultSaveFailure = false } = {}) {
+  const store = { selectedFile: empty ? '' : 'a.json', state: emptyResearch(), kind, saves: [], frameworks: [], resultSaves: [], resultSaveFailure };
   function Harness() {
     const [file, setFile] = React.useState(store.selectedFile);
     const [mode, setMode] = React.useState(kind);
@@ -41,6 +42,7 @@ async function mount({ kind = 'titles', empty = false, saveFailure = false } = {
       data: empty ? null : dataset, loading: false, loadFileContent: setFile, state: current,
       onChange: next => setStates(prev => ({ ...prev, [file]: typeof next === 'function' ? next(prev[file] || emptyResearch()) : next })),
       onSave: async value => { if (saveFailure) throw new Error('offline'); store.saves.push(value); },
+      onSaveResult: async value => { if (store.resultSaveFailure) throw new Error('offline'); store.resultSaves.push(value); },
       onUseFramework: value => store.frameworks.push(value),
       switchTab: tab => setMode(tab === 'research-theories' ? 'theories' : 'titles'),
     });
@@ -74,6 +76,8 @@ test('complete title → theory → title flow, details, save and regeneration',
   assert.equal(requests[2].context.theory, 'Framing');
   assert.equal(requests[2].previous_titles[0], titleCard.title);
   assert.equal(store.saves.length, 2);
+  assert.equal(store.resultSaves.length, 3);
+  assert.equal(store.resultSaves[1].kind, 'theories');
 });
 
 test('standalone theory workflow works without selecting a title', async () => {
@@ -109,4 +113,34 @@ test('empty datasets, AI failure and persistence failure are visible', async () 
   assert.match(document.querySelector('[role="alert"]').textContent, /AI gagal/);
   await click('Simpan konteks');
   assert.match(document.querySelector('[role="alert"]').textContent, /gagal disimpan/);
+});
+
+test('failed history save can retry without generating again', async () => {
+  let calls = 0;
+  globalThis.fetch = async (_url, options) => { calls++; return response(JSON.parse(options.body)); };
+  const store = await mount({ resultSaveFailure: true });
+  await click('Generate Ide Judul');
+  assert.match(document.querySelector('[role="alert"]').textContent, /gagal disimpan ke riwayat/);
+  store.resultSaveFailure = false;
+  await click('Simpan ulang hasil AI');
+  assert.equal(store.resultSaves.length, 1);
+  assert.equal(calls, 1);
+});
+
+test('history cards open exact cached result and filter active dataset', async () => {
+  const opened = [];
+  const record = { result: { kind: 'titles', items: [titleCard] }, updatedAt: '2026-09-25T10:00:00Z' };
+  root = createRoot(document.getElementById('root'));
+  await act(() => root.render(React.createElement(AiHistory, {
+    files: [{ filename: 'a.json', caption: 'Dataset A', analyses: { research_titles: record } }, { filename: 'b.json', caption: 'Dataset B', analyses: { research_titles: record } }],
+    kind: 'titles', selectedFile: 'b.json', onOpen: entry => opened.push(entry),
+  })));
+  assert.equal(document.querySelectorAll('.ai-history-card').length, 2);
+  const select = document.querySelector('select');
+  await act(() => { select.value = 'active'; select.dispatchEvent(new dom.window.Event('change', { bubbles: true })); });
+  assert.equal(document.querySelectorAll('.ai-history-card').length, 1);
+  await click('Buka Hasil ');
+  assert.equal(opened[0].filename, 'b.json');
+  assert.equal(opened[0].result, record.result);
+  assert.equal(opened[0].kind, 'titles');
 });

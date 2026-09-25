@@ -212,7 +212,8 @@ export async function getUserScrapes(userId) {
         video_url: data.video_url || '',
         comments_count: data.comments_count || (data.comments ? data.comments.length : 0),
         modified: data.modified || (data.updatedAt?.toDate?.()?.toISOString()) || new Date().toISOString(),
-        comments: data.comments || []
+        comments: data.comments || [],
+        analyses: data.analyses || {}
       };
     });
   } catch (err) {
@@ -228,7 +229,8 @@ export async function getUserScrapes(userId) {
         video_url: data.video_url || '',
         comments_count: data.comments_count || (data.comments ? data.comments.length : 0),
         modified: data.modified || new Date().toISOString(),
-        comments: data.comments || []
+        comments: data.comments || [],
+        analyses: data.analyses || {}
       };
     });
     // Sort in memory by modified descending
@@ -277,7 +279,7 @@ export async function saveUserAiAnalysis(userId, filename, analysisType, analysi
         }
       }
     },
-    { merge: true }
+    { mergeFields: [`analyses.${analysisType}`] }
   );
 }
 

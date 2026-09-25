@@ -12,6 +12,8 @@ import DashboardPage from './pages/DashboardPage';
 import CommentsPage from './pages/CommentsPage';
 import AnalysisPage from './pages/AnalysisPage';
 import ResearchPage from './pages/ResearchPage';
+import AiHistory from './components/AiHistory';
+import { researchCacheKey, restoreResearchResults } from './utils/aiHistory';
 import { emptyResearch, restoreResearch } from './utils/researchContext';
 import DatasetsPage from './pages/DatasetsPage';
 import SettingsPage from './pages/SettingsPage';
@@ -107,6 +109,18 @@ export default function App() {
   const [analysisType, setAnalysisType] = useState('entman_framing');
   const [fwCategoryFilter, setFwCategoryFilter] = useState('komunikasi');
   const [researchByFile, setResearchByFile] = useState({});
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState('');
+  const [historyOpening, setHistoryOpening] = useState(false);
+  const [researchProcessing, setResearchProcessing] = useState(false);
+  const [openedHistoryId, setOpenedHistoryId] = useState('');
+  const analysisSequence = useRef(0);
+  useEffect(() => {
+    if (!openedHistoryId) return;
+    const target = document.getElementById('ai-history-result');
+    target?.focus({ preventScroll: true });
+    target?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+  }, [openedHistoryId]);
   const loadSequence = useRef(0);
   const researchSaves = useRef(new Map());
   const researchState = researchByFile[selectedFile] || emptyResearch(
@@ -164,6 +178,9 @@ export default function App() {
       if (researchUser.current !== (user?.uid || null)) {
         researchUser.current = user?.uid || null;
         setResearchByFile({});
+        setOpenedHistoryId('');
+        setHistoryError('');
+        analysisSequence.current += 1;
         setSelectedFile('');
         setData(null);
         setFiles([]);
@@ -198,8 +215,12 @@ export default function App() {
   // Fetch list of saved files from Firestore (private per-user)
   const fetchFilesList = async () => {
     if (!currentUser) return;
+    const uid = currentUser.uid;
+    setHistoryLoading(true);
+    setHistoryError('');
     try {
       const userScrapes = await getUserScrapes(currentUser.uid);
+      if (researchUser.current !== uid) return;
       setFiles(userScrapes);
 
       if (userScrapes.length > 0 && !selectedFile) {
@@ -207,6 +228,46 @@ export default function App() {
       }
     } catch (err) {
       console.error('Failed to fetch files from user Firestore:', err);
+      if (researchUser.current === uid) setHistoryError('Riwayat belum dapat dimuat. Periksa koneksi lalu klik Muat ulang riwayat.');
+    } finally {
+      if (researchUser.current === uid) setHistoryLoading(false);
+    }
+  };
+
+  // Keep the existing per-dataset cache as the source for both old and new results.
+  const saveAiResult = async (filename, type, result) => {
+    const uid = currentUser.uid;
+    await saveUserAiAnalysis(uid, filename, type, result);
+    if (researchUser.current !== uid) return;
+    setFiles(prev => prev.map(file => file.filename === filename ? {
+      ...file, analyses: { ...file.analyses, [type]: { result, updatedAt: new Date().toISOString() } },
+    } : file));
+  };
+
+  const openHistory = async (entry) => {
+    if (historyOpening || loading || aiLoading || researchProcessing) return;
+    const uid = currentUser.uid;
+    setHistoryOpening(true);
+    setHistoryError('');
+    try {
+      const loaded = await loadFileContent(entry.filename, false, { skipAnalysis: true, framework: entry.kind === 'analysis' ? entry.type : null });
+      if (researchUser.current !== uid) return;
+      if (!loaded) throw new Error('Dataset untuk hasil ini belum dapat dimuat. Coba muat ulang riwayat.');
+      if (entry.kind === 'analysis') {
+        setAnalysisType(entry.type);
+        setAiAnalysis({ ...normalizeAiAnalysis(entry.result), analysis_type: entry.type, filename: entry.filename });
+        setAiError('');
+      } else {
+        setResearchByFile(prev => ({ ...prev, [entry.filename]: {
+          ...(prev[entry.filename] || emptyResearch()),
+          results: { ...prev[entry.filename]?.results, [entry.kind]: entry.result },
+        } }));
+      }
+      setOpenedHistoryId(entry.id);
+    } catch (err) {
+      if (researchUser.current === uid) setHistoryError(err.message || 'Hasil tersimpan belum dapat dibuka.');
+    } finally {
+      setHistoryOpening(false);
     }
   };
 
@@ -271,9 +332,12 @@ export default function App() {
   }, [currentUser]);
 
   // Load comment data for a specific file
-  const loadFileContent = async (filename, shouldSwitchTab = false) => {
+  const loadFileContent = async (filename, shouldSwitchTab = false, options = {}) => {
     if (!filename || !currentUser) return;
     const sequence = ++loadSequence.current;
+    analysisSequence.current += 1;
+    setOpenedHistoryId('');
+    setAiAnalysis(null);
     setLoading(true);
     setSelectedFile(filename);
     setData(null);
@@ -282,17 +346,20 @@ export default function App() {
       if (sequence !== loadSequence.current) return;
       if (docData) {
         setData(docData);
-        const restored = researchByFile[filename] || restoreResearch(docData.researchContext, fwCategoryFilter === 'all' ? 'komunikasi' : fwCategoryFilter, analysisType);
+        const restored = researchByFile[filename] || {
+          ...restoreResearch(docData.researchContext, fwCategoryFilter === 'all' ? 'komunikasi' : fwCategoryFilter, analysisType),
+          results: restoreResearchResults(docData.analyses),
+        };
         setResearchByFile(prev => ({ ...prev, [filename]: prev[filename] || restored }));
-        const restoredFramework = FRAMEWORKS_LIST.some(f => f.id === restored.draft.framework_id) ? restored.draft.framework_id : analysisType;
+        const restoredFramework = options.framework || (FRAMEWORKS_LIST.some(f => f.id === restored.draft.framework_id) ? restored.draft.framework_id : analysisType);
         setAnalysisType(restoredFramework);
         setExpandedReplies(new Set());
         setCurrentPage(1);
-        loadAiAnalysis(filename, restoredFramework);
+        if (!options.skipAnalysis) loadAiAnalysis(filename, restoredFramework);
         if (shouldSwitchTab) {
           switchTab('results');
         }
-        return;
+        return true;
       }
 
       const res = await fetch(`${API_BASE}/api/files/${encodeURIComponent(filename)}`, {
@@ -304,10 +371,11 @@ export default function App() {
         setData(json);
         setExpandedReplies(new Set());
         setCurrentPage(1);
-        loadAiAnalysis(filename, analysisType);
+        if (!options.skipAnalysis) loadAiAnalysis(filename, analysisType);
         if (shouldSwitchTab) {
           switchTab('results');
         }
+        return true;
       }
     } catch (err) {
       console.error('Failed to load file content:', err);
@@ -318,6 +386,7 @@ export default function App() {
 
   // Load cached AI analysis from Firestore
   const loadAiAnalysis = async (filename, type = analysisType) => {
+    const sequence = ++analysisSequence.current;
     if (!filename || !currentUser) {
       setAiAnalysis(null);
       return;
@@ -330,6 +399,7 @@ export default function App() {
         console.warn('Unable to read analysis history:', err);
       }
       if (!cached) cached = await getServerAnalysis(API_BASE, filename, type);
+      if (sequence !== analysisSequence.current) return;
       if (cached) {
         setAiAnalysis(normalizeAiAnalysis(cached));
         setAiError('');
@@ -337,6 +407,7 @@ export default function App() {
       }
       setAiAnalysis(null);
     } catch (err) {
+      if (sequence !== analysisSequence.current) return;
       console.error('Failed to check AI cache:', err);
       setAiAnalysis(null);
     }
@@ -344,6 +415,7 @@ export default function App() {
 
   // Change research framework
   const handleFrameworkChange = (newType) => {
+    setOpenedHistoryId('');
     setAnalysisType(newType);
     if (selectedFile) updateResearch(prev => ({ ...prev, draft: { ...prev.draft, framework_id: newType } }));
     setAiAnalysis(null); // Clear immediately to prevent rendering wrong/stale framework
@@ -358,6 +430,8 @@ export default function App() {
     if (!selectedFile || aiLoading) return;
     setAiLoading(true);
     setAiError('');
+    const sequence = ++analysisSequence.current;
+    const uid = currentUser.uid;
     try {
       const json = await requestAnalysis(API_BASE, {
         research_context: {
@@ -373,18 +447,20 @@ export default function App() {
       });
 
       const normalized = normalizeAiAnalysis(json);
-      setAiAnalysis(normalized);
+      if (researchUser.current !== uid) return;
+      if (sequence === analysisSequence.current) setAiAnalysis(normalized);
 
       if (currentUser) {
         try {
-          await saveUserAiAnalysis(currentUser.uid, selectedFile, analysisType, normalized);
+          await saveAiResult(selectedFile, analysisType, normalized);
         } catch (err) {
           console.warn('Analysis is available, but history sync failed:', err);
+          if (sequence === analysisSequence.current) setAiError('Hasil tersedia, tetapi gagal disimpan ke riwayat akun. Simpan ulang hasil melalui tombol di bawah.');
         }
       }
     } catch (err) {
       console.error('AI Analysis failed:', err);
-      setAiError(err.message || 'Terjadi kesalahan saat memproses analisis dengan AI.');
+      if (sequence === analysisSequence.current) setAiError(err.message || 'Terjadi kesalahan saat memproses analisis dengan AI.');
     } finally {
       setAiLoading(false);
     }
@@ -901,15 +977,30 @@ export default function App() {
           )}
 
           {/* TAB 3: ANALISIS AI SKRIPSI */}
+          {['ai-analysis', 'research-titles', 'research-theories'].includes(activeTab) && <>
+            <AiHistory key={activeTab} files={files}
+              kind={activeTab === 'ai-analysis' ? 'analysis' : activeTab === 'research-titles' ? 'titles' : 'theories'}
+              selectedFile={selectedFile} onOpen={openHistory} loading={historyLoading}
+              error={historyError} onRefresh={fetchFilesList} disabled={loading || aiLoading || historyOpening || researchProcessing}
+              openedId={openedHistoryId} />
+            {historyOpening && <p role="status">Membuka hasil AI tersimpan…</p>}
+            <div id="ai-history-result" tabIndex={-1} />
+          </>}
           {['research-titles', 'research-theories'].includes(activeTab) && (
             <ResearchPage key={`${currentUser.uid}:${selectedFile}:${activeTab}`}
               kind={activeTab === 'research-titles' ? 'titles' : 'theories'}
               files={files} selectedFile={selectedFile} data={data} loading={loading}
               loadFileContent={loadFileContent} state={researchState} onChange={updateResearch}
+              onSaveResult={result => saveAiResult(selectedFile, researchCacheKey(result.kind), result)}
+              onProcessingChange={setResearchProcessing}
               onSave={persistResearch} switchTab={switchTab} onUseFramework={handleFrameworkChange} />
           )}
           {activeTab === 'ai-analysis' && (
             <ErrorBoundary onReset={() => setAiAnalysis(null)}>
+              {aiAnalysis && aiError.includes('gagal disimpan') && <button onClick={async () => {
+                try { await saveAiResult(selectedFile, analysisType, aiAnalysis); setAiError(''); }
+                catch { setAiError('Hasil gagal disimpan ke riwayat. Periksa koneksi dan coba lagi.'); }
+              }}>Simpan ulang hasil analisis</button>}
               {(researchState.selectedTitle || researchState.selectedTheory) && <aside className="research-context">
                 <strong>Konteks penelitian aktif</strong>
                 <p>{researchState.selectedTitle || 'Judul belum dipilih'}</p>

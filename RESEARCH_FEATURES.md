@@ -2,7 +2,13 @@
 
 Menu **Generator ide judul** (`/ide-judul`) dan **Rekomendasi teori** (`/rekomendasi-teori`) menggunakan Dataset Switcher dan state `App` yang sama dengan analisis. Navigasi mobile menyediakan pintasan **Rancangan**.
 
-Generator menghasilkan 5–10 ide; rekomendasi menghasilkan 3–5 teori. Kartu mencakup penjelasan, kebutuhan data, detail, dan tindakan untuk membawa konteks ke fitur lain. Mengubah formulir atau mencari teori dari sebuah kartu tidak otomatis menetapkan judul. **Gunakan Judul**, **Gunakan Teori**, dan **Simpan konteks** menyimpan konteks pada `users/{uid}/scrapes/{dataset}.researchContext` melalui Firebase yang sudah digunakan aplikasi. **Simpan konteks** juga menetapkan judul yang dimasukkan secara manual. Hasil generasi disimpan dalam state per dataset selama sesi; pilihan penelitian dipulihkan dari Firestore.
+Generator menghasilkan 5–10 ide; rekomendasi menghasilkan 3–5 teori. Kartu mencakup penjelasan, kebutuhan data, detail, dan tindakan untuk membawa konteks ke fitur lain. Mengubah formulir atau mencari teori dari sebuah kartu tidak otomatis menetapkan judul. **Gunakan Judul**, **Gunakan Teori**, dan **Simpan konteks** menyimpan konteks pada `users/{uid}/scrapes/{dataset}.researchContext` melalui Firebase yang sudah digunakan aplikasi. **Simpan konteks** juga menetapkan judul yang dimasukkan secara manual. Hasil generasi terakhir dan pilihan penelitian dipulihkan dari Firestore.
+
+## Hasil AI Tersimpan
+
+Ketiga halaman AI menampilkan kartu hasil tersimpan lintas dataset, dengan pencarian dan filter dataset aktif. Kartu memuat dataset, jenis hasil/kerangka, ringkasan, jumlah hasil, dan waktu simpan. **Buka Hasil** memuat data terkait dan hasil cache tanpa memanggil model atau mengganti pilihan judul/teori.
+
+Penyimpanan memakai cache `analyses` pada dokumen dataset yang sudah ada: analisis tetap memakai ID framework, sedangkan hasil rancangan memakai `research_titles` dan `research_theories`. Field jenis hasil diganti secara utuh tanpa menghapus cache jenis lain. Riwayat ini menyimpan hasil terakhir per dataset dan jenis, bukan arsip semua generasi. Hasil analisis lama di Firestore langsung muncul; hasil judul/teori dari sesi sebelum fitur ini yang belum pernah disimpan tidak dapat dipulihkan. Kegagalan penyimpanan menampilkan tombol simpan ulang tanpa generasi ulang.
 
 ## Alur teknis
 

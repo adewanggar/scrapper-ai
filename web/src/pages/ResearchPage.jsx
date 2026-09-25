@@ -4,15 +4,20 @@ import { API_BASE, FRAMEWORK_CATEGORIES, FRAMEWORKS_LIST } from '../constants/fr
 import { METHODS, requestResearch, selectResearchTitle, selectResearchTheory } from '../utils/researchContext';
 import './research.css';
 
-export default function ResearchPage({ kind, files, selectedFile, data, loading, loadFileContent, state, onChange, onSave, switchTab, onUseFramework }) {
+export default function ResearchPage({ kind, files, selectedFile, data, loading, loadFileContent, state, onChange, onSave, onSaveResult, onProcessingChange, switchTab, onUseFramework }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [saveFailed, setSaveFailed] = useState(false);
   const controller = useRef(null);
   const draft = state.draft;
   const result = state.results?.[kind];
   const titles = kind === 'titles';
   useEffect(() => () => controller.current?.abort(), []);
+  useEffect(() => {
+    onProcessingChange?.(busy);
+    return () => onProcessingChange?.(false);
+  }, [busy, onProcessingChange]);
   const edit = (patch) => onChange({ ...state, draft: { ...draft, ...patch } });
   const save = async (next) => {
     setError(''); setNotice('');
@@ -39,7 +44,14 @@ export default function ResearchPage({ kind, files, selectedFile, data, loading,
         context: { ...draft, department: FRAMEWORK_CATEGORIES.find(c => c.id === draft.department)?.label || draft.department, theory: draft.theory || framework?.theory || '' },
         previous_titles: result?.items?.map(c => c.title).filter(Boolean) || [],
       }, signal);
-      if (!signal.aborted) onChange(prev => ({ ...prev, results: { ...prev.results, [kind]: { ...response, input: { ...draft } } } }));
+      if (!signal.aborted) {
+        const completed = { ...response, input: { ...draft } };
+        onChange(prev => ({ ...prev, results: { ...prev.results, [kind]: completed } }));
+        if (onSaveResult) {
+          try { await onSaveResult(completed); setSaveFailed(false); setNotice('Hasil AI tersimpan di riwayat akun.'); }
+          catch { setSaveFailed(true); setError('Hasil berhasil dibuat, tetapi gagal disimpan ke riwayat. Simpan ulang agar dapat dibuka pada sesi berikutnya.'); }
+        }
+      }
     } catch (e) {
       if (signal.aborted) setError('Permintaan dihentikan atau melewati batas waktu. Silakan coba kembali.');
       else setError(e.message || 'Koneksi gagal. Silakan coba kembali.');
@@ -80,6 +92,12 @@ export default function ResearchPage({ kind, files, selectedFile, data, loading,
     {busy && <p role="status" className="research-context">AI sedang menelaah dataset dan menyusun {titles ? 'alternatif judul' : 'rekomendasi teori'}…</p>}
     {error && <p role="alert" className="research-error">{error}</p>}
     {notice && <p role="status">{notice}</p>}
+    {saveFailed && result && <button disabled={busy} onClick={async () => {
+      setBusy(true);
+      try { await onSaveResult(result); setSaveFailed(false); setError(''); setNotice('Hasil AI tersimpan di riwayat akun.'); }
+      catch { setError('Penyimpanan riwayat masih gagal. Periksa koneksi dan coba lagi.'); }
+      finally { setBusy(false); }
+    }}>Simpan ulang hasil AI</button>}
     {!result && !busy && <p className="research-empty">Belum ada hasil. Sesuaikan formulir lalu jalankan {titles ? 'generator judul' : 'pencarian teori'}.</p>}
     {result && <>
       <aside className="research-context"><strong>Cakupan hasil</strong><p>{result.coverage.sampled} dari {result.coverage.total} teks komentar/balasan; {result.coverage.truncated} teks dipotong untuk konteks AI.</p>
