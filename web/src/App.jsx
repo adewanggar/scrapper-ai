@@ -313,9 +313,12 @@ export default function App() {
     setScrapeSuccess(null);
 
     try {
+      const trimmedInput = scrapeInput.trim();
       const payload = {
         platform: selectedPlatform,
-        video_url: scrapeInput.trim()
+        video_url: trimmedInput,
+        url: trimmedInput,
+        aweme_id: trimmedInput
       };
 
       // Scraper Instagram dinonaktifkan sementara (fokus ke TikTok dan YouTube)
@@ -351,7 +354,7 @@ export default function App() {
 
       setScrapeSuccess({
         filename: result.filename,
-        commentsCount: result.total_comments || result.comments_count || 0
+        commentsCount: result.total_comments ?? result.comments_count ?? (result.data?.comments?.length) ?? 0
       });
 
       await fetchFilesList();

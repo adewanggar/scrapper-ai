@@ -102,7 +102,15 @@ export default function DashboardPage({
                     : 'Tempelkan link video TikTok, shortlink vt.tiktok.com, atau ID video (contoh: https://vt.tiktok.com/ZSbJY5aH9/)...'
                 }
                 value={scrapeInput}
-                onChange={(e) => setScrapeInput(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setScrapeInput(val);
+                  if (val.includes('youtube.com') || val.includes('youtu.be')) {
+                    setSelectedPlatform('youtube');
+                  } else if (val.includes('tiktok.com')) {
+                    setSelectedPlatform('tiktok');
+                  }
+                }}
                 disabled={isScraping}
                 autoFocus
               />

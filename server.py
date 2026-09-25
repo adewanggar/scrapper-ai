@@ -281,7 +281,22 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
             return
 
         platform = body.get('platform', 'tiktok').lower()
-        raw_input = str(body.get('url') or body.get('aweme_id', '')).strip()
+        raw_input = str(
+            body.get('video_url') or 
+            body.get('url') or 
+            body.get('aweme_id') or 
+            body.get('link') or 
+            body.get('id') or 
+            ''
+        ).strip()
+
+        # Auto-detect platform if input matches YouTube or TikTok patterns
+        if ('youtube.com' in raw_input or 'youtu.be' in raw_input) and platform != 'youtube':
+            logger.info(f"Auto-detected YouTube URL while platform was '{platform}'. Switching to youtube.")
+            platform = 'youtube'
+        elif ('tiktok.com' in raw_input) and platform != 'tiktok':
+            logger.info(f"Auto-detected TikTok URL while platform was '{platform}'. Switching to tiktok.")
+            platform = 'tiktok'
 
         # Scraper Instagram dinonaktifkan sementara (fokus ke TikTok dan YouTube)
         # if platform == 'instagram':
@@ -342,12 +357,15 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
                     json.dump(data, f, ensure_ascii=False, indent=4)
 
                 logger.info(f"YouTube scraped and saved successfully: {final_path}")
+                comments_list = data.get("comments", []) if isinstance(data, dict) else []
                 self._send_json(200, {
                     "success": True,
                     "platform": "youtube",
                     "id": video_id,
                     "filename": final_filename,
-                    "data": data
+                    "data": data,
+                    "comments_count": len(comments_list),
+                    "total_comments": len(comments_list)
                 })
             except Exception as e:
                 logger.error(f"Error scraping YouTube {video_id}: {e}")
@@ -373,12 +391,15 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
                 json.dump(comments.dict, f, ensure_ascii=False, indent=4)
 
             logger.info(f"TikTok scraped and saved successfully: {final_path}")
+            comments_list = comments.dict.get("comments", []) if isinstance(comments.dict, dict) else []
             self._send_json(200, {
                 "success": True,
                 "platform": "tiktok",
                 "aweme_id": aweme_id,
                 "filename": f"{aweme_id}.json",
-                "data": comments.dict
+                "data": comments.dict,
+                "comments_count": len(comments_list),
+                "total_comments": len(comments_list)
             })
         except Exception as e:
             logger.error(f"Error scraping TikTok {aweme_id}: {e}")

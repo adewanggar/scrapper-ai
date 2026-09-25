@@ -85,10 +85,17 @@ class TiktokComment:
             }
         )
 
+        try:
+            resp_json = response.json() or {}
+        except Exception:
+            resp_json = {}
+
+        raw_replies = resp_json.get('comments') or []
+
         return [
             self.__parse_comment(
                 comment
-            ) for comment in response.json().pop('comments')
+            ) for comment in raw_replies if comment
         ]
     
     def get_all_comments(
@@ -100,14 +107,17 @@ class TiktokComment:
             aweme_id=aweme_id,
             page=page   
         )
-        while(True):
+        while data.has_more:
             page += 1
             
             comments: Comments = self.get_comments(
                 aweme_id=aweme_id,
                 page=page
             )
-            if(not comments.has_more): break
+            if not comments.comments or not comments.has_more:
+                if comments.comments:
+                    data.comments.extend(comments.comments)
+                break
 
             data.comments.extend(
                 comments.comments
@@ -133,25 +143,30 @@ class TiktokComment:
             }
         )
 
-        data: Dict[str, Any] = jmespath.search(    
-            """
-            {
-                caption: comments[0].share_info.title,
-                video_url: comments[0].share_info.url,
-                comments: comments,
-                has_more: has_more
-            }
-            """,
-            response.json()
-        )
+        try:
+            resp_json = response.json() or {}
+        except Exception:
+            resp_json = {}
+
+        raw_comments = resp_json.get('comments') or []
+        has_more = int(resp_json.get('has_more', 0))
+
+        caption = ""
+        video_url = ""
+        if raw_comments and isinstance(raw_comments[0], dict):
+            share_info = raw_comments[0].get('share_info', {}) or {}
+            caption = share_info.get('title', '')
+            video_url = share_info.get('url', '')
+
+        parsed_comments = [
+            self.__parse_comment(comment) for comment in raw_comments if comment
+        ]
 
         return Comments(
-            comments=[
-                self.__parse_comment(
-                    comment
-                ) for comment in data.pop('comments')
-            ],
-            **data,
+            comments=parsed_comments,
+            caption=caption,
+            video_url=video_url,
+            has_more=has_more
         )
     
     def __call__(
