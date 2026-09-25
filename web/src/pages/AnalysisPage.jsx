@@ -32,12 +32,14 @@ import {
   FRAMEWORKS_LIST
 } from '../constants/frameworks';
 import { normalizeAiAnalysis } from '../utils/aiNormalize';
+import { AiProgressBar } from '../components/ResearchProgress';
 
 export default function AnalysisPage({
   analysisType,
   handleFrameworkChange,
   aiSampleSize,
   setAiSampleSize,
+  aiModel = 'clario/gemini-3.7-flash',
   aiLoading,
   aiError,
   aiAnalysis: rawAiAnalysis,
@@ -648,6 +650,16 @@ export default function AnalysisPage({
                   </div>
                 )}
 
+                {/* AI Analysis Progress Bar */}
+                {aiLoading && (
+                  <AiProgressBar
+                    aiLoading={aiLoading}
+                    framework={currentFw}
+                    model={aiModel}
+                    sampleSize={aiSampleSize}
+                  />
+                )}
+
                 {/* Empty state when no analysis done yet for this framework */}
                 {!hasMatchingAnalysis && !aiLoading && (
                   <div className="empty-state-box">
@@ -687,7 +699,7 @@ export default function AnalysisPage({
                 )}
 
                 {/* AI Analysis Content View */}
-                {hasMatchingAnalysis && (
+                {hasMatchingAnalysis && !aiLoading && (
                   <div>
                     {/* 1. Context Banner (Perspective-Specific) */}
                     <div className="ai-context-banner">

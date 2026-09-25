@@ -114,13 +114,17 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
         parsed = urllib.parse.urlparse(self.path)
         path = parsed.path
 
-        if path.startswith('/api/') and path != '/api/status':
+        if path.startswith('/api/') and path not in ('/api/status', '/api/avatar-proxy'):
             if not self._is_authorized():
                 self._send_json(401, {"error": "Unauthorized: PIN Akses diperlukan atau tidak valid."})
                 return
 
         if path == '/api/files':
             self.handle_list_files()
+        elif path == '/api/avatar-proxy':
+            params = urllib.parse.parse_qs(parsed.query)
+            target_url = params.get('url', [''])[0]
+            self.handle_avatar_proxy(target_url)
         elif path == '/api/ai/frameworks':
             from ai_analyzer import ANALYSIS_FRAMEWORKS
             self._send_json(200, {"frameworks": list(ANALYSIS_FRAMEWORKS.values())})
@@ -136,6 +140,55 @@ class TikTokApiHandler(BaseHTTPRequestHandler):
             self._send_json(404, {"error": "API route not found"})
         else:
             self.handle_static(path)
+
+    def handle_avatar_proxy(self, target_url: str):
+        if not target_url or not (target_url.startswith('http://') or target_url.startswith('https://')):
+            self._send_json(400, {"error": "Invalid or missing image url"})
+            return
+
+        allowed_domains = (
+            'tiktokcdn.com',
+            'byteoversea.com',
+            'ibytedtos.com',
+            'ggpht.com',
+            'googleusercontent.com',
+            'youtube.com',
+            'tiktok.com'
+        )
+        parsed = urllib.parse.urlparse(target_url)
+        if not any(parsed.netloc.endswith(domain) for domain in allowed_domains):
+            self._send_json(403, {"error": "Domain not allowed for proxy"})
+            return
+
+        urls_to_try = [target_url]
+        if 'tiktokcdn.com' in target_url and ('-sign-' in target_url or '?' in target_url):
+            clean_url = target_url.split('?')[0].replace('-sign-', '-')
+            if clean_url not in urls_to_try:
+                urls_to_try.append(clean_url)
+
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+        }
+
+        for u in urls_to_try:
+            try:
+                resp = requests.get(u, headers=headers, timeout=6)
+                if resp.status_code == 200 and resp.content:
+                    content_type = resp.headers.get('Content-Type') or 'image/jpeg'
+                    self.send_response(200)
+                    self._send_cors_headers()
+                    self.send_header('Content-Type', content_type)
+                    self.send_header('Content-Length', str(len(resp.content)))
+                    self.send_header('Cache-Control', 'public, max-age=604800')
+                    self.end_headers()
+                    self.wfile.write(resp.content)
+                    return
+            except Exception as e:
+                logger.debug(f"Avatar proxy attempt failed for {u}: {e}")
+                continue
+
+        self._send_json(404, {"error": "Unable to fetch avatar image"})
 
     def handle_static(self, path):
         dist_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'web', 'dist')

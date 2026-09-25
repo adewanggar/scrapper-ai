@@ -1,5 +1,6 @@
 import React from "react";
 import "./comments.css";
+import { API_BASE } from "../constants/frameworks";
 import {
   Database,
   ChevronDown,
@@ -66,6 +67,29 @@ export default function CommentsPage({
   getPageNumbers,
   fileInputRef,
 }) {
+  const handleAvatarError = (e, originalAvatar) => {
+    const target = e.currentTarget;
+    if (!target.dataset.triedFallback && originalAvatar) {
+      target.dataset.triedFallback = "true";
+      if (
+        originalAvatar.includes("tiktokcdn.com") &&
+        (originalAvatar.includes("-sign-") || originalAvatar.includes("?"))
+      ) {
+        const cleanUrl = originalAvatar.split("?")[0].replace(/-sign-/, "-");
+        if (cleanUrl !== target.src) {
+          target.src = cleanUrl;
+          return;
+        }
+      }
+    }
+    if (!target.dataset.triedProxy && originalAvatar) {
+      target.dataset.triedProxy = "true";
+      target.src = `${API_BASE}/api/avatar-proxy?url=${encodeURIComponent(originalAvatar)}`;
+      return;
+    }
+    target.style.display = "none";
+  };
+
   return (
     <div className="comments-workspace">
       <header className="comments-page-heading">
@@ -427,9 +451,10 @@ export default function CommentsPage({
                               <img
                                 src={comment.avatar}
                                 alt={comment.nickname || comment.username}
-                                onError={(e) => {
-                                  e.target.style.display = "none";
-                                }}
+                                referrerPolicy="no-referrer"
+                                loading="lazy"
+                                decoding="async"
+                                onError={(e) => handleAvatarError(e, comment.avatar)}
                               />
                             ) : null}
                             <span>
@@ -541,9 +566,10 @@ export default function CommentsPage({
                                         <img
                                           src={reply.avatar}
                                           alt={reply.nickname || reply.username}
-                                          onError={(e) => {
-                                            e.target.style.display = "none";
-                                          }}
+                                          referrerPolicy="no-referrer"
+                                          loading="lazy"
+                                          decoding="async"
+                                          onError={(e) => handleAvatarError(e, reply.avatar)}
                                         />
                                       ) : null}
                                       <span>

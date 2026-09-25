@@ -12,6 +12,7 @@ import {
   Video,
   ShieldCheck,
 } from "lucide-react";
+import { ScrapeProgressBar } from "../components/ResearchProgress";
 
 export default function DashboardPage({
   selectedPlatform,
@@ -125,6 +126,10 @@ export default function DashboardPage({
               </button>
             </div>
           </form>
+          <ScrapeProgressBar
+            isScraping={isScraping}
+            platform={selectedPlatform}
+          />
           {scrapeError && (
             <div className="collection-feedback error" role="alert">
               <AlertCircle size={18} />
