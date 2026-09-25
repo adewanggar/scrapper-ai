@@ -124,22 +124,66 @@ function getDocIdFromFilename(filename) {
 
 /**
  * Save scraping result privately under users/{userId}/scrapes/{docId}
+ * Supports:
+ * - saveUserScrape(userId, filename, scrapeData)
+ * - saveUserScrape(userId, scrapeData)
  */
-export async function saveUserScrape(userId, scrapeData) {
+export async function saveUserScrape(userId, filenameOrData, optionalData) {
   if (!userId) throw new Error('User ID wajib untuk menyimpan data private.');
 
-  const filename = scrapeData.filename || `scrape_${Date.now()}.json`;
+  let filename = '';
+  let scrapeData = {};
+
+  if (typeof filenameOrData === 'string') {
+    filename = filenameOrData;
+    scrapeData = optionalData || {};
+  } else if (filenameOrData && typeof filenameOrData === 'object') {
+    scrapeData = filenameOrData;
+    filename = scrapeData.filename || (typeof optionalData === 'string' ? optionalData : '');
+  }
+
+  if (!filename) {
+    filename = scrapeData.filename || `scrape_${Date.now()}.json`;
+  }
+
   const docId = getDocIdFromFilename(filename);
   const docRef = doc(db, 'users', userId, 'scrapes', docId);
+
+  // Extract and sanitize comments to prevent Firestore crashing on `undefined` values
+  const rawComments = Array.isArray(scrapeData.comments) ? scrapeData.comments : [];
+  const sanitizedComments = rawComments.map((c, idx) => {
+    const rawReplies = Array.isArray(c.replies) ? c.replies : [];
+    return {
+      comment_id: String(c.comment_id || c.cid || `c_${idx + 1}`),
+      username: String(c.username || c.user || 'anonymous'),
+      nickname: String(c.nickname || c.username || 'User'),
+      comment: String(c.comment || c.text || ''),
+      create_time: String(c.create_time || ''),
+      avatar: String(c.avatar || ''),
+      like_count: Number(c.like_count || 0),
+      total_reply: Number(c.total_reply ?? rawReplies.length),
+      replies: rawReplies.map((r, rIdx) => ({
+        comment_id: String(r.comment_id || r.cid || `r_${idx}_${rIdx + 1}`),
+        username: String(r.username || r.user || 'anonymous'),
+        nickname: String(r.nickname || r.username || 'User'),
+        comment: String(r.comment || r.text || ''),
+        create_time: String(r.create_time || ''),
+        avatar: String(r.avatar || ''),
+        like_count: Number(r.like_count || 0),
+        total_reply: 0,
+        replies: []
+      }))
+    };
+  });
 
   const payload = {
     filename,
     userId,
-    caption: scrapeData.caption || '',
-    video_url: scrapeData.video_url || '',
-    comments_count: scrapeData.comments ? scrapeData.comments.length : (scrapeData.comments_count || 0),
-    comments: scrapeData.comments || [],
-    platform: scrapeData.platform || 'tiktok',
+    caption: String(scrapeData.caption || ''),
+    video_url: String(scrapeData.video_url || ''),
+    comments_count: sanitizedComments.length || Number(scrapeData.comments_count || 0),
+    comments: sanitizedComments,
+    platform: String(scrapeData.platform || (filename.startsWith('yt_') ? 'youtube' : 'tiktok')),
     modified: new Date().toISOString(),
     updatedAt: serverTimestamp(),
     createdAt: scrapeData.createdAt || new Date().toISOString()

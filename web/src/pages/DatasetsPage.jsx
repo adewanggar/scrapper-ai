@@ -12,7 +12,8 @@ import {
   Sparkles,
   Trash2,
   Users,
-  Video
+  Video,
+  RefreshCw
 } from 'lucide-react';
 import { deleteUserScrape, getUserScrapeContent } from '../firebase';
 
@@ -26,7 +27,9 @@ export default function DatasetsPage({
   loadFileContent,
   loadAiAnalysis,
   switchTab,
-  formatDate
+  formatDate,
+  syncServerFilesToFirestore,
+  isSyncingServer
 }) {
   const [fileSearchQuery, setFileSearchQuery] = useState('');
   const [filePlatformFilter, setFilePlatformFilter] = useState('all'); // 'all' | 'youtube' | 'tiktok'
@@ -120,14 +123,28 @@ export default function DatasetsPage({
                   <h2>Riwayat Dataset Penelitian</h2>
                   <p>Seluruh kumpulan dataset komentar TikTok dan YouTube yang tersimpan aman di akun privat Anda.</p>
                 </div>
-                <button
-                  className="btn btn-scrape-primary"
-                  onClick={() => switchTab('dashboard')}
-                  style={{ height: '38px', padding: '0 16px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
-                >
-                  <PlayCircle size={16} />
-                  <span>Scrape Dataset Baru</span>
-                </button>
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                  {syncServerFilesToFirestore && (
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => syncServerFilesToFirestore(true)}
+                      disabled={isSyncingServer}
+                      style={{ height: '38px', padding: '0 14px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                      title="Sinkronkan dataset dari server lokal ke akun Firestore Anda"
+                    >
+                      <RefreshCw size={15} style={isSyncingServer ? { animation: 'spin 1s linear infinite' } : {}} />
+                      <span>{isSyncingServer ? 'Menyinkronkan...' : 'Sinkronkan dari Server'}</span>
+                    </button>
+                  )}
+                  <button
+                    className="btn btn-scrape-primary"
+                    onClick={() => switchTab('dashboard')}
+                    style={{ height: '38px', padding: '0 16px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                  >
+                    <PlayCircle size={16} />
+                    <span>Scrape Dataset Baru</span>
+                  </button>
+                </div>
               </div>
 
               {/* Datasets Overview Stats Bar */}
@@ -258,10 +275,23 @@ export default function DatasetsPage({
                 <div className="empty-state-box">
                   <FolderArchive size={42} className="empty-state-icon" />
                   <h4>Belum ada dataset penelitian tersimpan</h4>
-                  <p>Mulai scraping video YouTube atau TikTok di tab Dashboard untuk mengumpulkan korpus komentar skripsi.</p>
-                  <button className="btn btn-scrape-primary" onClick={() => switchTab('dashboard')} style={{ height: '38px', padding: '0 16px' }}>
-                    Mulai Scraping
-                  </button>
+                  <p>Mulai scraping video YouTube atau TikTok di tab Dashboard, atau sinkronkan dataset yang ada di server lokal ke akun Firestore Anda.</p>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', marginTop: '14px' }}>
+                    {syncServerFilesToFirestore && (
+                      <button
+                        className="btn btn-secondary"
+                        onClick={() => syncServerFilesToFirestore(true)}
+                        disabled={isSyncingServer}
+                        style={{ height: '38px', padding: '0 16px', display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+                      >
+                        <RefreshCw size={15} style={isSyncingServer ? { animation: 'spin 1s linear infinite' } : {}} />
+                        <span>{isSyncingServer ? 'Menyinkronkan...' : 'Sinkronkan dari Server Lokal'}</span>
+                      </button>
+                    )}
+                    <button className="btn btn-scrape-primary" onClick={() => switchTab('dashboard')} style={{ height: '38px', padding: '0 16px' }}>
+                      Mulai Scraping
+                    </button>
+                  </div>
                 </div>
               ) : filteredAndSortedFiles.length === 0 ? (
                 <div className="empty-state-box">

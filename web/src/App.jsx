@@ -167,9 +167,63 @@ export default function App() {
     }
   };
 
+  // Sinkronisasi file yang ada di backend server ke Firestore user
+  const [isSyncingServer, setIsSyncingServer] = useState(false);
+  const syncServerFilesToFirestore = async (showNotice = false) => {
+    if (!currentUser) return;
+    setIsSyncingServer(true);
+    try {
+      const res = await fetch(`${API_BASE}/api/files`);
+      if (!res.ok) return;
+      const json = await res.json();
+      const serverFiles = json.files || [];
+      if (!serverFiles.length) return;
+
+      const userScrapes = await getUserScrapes(currentUser.uid);
+      const existingFilenames = new Set(userScrapes.map((f) => f.filename));
+
+      let syncedCount = 0;
+      for (const sf of serverFiles) {
+        if (!existingFilenames.has(sf.filename)) {
+          try {
+            const detailRes = await fetch(`${API_BASE}/api/files/${encodeURIComponent(sf.filename)}`);
+            if (detailRes.ok) {
+              const fileData = await detailRes.json();
+              if (fileData) {
+                fileData.filename = sf.filename;
+                await saveUserScrape(currentUser.uid, sf.filename, fileData);
+                syncedCount++;
+              }
+            }
+          } catch (syncErr) {
+            console.warn(`Gagal menyinkronkan file ${sf.filename}:`, syncErr);
+          }
+        }
+      }
+
+      if (syncedCount > 0) {
+        console.log(`Berhasil menyinkronkan ${syncedCount} file dari server ke Firestore.`);
+        await fetchFilesList();
+        if (showNotice) {
+          alert(`Berhasil menyinkronkan ${syncedCount} dataset dari server lokal ke akun Firestore Anda!`);
+        }
+      } else if (showNotice) {
+        alert('Semua dataset di server lokal sudah tersinkronisasi di akun Firestore Anda.');
+      }
+    } catch (err) {
+      console.warn('Gagal cek sinkronisasi server ke Firestore:', err);
+      if (showNotice) {
+        alert('Gagal menyinkronkan data: ' + (err.message || err));
+      }
+    } finally {
+      setIsSyncingServer(false);
+    }
+  };
+
   useEffect(() => {
     if (currentUser) {
       fetchFilesList();
+      syncServerFilesToFirestore(false);
     }
   }, [currentUser]);
 
@@ -339,16 +393,35 @@ export default function App() {
       }
 
       if (currentUser && result.filename) {
-        let fullData = null;
-        try {
-          const detailRes = await fetch(`${API_BASE}/api/files/${encodeURIComponent(result.filename)}`);
-          if (detailRes.ok) {
-            fullData = await detailRes.json();
+        // Gunakan result.data langsung yang sudah dikirim oleh API
+        let fullData = result.data || null;
+
+        // Fallback: jika result.data kosong, coba fetch dari server disk
+        if (!fullData || !fullData.comments || fullData.comments.length === 0) {
+          try {
+            const detailRes = await fetch(`${API_BASE}/api/files/${encodeURIComponent(result.filename)}`);
+            if (detailRes.ok) {
+              const diskData = await detailRes.json();
+              if (diskData && diskData.comments && diskData.comments.length > 0) {
+                fullData = diskData;
+              }
+            }
+          } catch (fetchErr) {
+            console.warn('Gagal fetch file detail dari server:', fetchErr);
           }
-        } catch {}
+        }
 
         if (fullData) {
-          await saveUserScrape(currentUser.uid, result.filename, fullData);
+          fullData.platform = fullData.platform || result.platform || selectedPlatform;
+          fullData.filename = result.filename;
+          try {
+            console.log('Menyimpan hasil scrape ke Firestore untuk user:', currentUser.uid, result.filename);
+            await saveUserScrape(currentUser.uid, result.filename, fullData);
+            console.log('✅ Berhasil menyimpan dataset ke Firestore!');
+          } catch (fsErr) {
+            console.error('❌ Gagal menyimpan dataset ke Firestore:', fsErr);
+            setScrapeError(`Perhatian: Data berhasil di-scrape di server (${result.filename}), namun gagal disimpan ke Firestore: ${fsErr.message}`);
+          }
         }
       }
 
@@ -797,6 +870,8 @@ export default function App() {
               loadAiAnalysis={loadAiAnalysis}
               switchTab={switchTab}
               formatDate={formatDate}
+              syncServerFilesToFirestore={syncServerFilesToFirestore}
+              isSyncingServer={isSyncingServer}
             />
           )}
 
