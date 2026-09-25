@@ -22,7 +22,7 @@ export default function AiHistory({ files, kind, selectedFile, onOpen, loading =
     {!loading && !error && !filtered.length && <p className="ai-history-empty">{entries.length ? 'Tidak ada hasil yang sesuai pencarian atau dataset ini.' : 'Belum ada hasil AI tersimpan. Hasil yang berhasil diproses akan muncul di sini.'}</p>}
     <div className="ai-history-grid">{(expanded ? filtered : filtered.slice(0, 6)).map(entry => <article key={entry.id} className={`ai-history-card ${entry.id === openedId ? 'is-open' : ''}`}>
       <div className="ai-history-meta"><span>{entry.filename === selectedFile ? 'Dataset aktif' : 'Dataset lain'}</span><span>{entry.id === openedId ? 'Sedang dibuka' : 'Tersimpan'}</span></div>
-      <h3>{entry.caption}</h3><strong>{entry.title}</strong><p className="ai-history-summary">{entry.summary}</p>
+      <h3 title={entry.caption}>{entry.caption}</h3><strong>{entry.title}</strong><p className="ai-history-summary">{entry.summary}</p>
       <small>{entry.count != null && `${entry.count} ${kind === 'analysis' ? 'komentar dianalisis' : kind === 'titles' ? 'ide judul' : 'teori'} · `}
         {Number.isFinite(Date.parse(entry.updatedAt)) ? <time dateTime={entry.updatedAt}>{new Date(entry.updatedAt).toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'short' })}</time> : 'Waktu belum tercatat'}</small>
       <button type="button" disabled={disabled || loading} onClick={() => onOpen(entry)} aria-label={`Buka hasil ${entry.title} untuk ${entry.caption}`}>Buka Hasil <ArrowUpRight size={15} /></button>

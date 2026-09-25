@@ -1,4 +1,4 @@
-.research-page { max-width: 1200px; margin: 0 auto; color: var(--text-primary, #23362f); padding-bottom: 30px; }
+.research-page { width: 100%; min-width: 0; margin: 0; color: var(--text-primary, #23362f); padding-bottom: 30px; }
 .research-page h1 { font-size: clamp(1.6rem, 3vw, 2.3rem); margin: 12px 0; }
 .research-page h2 { font-size: 1.2rem; line-height: 1.5; }
 .research-page h3 { font-size: .95rem; margin: 18px 0 6px; }
